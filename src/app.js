@@ -19,6 +19,7 @@
   var DAY_MS = 24 * HOUR_MS;
   var SAMPLES = 720;          // points per timeline
   var SEARCH_DAYS = 90;       // how far ahead to look for the next rise or set
+  var PLAY_MS = 16000;        // Play runs the whole look-ahead period in this long
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var COMPASS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 
@@ -35,6 +36,12 @@
   var results = null;   // last good { a, b, windowDays, scale }
   var drawn = null;     // chart handles for the cursor
   var cursorIndex = 0;
+  var globe = null;     // the 3D Moon, or null when the browser cannot draw it
+  var framed = false;   // true once the globe has been turned to show both sites
+  var playing = null;   // { from, t0, raf } while Play is running
+  var linkView = null;  // a link can aim the globe: g=latitude,longitude,zoom
+  var playButton = document.getElementById('play');
+  var scrub = document.getElementById('scrub');
 
   /* ---------- small helpers ---------- */
 
@@ -129,7 +136,7 @@
     var landingBtn = $(fs, '[data-action=landing]');
     p.textContent = '';
     if (!site) {
-      p.textContent = 'Your own coordinates. Longitude counts east: 90°W is −90. Height is above the 1737.4 km sphere.';
+      p.textContent = 'Your own coordinates. Longitude counts east: 90°W is −90. Height is above the 1737.4 km sphere; a click on the 3D Moon fills it in from NASA LOLA data.';
       if (landingBtn) landingBtn.hidden = true;
       return;
     }
@@ -412,11 +419,127 @@
 
   function setCursor(index) {
     if (!results || !drawn) return;
-    cursorIndex = Math.min(SAMPLES, Math.max(0, index));
+    cursorIndex = Math.min(SAMPLES, Math.max(0, Math.round(index)));
     ['a', 'b'].forEach(function (key) {
       drawn[key].timeline.setCursor(cursorIndex);
       drawn[key].panorama.setCursor(cursorIndex);
       renderReadout(key, cursorIndex);
+    });
+    renderMoon();
+  }
+
+  /* ---------- 3D Moon ---------- */
+
+  /* Light the globe for the time under the cursor and put the markers on it. */
+  function renderMoon() {
+    var A = results.a, B = results.b;
+    var s = A.samples[cursorIndex];
+    var text = 'Sunlight as of ' + fmtUtc(s.ms, true) +
+      (cursorIndex === 0 ? ', the chosen time' : ', ' + fmtDuration(s.hours) + ' later');
+    if (A.scn.startMs !== B.scn.startMs) text += '. The globe follows scenario A’s clock.';
+    document.getElementById('moon-time').textContent = text;
+    scrub.value = cursorIndex;
+    scrub.setAttribute('aria-valuetext', text);
+    if (!globe) return;
+    var sub = Sky.subPoints(new Date(s.ms));
+    globe.setSun(sub.sun.direction);
+    globe.setMarkers([
+      { kind: 'sun', label: 'Sun overhead', latDeg: sub.sun.latDeg, lonEastDeg: sub.sun.lonEastDeg },
+      { kind: 'earth', label: 'Earth overhead', latDeg: sub.earth.latDeg, lonEastDeg: sub.earth.lonEastDeg },
+      { kind: 'site', label: 'A', latDeg: A.scn.site.latDeg, lonEastDeg: A.scn.site.lonEastDeg },
+      { kind: 'site', label: 'B', latDeg: B.scn.site.latDeg, lonEastDeg: B.scn.site.lonEastDeg }
+    ]);
+  }
+
+  /* Turn the globe so both sites show, tipped toward the equator so the Moon stays recognisable. */
+  function frameSites(animate) {
+    if (!globe || !results) return;
+    var rad = Math.PI / 180;
+    var sum = [0, 0, 0];
+    [results.a, results.b].forEach(function (R) {
+      var lat = R.scn.site.latDeg * rad, lon = R.scn.site.lonEastDeg * rad;
+      sum[0] += Math.cos(lat) * Math.cos(lon);
+      sum[1] += Math.cos(lat) * Math.sin(lon);
+      sum[2] += Math.sin(lat);
+    });
+    var len = Math.sqrt(sum[0] * sum[0] + sum[1] * sum[1] + sum[2] * sum[2]);
+    var site = results.a.scn.site;
+    var lat = site.latDeg, lon = site.lonEastDeg;
+    if (len > 0.5) {
+      lat = Math.asin(sum[2] / len) / rad;
+      lon = Math.atan2(sum[1], sum[0]) / rad;
+    }
+    globe.lookAt(lat * 0.62, lon, 1, animate);
+    framed = true;
+  }
+
+  function setPlaying(on) {
+    if (on === !!playing) return;
+    playButton.textContent = on ? 'Pause' : 'Play';
+    playButton.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (!on) {
+      cancelAnimationFrame(playing.raf);
+      playing = null;
+      return;
+    }
+    if (cursorIndex >= SAMPLES) setCursor(0);
+    playing = { from: cursorIndex, t0: performance.now(), raf: 0 };
+    playing.raf = requestAnimationFrame(playStep);
+  }
+
+  function playStep(now) {
+    if (!playing) return;
+    var index = Math.floor(playing.from + (now - playing.t0) / PLAY_MS * SAMPLES);
+    if (index >= SAMPLES) {
+      setCursor(SAMPLES);
+      setPlaying(false);
+      return;
+    }
+    if (index !== cursorIndex) setCursor(index);
+    playing.raf = requestAnimationFrame(playStep);
+  }
+
+  function initGlobe() {
+    var host = document.getElementById('globe');
+    try {
+      globe = window.LunarGlobe ? window.LunarGlobe.create(host, window.MoonMaps) : null;
+    } catch (e) {
+      globe = null;
+    }
+    if (!globe) {
+      host.classList.add('is-off');
+      host.removeAttribute('tabindex');
+      document.getElementById('globe-msg').textContent =
+        'This browser cannot draw the 3D Moon. Everything else on the page still works.';
+      document.querySelector('.views').hidden = true;
+      document.getElementById('pick-choice').hidden = true;
+      return;
+    }
+    document.getElementById('relief-x').textContent = globe.reliefExaggeration;
+
+    globe.onPick = function (place) {
+      var fs = fieldsets[document.querySelector('[name=pick]:checked').value];
+      $(fs, '[name=site]').value = 'custom';
+      $(fs, '[name=lat]').value = Number(place.latDeg.toFixed(2));
+      var lon = Number(place.lonEastDeg.toFixed(2));
+      $(fs, '[name=lon]').value = lon === -180 ? 180 : lon;
+      $(fs, '[name=elev]').value = place.heightKm == null ? 0 : Number(place.heightKm.toFixed(2));
+      showSource(fs);
+      update();
+    };
+
+    host.querySelectorAll('[data-zoom]').forEach(function (b) {
+      b.addEventListener('click', function () { globe.zoomBy(b.getAttribute('data-zoom') === 'in' ? 1.6 : 1 / 1.6); });
+    });
+    document.querySelectorAll('[data-view]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var v = b.getAttribute('data-view');
+        if (v === 'near') globe.lookAt(0, 0, 1);
+        else if (v === 'far') globe.lookAt(0, 180, 1);
+        else if (v === 'south') globe.lookAt(-90, 0, 1.6);
+        else if (v === 'north') globe.lookAt(90, 0, 1.6);
+        else if (results) globe.lookAt(results[v].scn.site.latDeg, results[v].scn.site.lonEastDeg, 2.5);
+      });
     });
   }
 
@@ -442,16 +565,15 @@
   function wireChart(key) {
     var host = $(chartCols[key], '[data-role=timeline]');
     host.addEventListener('pointermove', function (e) {
-      if (drawn) setCursor(drawn[key].timeline.indexAt(e.clientX));
+      if (drawn && !playing) setCursor(drawn[key].timeline.indexAt(e.clientX));
     });
     host.addEventListener('pointerdown', function (e) {
+      setPlaying(false);
       if (drawn) setCursor(drawn[key].timeline.indexAt(e.clientX));
-    });
-    host.addEventListener('pointerleave', function (e) {
-      if (e.pointerType === 'mouse') setCursor(0);
     });
     host.addEventListener('keydown', function (e) {
       var step = e.shiftKey ? 24 : 1;
+      if (/^(Arrow(Left|Right)|Home|End)$/.test(e.key)) setPlaying(false);
       if (e.key === 'ArrowRight') setCursor(cursorIndex + step);
       else if (e.key === 'ArrowLeft') setCursor(cursorIndex - step);
       else if (e.key === 'Home') setCursor(0);
@@ -485,7 +607,8 @@
     var list = document.getElementById('sources');
     var items = [
       ['NASA JPL Horizons System', 'https://ssd.jpl.nasa.gov/horizons/', 'reference positions used to check every calculation'],
-      ['Astronomy Engine 2.1.19 by Don Cross (MIT license)', 'https://github.com/cosinekitty/astronomy', 'Sun, Earth, and Moon positions and the Moon’s rotation']
+      ['Astronomy Engine 2.1.19 by Don Cross (MIT license)', 'https://github.com/cosinekitty/astronomy', 'Sun, Earth, and Moon positions and the Moon’s rotation'],
+      ['NASA Scientific Visualization Studio, CGI Moon Kit', 'https://svs.gsfc.nasa.gov/4720/', 'the 3D Moon’s colour map (LROC wide-angle camera) and heights (LOLA laser altimeter), both from the Lunar Reconnaissance Orbiter']
     ];
     var seen = {};
     SITES.forEach(function (s) {
@@ -545,6 +668,21 @@
     reconcileSite(fs);
   }
 
+  /* Starting state: from the link if it carries one, otherwise IM-1 against IM-2, now. */
+  function applyLink() {
+    var h = readHash();
+    var g = (h.g || '').split(',').map(parseFloat);
+    linkView = g.length === 3 && g.every(isFinite) ? g : null;
+    var nowValue = toInputValue(Date.now());
+    $(fieldsets.a, '[name=time]').value = nowValue;
+    $(fieldsets.b, '[name=time]').value = nowValue;
+    setScenario('a', h.a || ',,,im1', h.ta);
+    setScenario('b', h.b || ',,,im2', h.tb === 'same' ? null : h.tb);
+    $(fieldsets.b, '[name=sameTime]').checked = !h.tb || h.tb === 'same';
+    var radio = form.querySelector('[name=window][value="' + (parseInt(h.w, 10) || 30) + '"]');
+    if (radio) radio.checked = true;
+  }
+
   /* ---------- main update ---------- */
 
   function update() {
@@ -563,7 +701,6 @@
     results = { a: A, b: B, windowDays: days };
     document.getElementById('scale-note').hidden = A.scale.max === B.scale.max;
     document.getElementById('verdict-note').hidden = a.startMs === b.startMs;
-    cursorIndex = 0;
 
     document.getElementById('head-a').textContent = a.name;
     document.getElementById('head-b').textContent = b.name + (b.startMs !== a.startMs ? ', ' + fmtUtc(b.startMs, true) : '');
@@ -572,6 +709,13 @@
     renderCharts();
     renderSamples(A, B);
     writeHash(A, B, days);
+    // Turn the globe when it has not been aimed yet, or when a site has gone round the back.
+    var wasFramed = framed;
+    if (globe && (!framed ||
+        !globe.isVisible(a.site.latDeg, a.site.lonEastDeg) || !globe.isVisible(b.site.latDeg, b.site.lonEastDeg))) {
+      frameSites(framed);
+      if (!wasFramed && linkView) globe.lookAt(linkView[0], linkView[1], linkView[2], false);
+    }
   }
 
   var pending = null;
@@ -625,20 +769,25 @@
       }
     });
 
-    // Starting state: from the link if it carries one, otherwise IM-1 against IM-2, now.
-    var h = readHash();
-    var nowValue = toInputValue(Date.now());
-    $(fieldsets.a, '[name=time]').value = nowValue;
-    $(fieldsets.b, '[name=time]').value = nowValue;
-    setScenario('a', h.a || ',,,im1', h.ta);
-    setScenario('b', h.b || ',,,im2', h.tb === 'same' ? null : h.tb);
-    $(fieldsets.b, '[name=sameTime]').checked = !h.tb || h.tb === 'same';
-    if (h.w) {
-      var radio = form.querySelector('[name=window][value="' + parseInt(h.w, 10) + '"]');
-      if (radio) radio.checked = true;
-    }
+    applyLink();
+    // A link pasted into a tab that already shows the page changes only the part after the #.
+    window.addEventListener('hashchange', function () {
+      setPlaying(false);
+      cursorIndex = 0;
+      framed = false;
+      applyLink();
+      update();
+    });
+
+    playButton.addEventListener('click', function () { setPlaying(!playing); });
+    scrub.max = SAMPLES;
+    scrub.addEventListener('input', function () {
+      setPlaying(false);
+      setCursor(parseInt(scrub.value, 10));
+    });
 
     renderSources();
+    initGlobe();
     update();
 
     var resizeTimer = null;

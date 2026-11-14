@@ -139,6 +139,26 @@
     };
   }
 
+  /*
+   * Where on the Moon the Sun, and the Earth, are straight overhead.
+   * Returns { utc, sun: { latDeg, lonEastDeg, direction }, earth: {...} }.
+   * `direction` is a unit vector in the Moon-fixed frame (x through 0 N 0 E,
+   * z through the north pole); the 3D view lights the globe along it.
+   */
+  function subPoints(date) {
+    var d = toDate(date);
+    var bodies = bodiesMoonFixed(d);
+    function point(v) {
+      var r = norm(v);
+      return {
+        latDeg: Math.asin(v[2] / r) / DEG,
+        lonEastDeg: Math.atan2(v[1], v[0]) / DEG,
+        direction: [v[0] / r, v[1] / r, v[2] / r]
+      };
+    }
+    return { utc: d.toISOString(), sun: point(bodies.sun), earth: point(bodies.earth) };
+  }
+
   function elevation(site, body, ms) {
     return skyAt(site, new Date(ms))[body].elevationDeg;
   }
@@ -231,6 +251,7 @@
   return {
     MOON_RADIUS_KM: MOON_RADIUS_KM,
     skyAt: skyAt,
+    subPoints: subPoints,
     nextCrossing: nextCrossing,
     timeline: timeline,
     visibilityHours: visibilityHours

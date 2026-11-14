@@ -23,11 +23,42 @@
   <header class="masthead">
     <div class="wrap">
       <h1>Lunar Landing Site Navigator</h1>
-      <p class="lede">Two landing scenarios, side by side. See where the Sun and the Earth sit above each horizon, and how long each one stays up.</p>
+      <p class="lede">Pick two landing sites and a date. See both on the Moon in that day's sunlight, and how long the Sun and the Earth stay above each horizon.</p>
     </div>
   </header>
 
   <main class="wrap">
+    <div class="stage">
+    <section class="moon" aria-labelledby="moon-h">
+      <h2 id="moon-h">Both sites on the Moon</h2>
+      <p class="moon-time" id="moon-time"></p>
+      <div class="globe" id="globe" tabindex="0" role="group" aria-label="3D Moon lit from the Sun's real direction. Drag or use the arrow keys to turn it, plus and minus to zoom. A click moves a site.">
+        <div class="globe-zoom">
+          <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+          <button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>
+        </div>
+        <p class="globe-msg" id="globe-msg">Loading the Moon map</p>
+      </div>
+      <div class="transport">
+        <button type="button" class="quiet" id="play" aria-pressed="false">Play</button>
+        <input type="range" id="scrub" min="0" max="720" step="1" value="0" aria-label="Time within the look-ahead period">
+      </div>
+      <div class="views" role="group" aria-label="Turn the Moon to">
+        <button type="button" class="quiet" data-view="near">Near side</button>
+        <button type="button" class="quiet" data-view="far">Far side</button>
+        <button type="button" class="quiet" data-view="south">South pole</button>
+        <button type="button" class="quiet" data-view="north">North pole</button>
+        <button type="button" class="quiet" data-view="a">Site A</button>
+        <button type="button" class="quiet" data-view="b">Site B</button>
+      </div>
+      <fieldset class="segmented" id="pick-choice">
+        <legend>A click on the Moon moves</legend>
+        <label><input type="radio" name="pick" value="a" checked><span>Site A</span></label>
+        <label><input type="radio" name="pick" value="b"><span>Site B</span></label>
+      </fieldset>
+      <p class="hint" id="globe-credit">Imagery and elevation: NASA Lunar Reconnaissance Orbiter (LROC colour mosaic, LOLA heights) from NASA's CGI Moon Kit. Slopes are drawn <span id="relief-x">3</span> times steeper than they are so craters show. Nothing casts a shadow here, so a lit crater floor on the globe can be dark on the real Moon. Near the poles the NASA mosaic also carries the shadows from the day each strip was photographed.</p>
+    </section>
+
     <form class="setup" id="setup" aria-label="Scenarios to compare" onsubmit="return false">
       <fieldset class="scenario" data-scenario="a">
         <legend><span class="tag">A</span> First scenario</legend>
@@ -81,6 +112,7 @@
         <span class="copied" id="copied" role="status" aria-live="polite"></span>
       </div>
     </form>
+    </div>
 
     <section class="verdict" aria-labelledby="verdict-h">
       <h2 id="verdict-h">What changes between A and B</h2>
@@ -142,7 +174,7 @@
           <div class="plot strips" data-role="strips"></div>
         </div>
       </div>
-      <p class="hint">Move the pointer over either timeline, or focus it and use the arrow keys. Both scenarios move together.</p>
+      <p class="hint">Move the pointer over either timeline, or focus it and use the arrow keys. Both scenarios and the 3D Moon move together.</p>
       <details class="data-table">
         <summary>Show the values as a table</summary>
         <div class="table-scroll">
@@ -195,6 +227,8 @@
   <script src="src/lunar-sky.js"></script>
   <script src="src/sites.js"></script>
   <script src="src/charts.js"></script>
+  <script src="vendor/moon-maps.js"></script>
+  <script src="src/globe.js"></script>
   <script src="src/app.js"></script>
 </body>
 </html>

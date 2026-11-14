@@ -15,6 +15,7 @@ const path = require('node:path');
 const LunarSky = require('../src/lunar-sky.js');
 
 const REF_DIR = path.join(__dirname, '..', 'reference', 'horizons');
+const SUBPOINT_DIR = path.join(__dirname, '..', 'reference', 'horizons-subpoints');
 const TOLERANCE_DEG = 0.02; // worst measured difference on 2026-11-14 was 0.0073
 
 function load(name) {
@@ -126,3 +127,26 @@ test('bad input is rejected with a clear message', () => {
   assert.throws(() => LunarSky.skyAt({ latDeg: 0, lonEastDeg: 0 }, 'not a date'), /Invalid date/);
   assert.throws(() => LunarSky.nextCrossing({ latDeg: 0, lonEastDeg: 0 }, 'mars', new Date()), /body must be/);
 });
+
+// The 3D Moon is lit from the sub-solar point and marks the sub-Earth point.
+// Distances on the sphere are compared, so longitude error near a pole is not overweighted.
+for (const file of fs.readdirSync(SUBPOINT_DIR).filter((f) => f.endsWith('.json'))) {
+  test(`sub-solar and sub-Earth points match Horizons: ${file}`, () => {
+    const doc = JSON.parse(fs.readFileSync(path.join(SUBPOINT_DIR, file), 'utf8'));
+    assert.ok(doc.rows.length > 100);
+    const rad = Math.PI / 180;
+    let worst = 0;
+    for (const row of doc.rows) {
+      const ours = LunarSky.subPoints(row.utc);
+      for (const body of ['sun', 'earth']) {
+        const lat = row[body].lat_deg * rad;
+        const lon = row[body].lon_east_deg * rad;
+        const ref = [Math.cos(lat) * Math.cos(lon), Math.cos(lat) * Math.sin(lon), Math.sin(lat)];
+        const d = ours[body].direction;
+        const cos = Math.min(1, ref[0] * d[0] + ref[1] * d[1] + ref[2] * d[2]);
+        worst = Math.max(worst, Math.acos(cos) / rad);
+      }
+    }
+    assert.ok(worst < TOLERANCE_DEG, `worst separation ${worst.toFixed(4)} degrees`);
+  });
+}

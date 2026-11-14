@@ -8,7 +8,7 @@ and metadata. This file is the running log.
 
 | Tool | Used for |
 | --- | --- |
-| Claude Code (Anthropic, model Claude Fable 5.2) | Writing code, tests, and documentation under the team's direction; reading the official Space Apps pages and guides; querying NASA JPL Horizons for reference data |
+| Claude Code (Anthropic, model Claude Fable 5.2) | Writing code, tests, and documentation under the team's direction; reading the official Space Apps pages and guides; querying NASA JPL Horizons for reference data; downloading and converting NASA's Moon maps |
 
 ## Where the idea came from
 
@@ -22,7 +22,8 @@ the challenge statement.
 - Every AI-written source file starts with an "SI disclosure" comment.
 - Commits made with the tool carry a `Co-Authored-By: Claude` trailer.
 - No AI-generated images, video, or audio are in the project so far. If any
-  are added they carry a visible watermark.
+  are added they carry a visible watermark. The 3D Moon is NASA imagery drawn
+  by code; no image model made any part of it.
 - Nothing generated uses NASA logos, flags, or mission identifiers.
 
 ## Log
@@ -33,8 +34,13 @@ the challenge statement.
 | Sat Nov 14, 10:07 | Wrote the first README and this log. | `README.md`, `SI_USE.md`, `SOURCES.md` |
 | Sat Nov 14, 10:07-10:22 | Read the NASA and LROC pages for site coordinates. Wrote the comparison page: form, verdict sentences, numbers table, horizon view, timeline, visibility bars. Chose the visual design. Took screenshots to check the layout. | `index.html`, `css/style.css`, `src/sites.js`, `src/charts.js`, `src/app.js` |
 
+| Sat Nov 14, 10:25-11:00 | Added the 3D Moon: wrote the script that converts NASA's colour and elevation maps, the WebGL globe, the sub-solar point calculation and its Horizons tests, the Play button and time slider. Moved the form beside the globe. Checked clicks, drag, zoom, and Play in a browser. | `src/globe.js`, `tools/build_moon_maps.py`, `tools/fetch_subpoints.py`, `src/lunar-sky.js`, `src/app.js`, `index.html`, `css/style.css`, `test/lunar-sky.test.js` |
+
 ## Not written by AI
 
 - `vendor/astronomy.browser.js`: Astronomy Engine by Don Cross, MIT license.
-- `reference/horizons/*.json`: numbers returned by NASA JPL Horizons. The
-  script only reformats them.
+- `reference/horizons/*.json`, `reference/horizons-subpoints/*.json`: numbers
+  returned by NASA JPL Horizons. The scripts only reformat them.
+- `vendor/moon-maps.js`: NASA imagery and elevation. The build script resizes
+  the colour map, works out ground slopes from the elevation grid, and stores
+  both as text.

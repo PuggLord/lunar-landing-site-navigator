@@ -130,6 +130,183 @@ main > section,
 main > form { padding: 28px 0; }
 main > section { border-top: 1px solid var(--hairline); }
 
+/* ---------- stage: the Moon beside the scenario form ---------- */
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 500px) minmax(0, 1fr);
+  column-gap: 48px;
+  row-gap: 28px;
+  align-items: start;
+  padding: 28px 0;
+}
+
+.moon-time {
+  margin-top: 4px;
+  min-height: 1.5em;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The view is a window onto space, so it stays dark in both themes and
+   carries its own colours for the things drawn on it. */
+.globe {
+  --sun: #d95926;
+  --earth: #3987e5;
+  position: relative;
+  margin-top: 12px;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #090a0c;
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.globe.is-dragging { cursor: grabbing; }
+.globe.is-off { aspect-ratio: auto; cursor: default; }
+.globe canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+.globe-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+.globe.is-ready canvas,
+.globe.is-ready .globe-markers { opacity: 1; }
+
+.globe-msg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: #96948d;
+  font-size: 14px;
+  text-align: center;
+}
+.globe.is-ready .globe-msg { display: none; }
+.globe.is-off .globe-msg { position: static; color: #c3c2b7; }
+.globe.is-off .globe-zoom { display: none; }
+
+.globe-marker { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.globe-marker i {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #f4f3ef;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(9, 10, 12, 0.8), inset 0 0 0 1px rgba(9, 10, 12, 0.8);
+}
+.globe-marker span {
+  position: absolute;
+  left: 12px;
+  top: -11px;
+  padding: 0 7px;
+  border-radius: 3px;
+  background: rgba(9, 10, 12, 0.74);
+  color: #f0efec;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.globe-marker.label-left span { left: auto; right: 12px; }
+.globe-marker-site span {
+  min-width: 22px;
+  padding: 0 6px;
+  background: #f4f3ef;
+  color: #14140f;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.globe-marker-sun i { background: var(--sun); box-shadow: 0 0 0 1px rgba(9, 10, 12, 0.8); }
+.globe-marker-earth i { background: var(--earth); box-shadow: 0 0 0 1px rgba(9, 10, 12, 0.8); }
+
+.globe-zoom {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 1;
+  display: grid;
+}
+.globe-zoom button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(240, 239, 236, 0.3);
+  background: rgba(9, 10, 12, 0.72);
+  color: #f0efec;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 150ms ease-out;
+}
+.globe-zoom button:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+.globe-zoom button:last-child { border-radius: 0 0 var(--radius) var(--radius); margin-top: -1px; }
+.globe-zoom button:hover { background: rgba(58, 58, 55, 0.92); }
+.globe-zoom button:focus-visible { outline-color: #f0efec; outline-offset: -3px; }
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.transport button { flex: none; min-width: 76px; }
+.transport input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  margin: 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.views button.quiet { height: 32px; padding: 0 10px; font-size: 13px; }
+
+#pick-choice { margin-top: 12px; }
+.moon > .hint { margin-top: 12px; }
+
+.stage .setup { grid-template-columns: 1fr; row-gap: 0; max-width: 640px; }
+.stage .scenario[data-scenario="b"] { margin-top: 36px; }
+.stage .scenario[data-scenario="b"]::before {
+  display: block;
+  left: 0;
+  right: 0;
+  top: -18px;
+  bottom: auto;
+  border-left: 0;
+  border-top: 1px solid var(--hairline);
+}
+.stage .shared { margin-top: 20px; }
+
+@media (max-width: 1040px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .moon { max-width: 560px; }
+}
+
 /* ---------- scenario form ---------- */
 
 .setup {
@@ -141,12 +318,17 @@ main > section { border-top: 1px solid var(--hairline); }
 
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 
+/* A floated legend stops the browser from drawing it across the fieldset's
+   top edge, so the fieldset lays out like a plain block. */
 .scenario legend {
+  float: left;
+  width: 100%;
   padding: 0;
   margin-bottom: 14px;
   font-size: 18px;
   font-weight: 650;
 }
+.scenario legend + * { clear: both; }
 .scenario[data-scenario="b"] { position: relative; }
 .scenario[data-scenario="b"]::before {
   content: "";
