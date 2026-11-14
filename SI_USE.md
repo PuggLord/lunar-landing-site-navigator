@@ -29,9 +29,9 @@ the challenge statement.
 
 | When (US Central) | What the tool did | Files |
 | --- | --- | --- |
-| Sat Nov 14, 10:01-10:10 | Wrote the Sun/Earth sky calculation, the Horizons download script, and the tests. Ran the comparison and reported the errors. | `src/lunar-sky.js`, `tools/fetch_horizons.py`, `test/lunar-sky.test.js` |
-| Sat Nov 14, 10:10 | Wrote the first README and this log. | `README.md`, `SI_USE.md`, `SOURCES.md` |
-| Sat Nov 14, 10:10-10:22 | Read the NASA and LROC pages for site coordinates. Wrote the comparison page: form, verdict sentences, numbers table, horizon view, timeline, visibility bars. Chose the visual design. Took screenshots to check the layout. | `index.html`, `css/style.css`, `src/sites.js`, `src/charts.js`, `src/app.js` |
+| Sat Nov 14, 10:01-10:07 | Wrote the Sun/Earth sky calculation, the Horizons download script, and the tests. Ran the comparison and reported the errors. | `src/lunar-sky.js`, `tools/fetch_horizons.py`, `test/lunar-sky.test.js` |
+| Sat Nov 14, 10:07 | Wrote the first README and this log. | `README.md`, `SI_USE.md`, `SOURCES.md` |
+| Sat Nov 14, 10:07-10:22 | Read the NASA and LROC pages for site coordinates. Wrote the comparison page: form, verdict sentences, numbers table, horizon view, timeline, visibility bars. Chose the visual design. Took screenshots to check the layout. | `index.html`, `css/style.css`, `src/sites.js`, `src/charts.js`, `src/app.js` |
 
 ## Not written by AI
 
