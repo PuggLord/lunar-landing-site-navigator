@@ -1,0 +1,190 @@
+<!doctype html>
+<!--
+  SI disclosure: this page was drafted with an AI coding tool (Claude Code,
+  Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026,
+  directed and reviewed by team Ksig UNT. See SI_USE.md.
+
+  The pictures are screenshots of the project's own page. No image model made
+  any part of them. Every figure in the text was read from the tool.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Our thinking: Lunar Landing Site Navigator</title>
+  <meta name="description" content="The choices behind Lunar Landing Site Navigator, and one comparison followed from its inputs to the sentence on screen.">
+  <meta name="generator" content="Drafted with Claude Code (AI tool); see SI_USE.md">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050608">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="think-page">
+  <header class="think-top">
+    <a class="mark" href="index.html">Lunar Landing Site Navigator</a>
+    <nav class="think-nav" aria-label="Project pages">
+      <a href="index.html">Open the tool</a>
+      <a href="deck/index.html">Slides</a>
+    </nav>
+  </header>
+
+  <main class="think">
+    <section class="band think-open" aria-labelledby="think-h">
+      <h1 id="think-h">Our thinking</h1>
+      <div class="band-body">
+        <p class="think-lede">The choices behind the tool, and one comparison followed from its inputs to the sentence on screen.</p>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="question-h">
+      <h2 id="question-h">The question we started from</h2>
+      <div class="band-body prose">
+        <p>The challenge asks for a way to see where the Sun and the Earth sit in the sky over a lunar landing site, and how that changes when the site or the date changes. The data already exists. JPL Horizons gives the positions, and Quickmap and Moon Trek show the terrain. None of them is built to put two options next to each other.</p>
+        <p>That gap matters most near the south pole, where IM-1 landed and IM-2 was aimed. The Sun and the Earth both stay within a few degrees of the horizon there, so a small change in site or date can decide whether a lander has power and a line home. We wanted someone to be able to change one thing and see what it costs.</p>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="choices-h">
+      <h2 id="choices-h">The choices we made</h2>
+      <div class="band-body">
+        <ul class="choices">
+          <li>
+            <h3>Two scenarios at once</h3>
+            <div class="prose">
+              <p>The challenge describes planners weighing options: one site against another, or a landing date against a later one. So the tool holds two scenarios, A and B, and each chart and table shows both of them.</p>
+            </div>
+          </li>
+          <li>
+            <h3>The answer comes first, as a sentence</h3>
+            <div class="prose">
+              <p>Charts take time to read. The first thing on the page is a plain sentence such as &ldquo;B loses the Sun first, in 7 d 16 h. A keeps it 23 h longer.&rdquo; The table and the charts sit underneath for anyone who wants to see where that came from.</p>
+            </div>
+          </li>
+          <li>
+            <h3>The horizon is the real ground</h3>
+            <div class="prose">
+              <p>Our first version used a flat horizon. At the poles that gives wrong answers, because the Sun is so low that a ridge or a crater wall can hide it for weeks. We switched to NASA&rsquo;s LOLA laser altimeter data and now work out the skyline in 720 compass directions around a site.</p>
+              <p>Shackleton crater shows the difference. With a flat horizon the tool calls the rim 53% lit and the floor 47% lit over 90 days. With the terrain, the rim is in sunlight 91% of the time and the floor gets none. The floor of Shackleton is in permanent shadow, so that second answer is the one that matches the Moon.</p>
+              <p><a href="index.html#a=-89.7786,-155.7256,1.735,shackleton-rim&amp;ta=2024-02-22T23:24&amp;b=-89.67,129.78,-2.786,shackleton-floor&amp;tb=same&amp;w=90">Open the Shackleton case in the tool</a></p>
+            </div>
+            <div class="think-views">
+              <figure>
+                <img src="deck/img/shackleton-rim.png" width="1500" height="380" loading="lazy" alt="The view out from the rim of Shackleton crater: the skyline stays within 2 degrees of level, and the Sun and the Earth sit above it.">
+                <figcaption>From the rim, the ground stays near 0&deg; all the way round.</figcaption>
+              </figure>
+              <figure>
+                <img src="deck/img/shackleton-floor.png" width="1500" height="380" loading="lazy" alt="The view out from the floor of Shackleton crater: the skyline is a wall more than 20 degrees high in every direction, and the Sun and the Earth are drawn as empty rings behind it.">
+                <figcaption>From the floor, the crater wall is 20&deg; to 24&deg; high and the Sun stays under 2&deg;.</figcaption>
+              </figure>
+            </div>
+          </li>
+          <li>
+            <h3>Sunlight counted as energy</h3>
+            <div class="prose">
+              <p>Hours of sunlight say little about power when the Sun is half hidden behind a ridge. The tool adds up the solar energy that reaches one square metre facing the Sun, in kWh, and counts only the part of the Sun&rsquo;s disk above the skyline.</p>
+              <p>It also reports the longest unbroken stretch without the Sun, since that is the stretch a battery has to cover. The same search runs for the Earth and gives the longest wait for a direct radio link.</p>
+            </div>
+          </li>
+          <li>
+            <h3>Nothing to install</h3>
+            <div class="prose">
+              <p>The tool is plain HTML, CSS and JavaScript. It opens from a file and works offline, so a judge or a teacher can run it anywhere and no server can go down in the middle of a demo.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="trace-h">
+      <h2 id="trace-h">One comparison, start to finish</h2>
+      <div class="band-body">
+        <div class="prose">
+          <p>This is the first worked case on the main page, &ldquo;Move the site 175 km&rdquo;, followed through the tool one step at a time. A is the IM-1 landing site and B is the planned IM-2 site. Both start at the IM-1 landing time, Feb 22, 2024, 23:24 UTC, and run for 90 days.</p>
+          <p><a href="index.html#a=-80.13,1.44,2.579,im1&amp;ta=2024-02-22T23:24&amp;b=-84.78,29.13,0,im2&amp;tb=same&amp;w=90">Open this case in the tool</a></p>
+        </div>
+
+        <div class="trace-head" aria-hidden="true">
+          <span></span>
+          <span><span class="tag">A</span> IM-1 site</span>
+          <span><span class="tag">B</span> Planned IM-2 site</span>
+          <span>Where it comes from, and how we checked it</span>
+        </div>
+        <ol class="trace">
+          <li>
+            <h3>Place the two sites</h3>
+            <p class="val" data-who="A"><b>80.13&deg;S, 1.44&deg;E</b></p>
+            <p class="val" data-who="B"><b>84.78&deg;S, 29.13&deg;E</b></p>
+            <p class="why">The IM-1 position is from NASA&rsquo;s Lunar Reconnaissance Orbiter image of the lander. The IM-2 position is from the LROC page for its landing region. The tool links both sources under the site name.</p>
+          </li>
+          <li>
+            <h3>Find the Sun at that minute</h3>
+            <p class="val" data-who="A"><b>10.5&deg;</b> up, 19&deg; from north</p>
+            <p class="val" data-who="B"><b>6.3&deg;</b> up, 351&deg; from north</p>
+            <p class="why">Astronomy Engine gives the positions of the Sun, Earth and Moon, and the IAU 2009 model gives the Moon&rsquo;s rotation. We compared 852 time steps at four places with NASA JPL Horizons. The largest difference was 0.0073&deg;.</p>
+          </li>
+          <li>
+            <h3>Find the ground in that direction</h3>
+            <p class="val" data-who="A">Skyline at <b>+0.2&deg;</b></p>
+            <p class="val" data-who="B">Skyline at <b>&minus;1.2&deg;</b></p>
+            <p class="why">The skyline is the highest ground along each of 720 directions, out to 200 km, from the 240 m LOLA grid. A second version of the calculation in Python agrees within 0.05&deg;. The grid puts the IM-1 site at 2,588 m, and NASA gives 2,579 m.</p>
+          </li>
+          <li>
+            <h3>Decide whether the Sun is up</h3>
+            <p class="val" data-who="A"><b>10.3&deg;</b> above the skyline</p>
+            <p class="val" data-who="B"><b>7.5&deg;</b> above the skyline</p>
+            <p class="why">The Sun counts as up when its centre is higher than the ground in its direction. The Earth gets the same test. At this minute both are up at both sites.</p>
+          </li>
+          <li>
+            <h3>Run the clock forward 90 days</h3>
+            <p class="val" data-who="A">Sun sets in <b>8 d 15 h</b>. The Earth stays up.</p>
+            <p class="val" data-who="B">Sun sets in <b>7 d 16 h</b>. The Earth sets in <b>9 d</b>.</p>
+            <p class="why">The tool repeats steps 2 to 4 across the period and searches for the moment each body crosses the skyline. With a flat horizon, its sunset time at the IM-1 site is 4 seconds from the Horizons time.</p>
+          </li>
+          <li>
+            <h3>Add up the period</h3>
+            <p class="val" data-who="A"><b>859 h</b> of sunlight, <b>1,164 kWh</b> per m&sup2;. Longest dark <b>18 d 14 h</b>. No gap in view of the Earth.</p>
+            <p class="val" data-who="B"><b>1,030 h</b> of sunlight, <b>1,389 kWh</b> per m&sup2;. Longest dark <b>16 d 11 h</b>. Longest gap in view of the Earth <b>5 d 17 h</b>.</p>
+            <p class="why">Energy starts from 1,361 W per m&sup2; at the Earth&rsquo;s distance from the Sun, adjusted for the distance that day and for how much of the Sun&rsquo;s disk clears the skyline. Eleven of the 39 automated tests cover the energy sum and the gap search.</p>
+          </li>
+          <li>
+            <h3>Write the sentence</h3>
+            <p class="say">&ldquo;B loses the Sun first, in 7 d 16 h. A keeps it 23 h longer.&rdquo;<br>&ldquo;B loses sight of the Earth in 9 d. A keeps it for at least the next 90 days.&rdquo;</p>
+            <p class="why">The page compares the two sets of numbers and puts the result at the top. In this case the IM-2 site collects more solar energy over the 90 days, and it goes up to 5 d 17 h at a time without a view of the Earth.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="limits-h">
+      <h2 id="limits-h">What we left out</h2>
+      <div class="band-body prose">
+        <p>The tool answers a geometry question: is the Sun, or the Earth, above the ground in its direction. Turning sunlight into watts needs a model of the solar panel. Turning &ldquo;Earth in view&rdquo; into a radio link needs an antenna and a ground station. We did not build those, and the main page says so next to the numbers.</p>
+        <p>The terrain has limits of its own. We use it within 17&deg; of a pole and a flat horizon everywhere else, because away from the poles a 2&deg; ridge moves sunrise by about 4 hours. The grid is 240 m for the polar sites in the list and 960 m for a point you click, and both smooth out narrow ridges. At the IM-1 site the two grids put the first sunset 4 hours apart.</p>
+        <p>We compared our Shackleton rim result with published work. Mazarico and others (2011) report a point near the rim that is sunlit for 240 days in a row. Our rim point is a different spot on a coarser grid, and over 2024 it gets sunlight 87% of the time.</p>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="ai-h">
+      <h2 id="ai-h">Where the AI tool came in</h2>
+      <div class="band-body prose">
+        <p>We used Claude Code, an AI coding tool, to write the code, the tests, the slides and the drafts of our text, this page included. We directed that work and reviewed it. The idea of comparing two scenarios is ours and comes from the challenge statement.</p>
+        <p>The terrain skyline and the energy number were added after we asked the tool where the project was weakest and told it to close those gaps. Files written this way carry a label at the top, and SI_USE.md in the repository logs each session. The project has no AI-generated images. The Moon on the main page is NASA imagery drawn by code.</p>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="next-h">
+      <h2 id="next-h">What we would do next</h2>
+      <div class="band-body prose">
+        <p>NASA Goddard publishes 5 m LOLA grids for south pole landing sites. Adding them would fix the nearest ridges, which is where a 240 m grid is weakest. After that we would give the solar panel a tilt and add an antenna model, so the energy and radio numbers get closer to what an engineer needs.</p>
+        <p>The repository has more detail. <code>docs/HOW_IT_WORKS.md</code> gives each formula with the function that runs it, <code>docs/FAQ.md</code> answers the questions we expect from judges, and <code>SOURCES.md</code> lists where each piece of data came from.</p>
+        <p><a href="index.html">Open the tool</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="mark">Lunar Landing Site Navigator</p>
+    <p>Team Ksig UNT, 2026 NASA Space Apps Challenge, Dallas. Drafted with an AI coding tool under the team&rsquo;s direction. Details are in SI_USE.md.</p>
+  </footer>
+</body>
+</html>

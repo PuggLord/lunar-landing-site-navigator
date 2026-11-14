@@ -819,6 +819,141 @@ svg .track { fill: var(--ground); }
 .foot .mark { grid-column: 1 / span 3; color: var(--ink); }
 .foot p + p { grid-column: 4 / -1; max-width: 86ch; }
 
+/* ---------- the thinking page ---------- */
+
+.think-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 30px;
+  padding: 26px var(--m) 0;
+}
+.think-top .mark { text-decoration: none; }
+.think-nav { display: flex; flex-wrap: wrap; gap: 4px 30px; }
+.think-nav a {
+  padding: 4px 0;
+  color: var(--ink-2);
+  text-decoration: none;
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 1px;
+  transition: color 220ms var(--ease), background-size 420ms var(--ease);
+}
+.think-nav a:hover,
+.think-nav a:focus-visible { color: var(--ink); background-size: 100% 1px; }
+
+.think-open { padding-top: clamp(64px, 9vw, 132px); align-items: end; }
+.think h1 {
+  grid-column: 1 / span 6;
+  font-size: clamp(46px, 7.2vw, 112px);
+  line-height: 0.96;
+  font-weight: 500;
+  font-stretch: 112%;
+  letter-spacing: -0.035em;
+}
+.think-open > .band-body { grid-column: 8 / -1; }
+.think-lede { max-width: 30ch; color: var(--ink-2); font-size: clamp(17px, 1.45vw, 21px); line-height: 1.4; }
+
+.prose p { max-width: 62ch; color: var(--ink-2); font-size: 16px; line-height: 1.58; }
+.prose p + p { margin-top: 14px; }
+.prose a { color: var(--ink); font-weight: 600; }
+.prose code { font: inherit; color: var(--ink); overflow-wrap: anywhere; }
+
+.choices { border-top: 1px solid var(--rule); }
+.choices > li {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+  column-gap: 20px;
+  row-gap: 10px;
+  align-items: baseline;
+  padding: 22px 0 26px;
+  border-bottom: 1px solid var(--hairline);
+}
+.choices h3 { max-width: 16em; color: var(--ink); }
+.think-views {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+  margin-top: 12px;
+}
+.think-views img { display: block; width: 100%; height: auto; background: var(--surface); }
+.think-views figcaption { margin-top: 8px; color: var(--muted); font-size: 13px; }
+
+/* One comparison traced through the tool: step, A, B, then source and check. */
+.trace-head, .trace > li {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) minmax(0, 4fr) minmax(0, 8fr);
+  column-gap: 20px;
+}
+.trace-head {
+  margin-top: 34px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.trace-head .tag { margin-right: 6px; }
+.trace { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.trace > li {
+  row-gap: 8px;
+  align-items: baseline;
+  padding: 18px 0 20px;
+  border-bottom: 1px solid var(--hairline);
+  counter-increment: step;
+}
+.trace h3 { font-size: 15px; line-height: 1.4; }
+.trace h3::before {
+  content: counter(step);
+  display: inline-block;
+  width: 1.6em;
+  color: var(--muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.trace p { margin: 0; color: var(--ink-2); }
+.trace .val b { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.trace .say { grid-column: 2 / span 2; color: var(--ink); font-weight: 500; }
+.trace .why { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+@media (max-width: 1240px) {
+  .trace-head { display: none; }
+  .trace { margin-top: 30px; border-top: 1px solid var(--rule); }
+  .trace > li { grid-template-columns: 1fr 1fr; }
+  .trace h3, .trace .why, .trace .say { grid-column: 1 / -1; }
+  .trace .val::before {
+    content: attr(data-who);
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    background: var(--ink);
+    color: var(--page);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: 2px;
+  }
+}
+@media (max-width: 900px) {
+  .think h1, .think-open > .band-body { grid-column: 1 / -1; }
+  .think-lede { max-width: 34ch; }
+  /* Links a thumb has to hit get a 44 px tall target. */
+  .think-top { padding-top: 12px; }
+  .think-top .mark, .think-nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  .prose p > a:only-child { display: inline-flex; align-items: center; min-height: 44px; }
+}
+@media (max-width: 700px) {
+  .choices > li { grid-template-columns: 1fr; }
+  .think-views { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .trace > li { grid-template-columns: 1fr; }
+}
+
 /* ---------- arrival: once, on load ---------- */
 
 @keyframes rise {

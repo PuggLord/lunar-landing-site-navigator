@@ -32,12 +32,16 @@ two scenarios. Add `&g=latitude,longitude,zoom` to the end of a link to aim the
 globe, for example `&g=-90,0,1.6` for the south pole. `&h=flat` turns the
 terrain skyline off.
 
-The page has one dark theme: the Moon fills the first screen, the answer is
-the headline beside it, and the two bars on the time slider mark when the Sun
-is up at each site.
+The page has one dark theme. The Moon fills the first screen with the answer
+written beside it, and two bars on the time slider show when the Sun is up at
+each site.
 
-The 3D Moon needs WebGL 2, which every current browser has. Without it the
-rest of the page still works.
+The 3D Moon needs WebGL 2, which current browsers have. Without it the rest of
+the page still works.
+
+`thinking.html` is a second page, linked from the first. It explains the
+choices behind the tool and follows one comparison from its inputs to the
+sentence on screen.
 
 ## Run the tests
 
@@ -80,8 +84,9 @@ for its orientation check):
 ## How it works, and questions a judge might ask
 
 `docs/HOW_IT_WORKS.md` follows the calculation step by step, with each formula
-and the function that runs it. `docs/FAQ.md` answers the questions we expect.
-`docs/PITCH.md` has a 60 second and a 3 minute script.
+and the function that runs it. `docs/FAQ.md` answers the questions we expect,
+and `docs/PITCH.md` has a 60 second and a 3 minute script. The reasons for our
+choices are on the site itself, in `thinking.html`.
 
 ## Slides and submission text
 
@@ -93,7 +98,7 @@ Chrome or Edge):
     powershell -File tools/build_deck_pdf.ps1
 
 `demo/Lunar-Landing-Site-Navigator-demo.mp4` is a 29-second video of the
-tool with no sound. Every frame is a screenshot of the page or the slides. To
+tool with no sound. Each frame is a screenshot of the page or the slides. To
 record it again (needs Node.js 22 or newer, ffmpeg, and a Chromium browser;
 takes about ten minutes):
 
@@ -116,10 +121,11 @@ page.
 - The grids smooth narrow ridges. At the IM-1 site the two grids give first
   sunsets 4 hours apart, and on a narrow peak the coarse one can understate
   sunlight by a quarter of the year.
-- Solar energy is sunlight arriving on one square metre that faces the Sun. It
-  is not electricity: panel angle, efficiency and temperature are left out.
-- "Earth in view" does not promise a radio link. Lander tilt and antenna
-  pointing are not modelled.
+- Solar energy is sunlight arriving on one square metre that faces the Sun,
+  before a panel turns any of it into electricity. Panel angle and efficiency
+  are left out.
+- "Earth in view" is a line-of-sight test. Lander tilt and antenna pointing
+  are not modelled.
 - For the Sun and Earth geometry the Moon is a sphere of radius 1737.4 km, the
   same as Horizons.
 
@@ -134,6 +140,7 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | Path | What it is |
 | --- | --- |
 | `index.html`, `css/style.css` | The page |
+| `thinking.html` | "Our thinking": the choices behind the tool, and one comparison traced from inputs to answer |
 | `css/fonts.css` | The typeface, Mona Sans, stored inside a stylesheet so the page needs no network. Made by `tools/build_fonts_css.py` |
 | `src/lunar-sky.js` | Sun and Earth sky position, horizon crossings, timelines, solar energy, longest gaps |
 | `src/terrain.js` | The skyline: reads the LOLA grid and finds the height of the ground in each compass direction |

@@ -190,7 +190,7 @@ async function main() {
 
     /* 2. Move the site 175 km: 7.6 s. */
     await open(`index.html#${CASE_MOVE}`, 5000);
-    await run(caption, 'Move the site 175 km', 'IM-1 landing site against the planned IM-2 site, 90 days');
+    await run(caption, 'Move the site 175 km', 'The IM-1 landing site and the planned IM-2 site, over 90 days');
     await run(setTime, 0);
     await hold(24);
     await sweep(180);
@@ -212,7 +212,7 @@ async function main() {
     await run((h) => { location.hash = h; }, CASE_RIM);
     await sleep(1500);
     await run((y) => { scrollTo(0, y); }, top);
-    await run(caption, 'Shackleton crater: the rim against the floor', 'The skyline is NASA LOLA terrain. The floor never sees the Sun.', true);
+    await run(caption, 'Shackleton crater, rim and floor', 'The skyline is NASA LOLA terrain. The floor gets no sunlight in 90 days.', true);
     await run(setTime, 0);
     await hold(20);
     await sweep(80);
@@ -221,7 +221,7 @@ async function main() {
     /* 5. Land two weeks late: 6 s. */
     await run((h) => { scrollTo(0, 0); location.hash = h; }, CASE_LATE);
     await sleep(1500);
-    await run(caption, 'Land two weeks late', 'The IM-1 site on its landing day and 14 days after');
+    await run(caption, 'Land two weeks late', 'The IM-1 site on its landing day and 14 days later');
     await run(setTime, 0);
     await hold(24);
     await sweep(132);

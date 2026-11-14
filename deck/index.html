@@ -29,7 +29,7 @@
       <p class="who"><b>Team Ksig UNT</b>2026 NASA Space Apps Challenge, Dallas</p>
       <div class="what">
         <h1>Lunar Landing Site Navigator</h1>
-        <p>Two landing sites or two landing dates on the Moon, compared on one screen against the real skyline, with the answer written as a sentence.</p>
+        <p>Compare two landing sites or two landing dates on the Moon, and see which one loses the Sun or the Earth first.</p>
       </div>
       <p class="credit">Moon imagery: NASA Lunar Reconnaissance Orbiter, drawn by our code</p>
       <footer class="chrome"><span>1 / 7</span></footer>
@@ -39,11 +39,11 @@
   <div class="frame">
     <section class="slide" aria-label="Slide 2 of 7">
       <div class="problem">
-        <h2>When the landing date moves, the sunlight and the radio link move with it.</h2>
+        <h2>A two-week slip can leave a polar lander in the dark.</h2>
         <div class="copy">
-          <p class="lead">At the Moon's south pole the Sun and the Earth both stay within a few degrees of the horizon, and that horizon is ridges and crater rims. A new date, or a site a little closer to the pole, can cost a lander its power or its link to Earth for days.</p>
-          <p>The data to check this is public, in JPL Horizons, Quickmap and Moon Trek. The challenge statement names the gap: judging each site and date means moving between several interfaces and reading raw numbers.</p>
-          <p>A planner with two options has to run that twice and work out the difference by hand.</p>
+          <p class="lead">At the Moon's south pole the Sun and the Earth both sit within a few degrees of the horizon, and the horizon there is ridges and crater rims. Change the date, or move the site closer to the pole, and a lander can lose power or its link to Earth for days.</p>
+          <p>The data needed to check this is public, in JPL Horizons, Quickmap and Moon Trek. The challenge statement points out the catch: checking one site and date means going between several interfaces and reading raw numbers.</p>
+          <p>With two options on the table, a planner does that twice and then works out the difference by hand.</p>
         </div>
       </div>
       <footer class="chrome"><span>Lunar Landing Site Navigator</span><span>2 / 7</span></footer>
@@ -56,9 +56,9 @@
         <div class="words">
           <h2>Pick two scenarios and read the answer.</h2>
           <ul class="points">
-            <li>The headline is the result. Here the IM-1 site on its landing day and 14 days after: land late and the lander waits <b>12 d 2 h</b> in the dark for sunrise.</li>
-            <li>Six landing sites with sourced coordinates, or click the Moon to place your own.</li>
-            <li>Press Play and the line between day and night crosses the Moon while the charts follow.</li>
+            <li>The first thing on screen is the answer. This is the IM-1 site on its landing day and 14 days later. The late lander waits <b>12 d 2 h</b> in the dark for sunrise.</li>
+            <li>Choose from six landing sites with sourced coordinates, or click the Moon to place your own.</li>
+            <li>Press Play to run the period forward. The day and night line moves across the Moon and the charts keep pace.</li>
           </ul>
         </div>
         <img class="shot" src="img/tool.png" alt="The tool: a 3D Moon with the IM-1 site marked near the south pole, the two scenarios on the right, and the headline: A has sunlight and loses the Sun in 8 d 15 h. B is in the dark and gets the Sun back in 12 d 2 h.">
@@ -72,7 +72,7 @@
       <div class="wide">
         <div class="head">
           <h2>Move the site 175 km and the Earth starts to set.</h2>
-          <p>Left, the IM-1 landing site: the Earth stays up for all <b>90 days</b>. Right, the planned IM-2 site: the Earth sets after <b>9 days</b>, and the longest break in the radio link lasts <b>5 d 17 h</b>. That site gets more sunlight, <b>1,389</b> against <b>1,164 kWh per m²</b>. The grey ground in each chart is the real skyline.</p>
+          <p>On the left is the IM-1 landing site, where the Earth stays up for all <b>90 days</b>. At the planned IM-2 site on the right it sets after <b>9 days</b>, and the longest gap is <b>5 d 17 h</b>. That site collects more sunlight, <b>1,389</b> against <b>1,164 kWh per m²</b>. The grey ground is the real skyline.</p>
         </div>
         <div class="crop"><img src="img/charts.png" alt="Two sets of charts, each with the ground drawn as a grey skyline. At the IM-1 site the blue Earth line stays above the skyline for 90 days. At the planned IM-2 site it dips below the skyline three times."></div>
       </div>
@@ -84,10 +84,10 @@
     <section class="slide" aria-label="Slide 5 of 7">
       <div class="ground">
         <div class="words">
-          <h2>Step off the rim of Shackleton and the Sun never rises.</h2>
-          <p>Two places 10 km apart at the south pole, over 90 days. The rim has sunlight <b>91%</b> of the time. The floor has <b>none</b>.</p>
-          <p>The horizon in the tool is the ground itself: NASA LOLA laser altimeter heights on a 240&nbsp;m grid, read in 720 compass directions out to 200 km.</p>
-          <p>With a flat horizon the tool gives 53% and 47%, and the difference between the two places disappears.</p>
+          <h2>At Shackleton crater, 10 km separates 91% sunlight from none.</h2>
+          <p>These are two points at the south pole over 90 days. The one on the rim is sunlit <b>91%</b> of the time, and the one on the floor gets <b>no</b> sunlight.</p>
+          <p>The tool gets this right because its horizon is the ground. We read NASA LOLA laser altimeter heights on a 240&nbsp;m grid in 720 compass directions, out to 200 km.</p>
+          <p>With a flat horizon the same two points come out at 53% and 47%, nearly the same.</p>
         </div>
         <div class="views">
           <figure>
@@ -95,7 +95,7 @@
             <img class="shot" src="img/shackleton-rim.png" alt="The view out from the rim of Shackleton crater: the skyline wavers within 2 degrees of level, and the Sun and the Earth sit above it.">
           </figure>
           <figure>
-            <figcaption><b>Floor.</b> The crater wall stands 20° to 24° high on every side. The Sun stays under 2°.</figcaption>
+            <figcaption><b>Floor.</b> The crater wall is 20° to 24° high in every direction, and the Sun stays under 2°.</figcaption>
             <img class="shot" src="img/shackleton-floor.png" alt="The view out from the floor of Shackleton crater: the skyline is a wall more than 20 degrees high in every direction, and the Sun and the Earth are drawn as empty rings behind it.">
           </figure>
         </div>
@@ -108,10 +108,10 @@
     <section class="slide" aria-label="Slide 6 of 7">
       <div class="checks">
         <div class="left">
-          <h2>Every number has a check behind it.</h2>
+          <h2>The checks we ran on the numbers.</h2>
           <div class="notes">
-            <p><b>NASA data in the tool.</b> LOLA polar elevation grids at 240&nbsp;m for the skyline. JPL Horizons for the reference tables. Lunar Reconnaissance Orbiter colour mosaic for the 3D Moon. Site coordinates from NASA, LROC, NSSDCA and USGS pages, each linked on the page.</p>
-            <p><b>What it leaves out.</b> Terrain is used within 17° of a pole and the horizon is flat elsewhere. Solar panel angle, lander tilt and antenna pointing are not modelled. The page says so beside the numbers.</p>
+            <p><b>NASA data in the tool.</b> The skyline comes from LOLA polar elevation grids at 240&nbsp;m, and the reference tables from JPL Horizons. The 3D Moon uses the Lunar Reconnaissance Orbiter colour mosaic. Site coordinates come from NASA, LROC, NSSDCA and USGS pages, which the tool links to.</p>
+            <p><b>What it leaves out.</b> We use terrain within 17° of a pole and a flat horizon elsewhere. We don't model solar panel angle, lander tilt or antenna pointing, and the page says so next to the numbers.</p>
           </div>
         </div>
         <dl class="ledger">
@@ -129,23 +129,23 @@
   <div class="frame">
     <section class="slide" aria-label="Slide 7 of 7">
       <div class="close">
-        <h2>One page, no server, open source.</h2>
+        <h2>It opens in a browser with nothing to install.</h2>
         <div>
         <div class="thirds">
           <div>
             <h3>How it is built</h3>
-            <p>Plain HTML, CSS and JavaScript. It opens from a file with no network and no account. Astronomy Engine (MIT) gives the positions and NASA LOLA terrain gives the skyline. The 3D Moon is our own WebGL code.</p>
+            <p>The tool is plain HTML, CSS and JavaScript, and it works offline with no account. Astronomy Engine (MIT license) supplies the positions and NASA LOLA terrain supplies the skyline. The 3D Moon is WebGL code written for this project.</p>
           </div>
           <div>
             <h3>Use of AI</h3>
-            <p>The idea is the team's. The code, the tests and these slides were written with Claude Code under the team's direction. Every file is labelled and SI_USE.md logs each session. Nothing here is an AI-generated image.</p>
+            <p>The idea is ours. We used Claude Code to write the code, the tests and these slides, and we directed and reviewed the work. Files made that way are labelled, and SI_USE.md logs each session. The project has no AI-generated images.</p>
           </div>
           <div>
             <h3>Next</h3>
-            <p>LOLA's 5 m grids for the candidate Artemis sites, so the nearest ridges are exact. Solar panel tilt and an antenna model. Landing sites from other countries' programs.</p>
+            <p>First we would add NASA's 5&nbsp;m LOLA grids for south pole landing sites, which resolve the nearest ridges. After that come solar panel tilt and an antenna model.</p>
           </div>
         </div>
-        <p class="where">The live tool and the source code are at the Project link on our Space Apps page.</p>
+        <p class="where">The live tool and the source code are at the Project link on our Space Apps page. Its &ldquo;Our thinking&rdquo; page explains each choice.</p>
         </div>
       </div>
       <footer class="chrome"><span>Team Ksig UNT, 2026 NASA Space Apps Challenge, Dallas</span><span>7 / 7</span></footer>

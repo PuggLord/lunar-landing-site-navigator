@@ -2,7 +2,7 @@
 
 # How the Lunar Landing Site Navigator works
 
-This page follows the calculation in the order the code runs it. Each step gives the question it answers, the formula, and the function that does the work. The engine is `src/lunar-sky.js`. It exports nine functions (`skyAt`, `subPoints`, `nextCrossing`, `timeline`, `visibilityHours`, `solarIrradiance`, `diskFraction`, `solarEnergy`, `longestGap`) and three constants (`MOON_RADIUS_KM`, `AU_KM`, `SOLAR_CONSTANT_W_M2`). The other helpers are private to the file. The terrain code is in `src/terrain.js`, and its build script is `tools/build_terrain.py`.
+This page follows the calculation in the order the code runs it. Each step has its formula and the function that does the work. For the reasons behind our choices, see the site's "Our thinking" page (`thinking.html`). The engine is `src/lunar-sky.js`. It exports nine functions (`skyAt`, `subPoints`, `nextCrossing`, `timeline`, `visibilityHours`, `solarIrradiance`, `diskFraction`, `solarEnergy`, `longestGap`) and three constants (`MOON_RADIUS_KM`, `AU_KM`, `SOLAR_CONSTANT_W_M2`). The other helpers are private to the file. The terrain code is in `src/terrain.js`, and its build script is `tools/build_terrain.py`.
 
 The engine runs in the browser and in Node. In the page it sets a global named `LunarSky`. In the tests it uses `module.exports`, so the same code produces the numbers that the tests check.
 
@@ -10,7 +10,7 @@ The maths needs four ideas. A vector has three components. The dot product `a . 
 
 ## 1. Where the Sun and the Earth are
 
-The first question is where the Sun and the Earth are, measured from the centre of the Moon, at one instant.
+We start with the Sun and the Earth as seen from the centre of the Moon at one instant.
 
 ```
 sun_from_moon   = (sun_geo - moon_geo) * KM_PER_AU
@@ -41,7 +41,7 @@ Functions: `moonFrame(time)` builds the three axes from the IAU 2009 pole and sp
 
 ## 3. The site's up, north and east
 
-The second question is which way is up, north and east at the site. These three are perpendicular unit vectors. The site sits at radius R from the Moon's centre.
+Next we need the site's own directions: up, north and east, as three perpendicular unit vectors. The site sits at radius R from the Moon's centre.
 
 ```
 R        = 1737.4 + elevation_km
@@ -57,7 +57,7 @@ Function: `siteBasis(site)`, private to `src/lunar-sky.js`. The site height in `
 
 ## 4. Compass direction and height of a body
 
-The third question is where the Sun or the Earth sits in the site's sky: which compass direction, and how far above the flat horizon.
+With those we can place the Sun or the Earth in the site's sky, as a compass direction and a height above the flat horizon.
 
 ```
 v          = body_position - site_position
@@ -73,7 +73,7 @@ Function: `azEl(basis, bodyKm, bodyRadiusKm)`, private, called by `skyAt` and `t
 
 ## 5. The skyline from terrain
 
-The fourth question is how high the ground rises in each compass direction, as seen from the site. The terrain is the NASA LOLA laser altimeter data from the Lunar Reconnaissance Orbiter. The polar gridded products are LDEM_60S_240M and LDEM_60N_240M from the NASA Planetary Data System. Each pixel covers 240 m, and the heights are measured from a sphere of radius 1737.4 km.
+The skyline is how high the ground rises in each compass direction, as seen from the site. The terrain is the NASA LOLA laser altimeter data from the Lunar Reconnaissance Orbiter. The polar gridded products are LDEM_60S_240M and LDEM_60N_240M from the NASA Planetary Data System. Each pixel covers 240 m, and the heights are measured from a sphere of radius 1737.4 km.
 
 There are two skyline paths, and both use the same geometry.
 
@@ -101,7 +101,7 @@ The choice of path is made in `skylineFor` in `src/app.js`. The Horizon switch s
 
 ## 6. Deciding whether a body is up
 
-The fifth question is whether the body is above whatever hides it in its direction.
+A body is up when it is above the ground in its own direction.
 
 The engine keeps two numbers for each body at each sample. `elevationDeg` is the height of the disk centre above the flat plane. `clearDeg` is the height above the skyline in its own direction:
 
@@ -114,7 +114,7 @@ With no skyline, `clearDeg` equals `elevationDeg`. The skyline is a function of 
 
 ## 7. The moment of sunset or Earthset
 
-The sixth question is when a body next crosses the horizon after a given time. The search is a coarse scan followed by a bisection.
+To find when a body next crosses the horizon, the engine runs a coarse scan and then a bisection.
 
 1. From the chosen time, evaluate the clearance every hour, for up to `maxDays` days (60 by default, 90 in the page).
 2. At the first hour where the sign changes, halve the one-hour interval. Keep the half where the sign changes, and repeat until the interval is 1000 ms or less.
@@ -128,7 +128,7 @@ The hourly scan can miss a body that rises and sets inside one hour. The bisecti
 
 ## 8. Hours of visibility over a period
 
-The seventh question is how many hours, over the look-ahead period, the Sun is up, the Earth is up, and both are up.
+This step counts the hours in the look-ahead period when the Sun is up, when the Earth is up, and when both are.
 
 ```
 for each sample i, except the last:
@@ -143,7 +143,7 @@ Each sample counts the step that starts at it. Each change between up and down c
 
 ## 9. Solar energy
 
-The eighth question is how much sunlight reaches a panel that turns to follow the Sun, over the look-ahead period.
+Energy is the sunlight reaching a panel that turns to follow the Sun, added up over the look-ahead period.
 
 ```
 S        = 1361 * (AU_KM / d_sun)^2              W per m^2
@@ -162,7 +162,7 @@ Function: `solarEnergy(samples)`, exported. It applies the trapezoid rule across
 
 ## 10. The longest gap
 
-The ninth question is the longest unbroken time without the Sun, which is what a battery must cover, and the longest unbroken time without the Earth, which is the longest radio gap.
+The last step finds the longest unbroken time without the Sun, which a battery has to cover, and the longest unbroken time without the Earth, which is the longest radio gap.
 
 Function: `longestGap(samples, body)`, exported. A body counts as down at every sample where `clearDeg` is zero or less. The start and end of each run are interpolated linearly between samples. The function returns `hours`, `startHours`, `endHours` and `openEnded`. `openEnded` is true when the run reaches the last sample, so the real gap can be longer than the number shown. The page reads the gaps from the same samples as step 9.
 

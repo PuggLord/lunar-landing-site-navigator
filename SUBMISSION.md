@@ -22,25 +22,23 @@ Lunar Landing Site Navigator
 
 ## 2. High-level summary
 
-Lunar Landing Site Navigator compares two landing scenarios on the Moon: two
-sites on the same date, or one site on two dates. For each it works out where
-the Sun and the Earth sit above the real skyline, how long each stays in view,
-and how much solar energy arrives. It writes the result as a sentence: which
-scenario loses the Sun or the Earth first, and by how long.
+Lunar Landing Site Navigator compares two landing scenarios on the Moon. You
+give it two sites on the same date, or one site on two dates, and it tells you
+which one loses the Sun or the Earth first and by how long.
 
-Mission schedules slip and landing sites move. Near the south pole the Sun and
-the Earth both stay within a few degrees of the horizon, and that horizon is
-ridges and crater rims. A two-week delay or a site 175 km away can leave a
-lander without power or without a direct radio link for days. The existing
-tools hold this data, and each answers one site and one date at a time. Ours
-puts two side by side.
+We built it because mission schedules slip and landing sites get moved. Near
+the south pole the Sun and the Earth both sit within a few degrees of the
+horizon, and the horizon is ridges and crater rims. A two-week delay, or a
+site 175 km away, can leave a lander without power or without a direct radio
+link for days. JPL Horizons, Quickmap and Moon Trek hold the data to check
+this, one site and one date at a time. Our tool puts two cases side by side.
 
+For each scenario the tool works out where the Sun and the Earth sit above the
+real skyline, how long each stays in view, and how much solar energy arrives.
 The skyline comes from NASA's LOLA laser altimeter grids. In a 90-day run the
-rim of Shackleton crater has sunlight 91% of the time, and the crater floor
-10 km away has none. A 3D Moon built from NASA Lunar Reconnaissance Orbiter
-imagery shows both sites lit from the Sun's real direction. Sun and Earth
-positions are tested against NASA JPL Horizons; the largest difference we
-found is 0.0073 degrees.
+rim of Shackleton crater gets sunlight 91% of the time and the crater floor
+10 km away gets none. We tested the Sun and Earth positions against NASA JPL
+Horizons, and the largest difference we found was 0.0073 degrees.
 
 ## 3. Link to project demo
 
@@ -54,118 +52,127 @@ found is 0.0073 degrees.
 
 **What it does**
 
-You pick scenario A and scenario B. Each is a place on the Moon and a start
-time. The place comes from a list of six landing sites with sourced
-coordinates (IM-1 Odysseus, the planned IM-2 site, the Blue Ghost Mission 1
-landing region, Apollo 11, 15 and 17) and two reference places at Shackleton
-crater, from typed latitude and longitude, or from a click on the 3D Moon.
+You choose scenario A and scenario B. Each one is a place on the Moon and a
+start time. You can pick the place from a list, type a latitude and longitude,
+or click the 3D Moon. The list has six landing sites with sourced coordinates
+(IM-1 Odysseus, the planned IM-2 site, the Blue Ghost Mission 1 landing
+region, Apollo 11, 15 and 17) and two reference points at Shackleton crater.
 
-The page then shows, for both scenarios together:
+The page then shows both scenarios together:
 
-- A headline sentence with the result, for example "B loses sight of the Earth
-  in 9 d. A keeps it for at least the next 90 days."
-- A table of the numbers a planner asks for: Sun and Earth height above the
-  skyline and compass direction at the chosen time, time to the next sunset
-  and Earthset, hours of sunlight, solar energy in kWh per square metre, the
-  longest time without the Sun, hours of Earth visibility, and the longest
-  time without the Earth, over a look-ahead period of 3, 14, 30 or 90 days.
-- A view out from each site, with the ground drawn as the real skyline and the
+- A sentence at the top with the result, for example "B loses sight of the
+  Earth in 9 d. A keeps it for at least the next 90 days."
+- A table of numbers for a look-ahead period of 3, 14, 30 or 90 days. It gives
+  the height and compass direction of the Sun and the Earth at the start, the
+  time to the next sunset and Earthset, hours of sunlight, solar energy in kWh
+  per square metre, hours with the Earth in view, and the longest stretch
+  without each.
+- A view out from each site. The ground is drawn as the real skyline, with the
   paths of the Sun and the Earth crossing it.
 - A timeline of height above the skyline for the whole period, with bars that
-  mark when the Sun is up, when the Earth is up, and when both are.
+  show when the Sun and the Earth are up.
 - A 3D Moon with both sites marked, lit from the Sun's real direction. Play
-  runs the period forward. Drag turns the Moon, and a click moves a site.
+  runs the period forward. You can drag the Moon to turn it or click it to
+  move a site.
 - A Horizon control that switches between the LOLA skyline and a flat horizon,
-  to show how much of an answer comes from terrain.
+  so you can see how much of an answer comes from terrain.
 
-Four worked cases load with one click and show why this matters:
+Four worked cases load with one click:
 
-- Move the site 175 km, from the IM-1 landing site to the planned IM-2 site.
-  At the first the Earth never sets in 90 days. At the second it sets after 9
-  days, and the longest break in the radio link lasts 5 d 17 h. The second
-  site gets more sunlight: 1,389 kWh per square metre against 1,164.
-- Land two weeks late at the IM-1 site. On landing day the Sun stays above the
-  ridges for 8 d 15 h. Fourteen days later the lander arrives in the dark and
-  waits 12 d 2 h for sunrise.
-- Stand on the rim of Shackleton crater, then on its floor, 10 km apart at the
-  south pole. Over 90 days the rim has sunlight 91% of the time and the floor
-  has none. With a flat horizon the two read 53% and 47%.
-- Set the pole beside Apollo 11. At the Apollo 11 site the Sun stands 86° up.
-  At the IM-1 site it clears the skyline by 10.3°, and the Earth stays between
+- Move the site 175 km. From the IM-1 landing site the Earth stays in view for
+  all 90 days. From the planned IM-2 site it sets after 9 days, and the
+  longest stretch without it is 5 d 17 h. The IM-2 site gets more sunlight,
+  1,389 kWh per square metre against 1,164.
+- Land two weeks late at the IM-1 site. A lander that arrives on landing day
+  gets 8 d 15 h before the Sun goes behind the ridges. One that arrives 14
+  days later lands in the dark and waits 12 d 2 h for sunrise.
+- Compare the rim of Shackleton crater with its floor, about 10 km apart at
+  the south pole. Over 90 days the rim is in sunlight 91% of the time and the
+  floor gets none. With a flat horizon the tool gives 53% and 47%.
+- Set the pole beside Apollo 11. At the Apollo 11 site the Sun is 86° up. At
+  the IM-1 site it clears the skyline by 10.3°, and the Earth sits between
   2.5° and 16.4° above it.
 
-A copied link reopens the same comparison, so a planner can send a colleague
-the exact case they are looking at.
+The address bar holds the whole comparison, so you can copy the link and send
+someone the exact case you are looking at.
+
+The site also has a page called "Our thinking". It explains the choices we
+made and follows one comparison from its inputs to the sentence on screen.
 
 **Who it is for**
 
-Mission planners who need a first answer in a minute when a date or a site
-changes, before a full terrain study. Teachers and students who want to see
-why the south pole is hard. Anyone curious about how long a lunar day lasts.
+Mission planners who need a first answer when a date or a site changes, before
+a full terrain study. It also works for teachers and students who want to see
+why the south pole is a hard place to land.
 
 **How it works**
 
-The page is plain HTML, CSS and JavaScript with no framework and no server.
-It opens from a file and works with no network connection. Sun and Moon
-positions come from Astronomy Engine, with the Moon's orientation from the
-IAU 2009 rotation model. Our code turns those into height and compass
-direction for an observer standing on the Moon.
+The page is plain HTML, CSS and JavaScript, with no framework and no server.
+It opens from a file and works offline. Astronomy Engine supplies the
+positions of the Sun, the Earth and the Moon, and the IAU 2009 rotation model
+gives the Moon's orientation. Our code turns those into a height and a compass
+direction for someone standing at the site.
 
-Within 17 degrees of either pole the horizon is a skyline worked out from
-NASA's LOLA polar elevation grids (LDEM_60S_240M and LDEM_60N_240M): the
-height of the ground in 720 compass directions out to 200 km, seen from 2 m
-above the surface. The listed polar sites use the full 240 m grid, computed
-ahead of time. Any other polar point uses a 960 m grid, computed in the
-browser in about 20 milliseconds. The Sun or the Earth counts as up when it
-stands higher than the ground in its direction. Farther from the poles the
-horizon is flat, because there the Sun crosses it steeply and a ridge moves
-sunrise by hours, not days.
+Within 17 degrees of either pole, the horizon is a skyline worked out from
+NASA's LOLA polar elevation grids (LDEM_60S_240M and LDEM_60N_240M). For each
+of 720 compass directions we find the highest ground out to 200 km, as seen
+from 2 m above the surface. The polar sites in the list use the full 240 m
+grid, computed ahead of time. Any other polar point uses a 960 m grid and is
+computed in the browser in about 20 milliseconds. The Sun or the Earth counts
+as up when it is higher than the ground in its direction. Farther from the
+poles we use a flat horizon, because the Sun crosses it steeply there and a
+2 degree ridge shifts sunrise by about 4 hours.
 
-Solar energy is the sunlight that reaches one square metre facing the Sun:
-1,361 W per square metre at the Earth's distance, scaled for the Sun's
-distance that day and for the share of the Sun's disk above the skyline.
+Solar energy is the sunlight that reaches one square metre facing the Sun. We
+start from 1,361 W per square metre at the Earth's distance from the Sun,
+adjust for the Sun's distance that day, and count the share of the Sun's disk
+above the skyline.
 
-The 3D Moon is our own WebGL code with no library behind it: a sphere shaded
-from the NASA colour mosaic and from ground slopes worked out of the laser
-altimeter heights.
+The 3D Moon is WebGL code written for this project, with no library behind
+it. It shades a sphere using the NASA colour mosaic and ground slopes worked
+out from the laser altimeter heights.
 
 **How we know the numbers are right**
 
-Positions. The tests compare the tool with tables saved from NASA JPL
-Horizons: 852 time steps at four places on the Moon. The largest difference
-in Sun or Earth position is 0.0073 degrees, and with a flat horizon the sunset
-time at the IM-1 site differs by 4 seconds. The Sun direction that lights the
-3D Moon is tested over 278 more time steps, with a largest difference of
-0.0067 degrees.
+Positions. Our tests compare the tool with tables saved from NASA JPL
+Horizons, 852 time steps at four places on the Moon. The largest difference in
+Sun or Earth position is 0.0073 degrees. With a flat horizon, the sunset time
+at the IM-1 site is 4 seconds from the Horizons time. We also test the Sun
+direction that lights the 3D Moon over another 278 time steps, where the
+largest difference is 0.0067 degrees.
 
-Terrain. The skyline code gives the known answer on made-up terrain (flat
-ground, a wall, a bowl), and on the real grid it agrees with a second
-calculation written in Python within 0.05 degrees over 2,160 directions at
-three sites. The grid puts the IM-1 site 2,588 m up, where NASA gives 2,579 m.
-The floor of Shackleton crater, a place in permanent shadow, gets no sunlight
+Terrain. On made-up terrain where we know the answer (flat ground, a wall, a
+bowl), the skyline code gives that answer. On the real grid it agrees with a
+second version written in Python within 0.05 degrees, over 2,160 directions at
+three sites. The grid puts the IM-1 site at 2,588 m, and NASA gives 2,579 m.
+The floor of Shackleton crater is in permanent shadow, and it gets no sunlight
 in the tool. Mazarico and others (2011) report a point near the Shackleton rim
-that is sunlit for most of the year; our rim point reads 87% over 2024.
+that is sunlit for most of the year. Our rim point gets sunlight 87% of the
+time over 2024.
 
-All 39 tests run with one command, `node --test`, and nothing to install.
+All 39 tests run with one command, `node --test`, and need nothing installed.
 
 **What it leaves out**
 
-Terrain is used within 17 degrees of a pole, and the horizon is flat
-elsewhere. The 240 m and 960 m grids smooth narrow ridges and small craters:
-at the IM-1 site the two give first sunsets 4 hours apart, and on a narrow
-peak the coarse grid can understate sunlight by a quarter of the year. The
-lander is a point 2 m above the ground with no tilt. The energy figure is
-sunlight arriving, not electricity: panel angle, efficiency, temperature and
-dust are not modelled. "Earth in view" means the centre of the Earth's disk
-clears the skyline, with no antenna, ground station or data rate. The page
-says all of this beside the numbers. The 3D Moon is a picture and no number
-comes from it.
+We use terrain within 17 degrees of a pole and a flat horizon elsewhere. The
+240 m and 960 m grids smooth narrow ridges and small craters. At the IM-1 site
+the two grids put the first sunset 4 hours apart, and on a narrow peak the
+coarse grid can miss about a quarter of the year's sunlight. We treat the
+lander as a point 2 m above the ground with no tilt.
+
+The energy figure is sunlight arriving, before any panel turns it into
+electricity. We don't model panel angle, efficiency, temperature or dust.
+"Earth in view" means the centre of the Earth's disk is above the skyline, and
+we don't model an antenna, a ground station or a data rate. The page states
+these limits next to the numbers. The 3D Moon is a picture, and the numbers
+are calculated separately from it.
 
 **What comes next**
 
-The 5 m LOLA grids that NASA Goddard publishes for south pole landing sites,
-so the nearest ridges are exact. Solar panel tilt and an antenna model.
-Landing sites from other countries' lunar programs.
+NASA Goddard publishes 5 m LOLA grids for south pole landing sites, and adding
+them would resolve the nearest ridges. After that we would add solar panel
+tilt and an antenna model. We would also like to add landing sites from other
+countries' lunar programs.
 
 **Tools**
 
@@ -180,9 +187,9 @@ Pillow for the data scripts, Astronomy Engine 2.1.19, Mona Sans typeface.
 
 We used one AI coding tool, Claude Code (Anthropic, model Claude Fable 5.2).
 
-The idea is the team's: pick a landing site and a time, see where the Sun and
-the Earth are, and compare two scenarios. The comparison of sites and dates
-comes from the challenge statement.
+The idea is ours: pick a landing site and a time, see where the Sun and the
+Earth are, and compare two scenarios. Comparing sites and dates comes from the
+challenge statement.
 
 What the team decided `[team: edit this list so every line is true, and add who checked which numbers]`:
 
@@ -194,30 +201,33 @@ What the team decided `[team: edit this list so every line is true, and add who 
 - What to deliver: the live tool, seven slides, a short video and this page.
 - To ask where the project could lose, and then to add the terrain skyline and
   the energy figure in answer.
+- That the first drafts of the text read as machine-written, that they should
+  be rewritten in plain language, and that the site needed a page explaining
+  our thinking.
 
-Under the team's direction the tool wrote the code, the tests, the
-documentation, the slides and the first draft of this page. It read the Space
-Apps guides, downloaded reference tables from NASA JPL Horizons, downloaded
-and converted NASA's Moon maps and LOLA elevation grids, and looked at
+We directed the tool as it wrote the code, the tests, the documentation, the
+slides and the first draft of this page. The tool read the Space Apps guides
+and downloaded reference tables from NASA JPL Horizons. It downloaded and
+converted NASA's Moon maps and LOLA elevation grids, and it looked at
 published websites for design reference. A web capture service, Firecrawl,
 took screenshots of those reference sites and read two NASA pages and one
 paper abstract.
 
-How it is labelled: every AI-written file starts with an "SI disclosure"
-comment, the page and the slides carry a `generator` tag in their metadata,
-commits made with the tool carry a `Co-Authored-By: Claude` line, and the file
+How we label it. Each AI-written file starts with an "SI disclosure" comment.
+The pages and the slides carry a `generator` tag in their metadata, and
+commits made with the tool carry a `Co-Authored-By: Claude` line. The file
 `SI_USE.md` in the repository logs each session with times and files.
 
-No AI-generated images, video or audio are in the project. The Moon on the
-page and in the slides is NASA imagery drawn by code. The demo video is
-screenshots of the page joined by a script the tool wrote, and its last card
-says so. Nothing uses NASA logos, flags or mission identifiers.
+The project has no AI-generated images, video or audio. The Moon on the page
+and in the slides is NASA imagery drawn by code. The demo video is screenshots
+of the page joined by a script the tool wrote, and its last card says so. We
+use no NASA logos, flags or mission identifiers.
 
 ## 7. NASA data
 
 - LOLA Gridded Data Records, polar products LDEM_60S_240M and LDEM_60N_240M
   (Lunar Orbiter Laser Altimeter on the Lunar Reconnaissance Orbiter), NASA
-  Planetary Data System Geosciences Node. The terrain behind every skyline.
+  Planetary Data System Geosciences Node. The terrain behind the skylines.
   https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/
 - JPL Horizons System API. Reference positions of the Sun and the Earth for an
   observer on the Moon, and the sub-solar point. The position tests compare

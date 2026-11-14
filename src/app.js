@@ -737,8 +737,8 @@
       $(col, '[data-role=title]').textContent = R.scn.name + ', from ' + fmtUtc(R.scn.startMs, true);
       var base = { samples: R.samples, startMs: R.scn.startMs, windowDays: results.windowDays, scale: R.scale, zeroLabel: R.word };
       $(col, '[data-role=cap-panorama]').textContent = R.horizon
-        ? 'Looking out from the site: compass direction across, height up. The ground is the skyline from LOLA terrain.'
-        : 'Looking out from the site: compass direction across, height above the horizon up';
+        ? 'The view from the site. Compass direction runs across and height runs up. The grey ground is the skyline from LOLA terrain.'
+        : 'The view from the site. Compass direction runs across and height above the horizon runs up.';
       $(col, '[data-role=cap-timeline]').textContent = 'Height above the ' + R.word + ' over time';
       drawn[key] = {
         panorama: Charts.panorama($(col, '[data-role=panorama]'), {
@@ -795,7 +795,7 @@
   function renderSources() {
     var list = document.getElementById('sources');
     var items = [
-      ['NASA JPL Horizons System', 'https://ssd.jpl.nasa.gov/horizons/', 'reference positions used to check every calculation'],
+      ['NASA JPL Horizons System', 'https://ssd.jpl.nasa.gov/horizons/', 'the reference positions our tests compare against'],
       ['Astronomy Engine 2.1.19 by Don Cross (MIT license)', 'https://github.com/cosinekitty/astronomy', 'Sun, Earth, and Moon positions and the Moon’s rotation'],
       ['NASA Planetary Data System, LOLA Gridded Data Records, polar grids at 240 m', 'https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/', 'the skyline at sites near the poles, from the Lunar Orbiter Laser Altimeter on the Lunar Reconnaissance Orbiter'],
       ['NASA Scientific Visualization Studio, CGI Moon Kit', 'https://svs.gsfc.nasa.gov/4720/', 'the 3D Moon’s colour map (LROC wide-angle camera) and heights (LOLA laser altimeter), both from the Lunar Reconnaissance Orbiter']
