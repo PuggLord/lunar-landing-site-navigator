@@ -115,4 +115,21 @@ The idea was ours, and we told it what to build.
 It's for a mission planner who needs a quick first answer  
 when a date or a site changes.  
 It runs in a browser. There's nothing to install.  
-Thanks for watching.  
+Thanks for watching.
+
+## The 30-second version
+
+`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` works the same way and runs 29.6 seconds, so with our voices added it fits the Space Apps limit for a video demo. Its first word starts at 1.5 seconds. It has 56 words, and there is no room to slow down, so practise it once before recording.
+
+**Reader 1, 0:01** (the first screen, IM-1 against the planned IM-2 site, with the 90 days running)
+
+Hi, we're team Ksig UNT.  
+Our tool compares two Moon landing sites, or two dates.  
+Here, B loses the Sun 23 hours before A,  
+and loses the Earth after 9 days.
+
+**Reader 2, 0:16** (Shackleton crater, then the numbers table)
+
+The skyline is real NASA terrain.  
+At Shackleton crater, the rim gets Sun 91 percent of the time.  
+The floor, 10 km away, gets none.  

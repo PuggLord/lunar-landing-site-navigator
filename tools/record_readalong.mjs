@@ -15,6 +15,7 @@
  * Needs Node.js 22 or newer, ffmpeg on the PATH, and a Chromium browser.
  *
  *     node tools/record_readalong.mjs                     the video and docs/READ_ALONG.md
+ *     node tools/record_readalong.mjs --short             the 30-second version
  *     node tools/record_readalong.mjs --doc               only docs/READ_ALONG.md
  *     node tools/record_readalong.mjs --encode            join the pictures from the last run again
  *     node tools/record_readalong.mjs --stills 5,40 DIR   single frames at those seconds, for checking
@@ -27,12 +28,15 @@ import { copyFileSync, existsSync, linkSync, mkdirSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BLOCKS, READERS, SAY } from './readalong_script.mjs';
+import { BLOCKS, SHORT_BLOCKS, READERS, SAY } from './readalong_script.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = join(ROOT, 'demo', 'Lunar-Landing-Site-Navigator-read-along.mp4');
+/* --short records the 30-second version, which fits the Space Apps limit for a video demo. */
+const SHORT = process.argv.includes('--short');
+const NAME = SHORT ? 'Lunar-Landing-Site-Navigator-30s-read-along.mp4' : 'Lunar-Landing-Site-Navigator-read-along.mp4';
+const OUT = join(ROOT, 'demo', NAME);
 const DOC = join(ROOT, 'docs', 'READ_ALONG.md');
-const WORK = join(tmpdir(), 'llsn-readalong');
+const WORK = join(tmpdir(), SHORT ? 'llsn-readalong-30s' : 'llsn-readalong');
 const FRAMES_DIR = join(WORK, 'frames');
 const PORT = 8767;
 const DEBUG_PORT = 9335;
@@ -66,6 +70,10 @@ const LEAD = 1.5;    // seconds of title before the first count-in
 const DOT = 0.4;     // seconds per count-in dot, three dots before each reader
 const TAIL = 0.8;    // seconds after a reader's last word
 const END = 3.0;     // seconds on the closing card
+const SHORT_LEAD = 0.3;
+const SHORT_TAIL = 0.5;
+const SHORT_END = 1.5;
+const LIMIT = 30;    // the Space Apps limit for a video demo, in seconds
 
 function syllables(raw) {
   const w = raw.replace(/[,.;:?!]+$/, '');
@@ -81,12 +89,12 @@ function syllables(raw) {
 const wordSeconds = (w) => 0.14 + 0.155 * syllables(w);
 const pauseAfter = (w, endOfLine) => (/[.?!]$/.test(w) ? 0.4 : /[,;:]$/.test(w) ? 0.18 : endOfLine ? 0.06 : 0);
 
-function buildTimeline() {
+function buildTimeline(source, lead, tail, end) {
   let t = 0;
   let count = 0;
-  const blocks = BLOCKS.map((block, b) => {
+  const blocks = source.map((block, b) => {
     const k = { who: block.who, scene: block.scene, t0: t };
-    if (b === 0) t += LEAD;
+    if (b === 0) t += lead;
     k.count0 = t;
     t += 3 * DOT;
     k.speak0 = t;
@@ -101,11 +109,11 @@ function buildTimeline() {
       return line;
     });
     k.speakEnd = t;
-    t += TAIL;
+    t += tail;
     k.t1 = t;
     return k;
   });
-  return { blocks, total: t + END, words: count };
+  return { blocks, total: t + end, words: count };
 }
 
 /* What is on screen at time t: which block, what the caption shows, and where the reader is in the block. */
@@ -137,7 +145,7 @@ function locate(tl, t) {
 
 const clock = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
 
-function writeDoc(tl) {
+function writeDoc(tl, short) {
   const out = [];
   out.push('<!-- SI disclosure: drafted with an AI coding tool (Claude Code, Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026, for team Ksig UNT to check and edit. See SI_USE.md. -->');
   out.push('<!-- Made by tools/record_readalong.mjs from tools/readalong_script.mjs. Edit the script there and run it again. -->');
@@ -167,6 +175,16 @@ function writeDoc(tl) {
   out.push('');
   out.push(`${tl.words} words, about ${Math.round(tl.words / ((tl.total - END) / 60))} words a minute with the pauses counted. The time beside each turn is when its first word starts.`);
   tl.blocks.forEach((k) => {
+    out.push('');
+    out.push(`**${READERS[k.who]}, ${clock(k.speak0)}** (${SCENE_NOTES[k.scene]})`);
+    out.push('');
+    k.lines.forEach((line) => out.push(line.text + '  '));
+  });
+  out.push('');
+  out.push('## The 30-second version');
+  out.push('');
+  out.push(`\`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4\` works the same way and runs ${short.total.toFixed(1)} seconds, so with our voices added it fits the Space Apps limit for a video demo. Its first word starts at ${short.blocks[0].speak0.toFixed(1)} seconds. It has ${short.words} words, and there is no room to slow down, so practise it once before recording.`);
+  short.blocks.forEach((k) => {
     out.push('');
     out.push(`**${READERS[k.who]}, ${clock(k.speak0)}** (${SCENE_NOTES[k.scene]})`);
     out.push('');
@@ -214,6 +232,8 @@ const SCENE_NOTES = {
   late: 'IM-1 on landing day and two weeks later',
   energy: 'the numbers table',
   checks: 'the slide with our checks',
+  short1: 'the first screen, IM-1 against the planned IM-2 site, with the 90 days running',
+  short2: 'Shackleton crater, then the numbers table',
   limits: 'the notes under the charts, then the foot of the page',
   close: 'the last slide'
 };
@@ -305,6 +325,27 @@ const SCENES = {
     enter: async (x) => { await x.open(DECK, '', 'deck', 1500); await x.run(slide, 6); },
     state: () => ({})
   },
+  short1: {
+    enter: async (x) => {
+      await x.open(TOOL, CASE_MOVE, 'tool', 6000);
+      x.vars.play = Math.max(0, await x.run(topOf, '.transport', 620));
+    },
+    state: (c, v) => ({
+      scroll: v.play, scrub: sweep(c, 0, c.D),
+      marks: c.on && c.line >= 2 ? [{ sel: '#verdict' }] : []
+    })
+  },
+  short2: {
+    enter: async (x) => {
+      await x.open(TOOL, CASE_RIM, 'tool', 6000);
+      x.vars.charts = await x.run(topOf, '.charts', -60);
+      x.vars.row = await x.run(topOf, '#numbers-h', 60);
+    },
+    state: (c, v) => ({
+      scroll: glide(c, c.L(1) - 0.8, 0.8, v.charts, v.row), scrub: sweep(c, -1.2, c.L(1) - 0.8),
+      marks: !c.on ? [] : c.line === 0 ? [{ sel: '[data-role=panorama]' }] : [{ row: 'Sunlight in' }]
+    })
+  },
   end: {
     enter: async (x) => { await x.open(DECK, '', 'deck', 1500); await x.run(slide, 0, 'credit'); },
     state: () => ({})
@@ -359,11 +400,14 @@ async function connect() {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  const tl = buildTimeline();
+  const args = process.argv.slice(2).filter((a) => a !== '--short');
+  const long = buildTimeline(BLOCKS, LEAD, TAIL, END);
+  const short = buildTimeline(SHORT_BLOCKS, SHORT_LEAD, SHORT_TAIL, SHORT_END);
+  const tl = SHORT ? short : long;
+  if (short.total > LIMIT) throw new Error(`The short script runs ${short.total.toFixed(1)} s. Cut words to get under ${LIMIT}.`);
   const spoken = tl.blocks.reduce((sum, k) => sum + k.speakEnd - k.speak0, 0);
   console.log(`${tl.words} words, ${clock(tl.total)} (${tl.total.toFixed(1)} s), ${Math.round(tl.words / spoken * 60)} words a minute while speaking`);
-  writeDoc(tl);
+  writeDoc(long, short);
   if (args[0] === '--doc') return;
   const stills = args[0] === '--stills' ? args[1].split(',').map(Number) : null;
   const stillsDir = stills ? resolve(args[2]) : null;
@@ -405,7 +449,7 @@ async function main() {
     await cdp.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/tools/readalong.html` });
     await loaded;
     await sleep(600);
-    await run((blocks, readers) => { stage.setScript(blocks, readers); }, BLOCKS, READERS);
+    await run((blocks, readers) => { stage.setScript(blocks, readers); }, SHORT ? SHORT_BLOCKS : BLOCKS, READERS);
 
     const x = {
       vars: {},

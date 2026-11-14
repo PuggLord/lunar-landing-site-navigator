@@ -42,7 +42,7 @@ Horizons, and the largest difference we found was 0.0073 degrees.
 
 ## 3. Link to project demo
 
-`[paste one public link: deck/Lunar-Landing-Site-Navigator.pdf (seven slides) or demo/Lunar-Landing-Site-Navigator-demo.mp4 (29 seconds)]`
+`[paste one public link: deck/Lunar-Landing-Site-Navigator.pdf (seven slides), or demo/Lunar-Landing-Site-Navigator-demo.mp4 (29 seconds, silent), or the narrated 30-second video once the team has recorded its voices over demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4. Check that the narrated file is 30 seconds or less before linking it.]`
 
 ## 4. Link to final project
 

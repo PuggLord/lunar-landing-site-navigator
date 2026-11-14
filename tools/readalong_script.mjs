@@ -101,6 +101,24 @@ export const BLOCKS = [
 ];
 
 /*
+ * The 30-second version, one turn each. The recorder refuses to run if this
+ * goes over 30 seconds, because a longer video cannot be the Space Apps demo.
+ */
+export const SHORT_BLOCKS = [
+  { who: 1, scene: 'short1', lines: [
+    "Hi, we're team Ksig UNT.",
+    'Our tool compares two Moon landing sites, or two dates.',
+    'Here, B loses the Sun 23 hours before A,',
+    'and loses the Earth after 9 days.'
+  ] },
+  { who: 2, scene: 'short2', lines: [
+    'The skyline is real NASA terrain.',
+    'At Shackleton crater, the rim gets Sun 91 percent of the time.',
+    'The floor, 10 km away, gets none.'
+  ] }
+];
+
+/*
  * How many syllables a reader says for a word that is not spelled the way it
  * sounds. The timing of the underline uses these.
  */

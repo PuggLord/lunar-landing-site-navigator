@@ -117,6 +117,12 @@ change, record it again (about five minutes):
 
     node tools/record_readalong.mjs
 
+`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` is the same idea cut to
+29.6 seconds, with one turn for each of two readers. With their voices added
+it fits the Demo field. To record it again:
+
+    node tools/record_readalong.mjs --short
+
 `SUBMISSION.md` holds drafts of the eight fields on the Space Apps project
 page.
 
