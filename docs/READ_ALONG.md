@@ -3,7 +3,7 @@
 
 # Read-along video
 
-`demo/Lunar-Landing-Site-Navigator-read-along.mp4` shows the tool with our script in a band under it. It runs 3:26 and has no sound. We play it, read the script out loud as the underline moves, and record our voices. With the voices added it becomes the long version of our demo.
+`demo/Lunar-Landing-Site-Navigator-read-along.mp4` shows the tool with our script in a band under it. It runs 3:56 and has no sound. We play it, read the script out loud as the underline moves, and record our voices. With the voices added it becomes the long version of our demo.
 
 ## How to record
 
@@ -24,90 +24,95 @@ ffmpeg -i demo/Lunar-Landing-Site-Navigator-read-along.mp4 -i voice.m4a -map 0:v
 
 ## The script
 
-446 words, about 131 words a minute with the pauses counted. The time beside each turn is when its first word starts.
+531 words, about 137 words a minute with the pauses counted. The time beside each turn is when its first word starts.
 
 **Reader 1, 0:02** (the title)
 
-Launch dates slip, and landing sites get moved.  
-Near the Moon's south pole, a change like that can decide  
-whether a lander has sunlight and can still see the Earth.  
-We are team Ksig UNT.  
-This is Lunar Landing Site Navigator.
+Hi, we're team Ksig UNT.  
+This is our project, Lunar Landing Site Navigator.  
+Say a Moon landing slips two weeks, or the site gets moved.  
+Near the south pole, that can mean no sunlight,  
+or no view of the Earth.  
+Our tool lets you check.
 
-**Reader 2, 0:21** (the first screen, IM-1 against the planned IM-2 site)
+**Reader 2, 0:22** (the first screen, IM-1 against the planned IM-2 site)
 
-You give the tool two scenarios.  
-Each one is a place on the Moon and a start time.  
-Here, A is the site where the IM-1 lander came down.  
-B is the planned IM-2 site, 175 kilometres away.  
-The sentence beside the Moon is the answer.  
-At B, the Earth sets after 9 days.  
-At A, it stays in view for the full 90.
+You start with two scenarios.  
+Each one is a spot on the Moon and a start time.  
+A is where the IM-1 lander came down.  
+B is the site planned for IM-2, 175 km away.  
+The big sentence on the left is the result.  
+B loses the Sun first, 23 hours before A.  
+B also loses the Earth after 9 days.  
+A can see the Earth for all 90.
 
-**Reader 1, 0:48** (the Moon, with the 90 days running)
+**Reader 1, 0:52** (the Moon, with the 90 days running)
 
 The Moon on screen is NASA imagery.  
-Our code lights it from the Sun's real direction  
-at the time you picked.  
-Press Play, and the 90 days run forward.  
-The two bars by the slider show when the Sun is up  
-at each site.  
-The Moon is a picture. We calculate the numbers separately.
+We light it from the Sun's real position  
+for the time you picked.  
+Hit Play and the 90 days run forward.  
+The orange bars by the slider show when the Sun is up.  
+Top bar is site A, bottom bar is B.  
+The numbers don't come from this picture.  
+We calculate them on their own.
 
-**Reader 2, 1:12** (the view from each site)
+**Reader 2, 1:18** (the view from each site)
 
-Further down is the view from each site.  
-Compass direction runs across, and height runs up.  
-The grey ground is the real skyline.  
-We built it from NASA's LOLA laser altimeter data.  
-The Sun or the Earth counts as up  
-when it is higher than the ground in its direction.
+Scroll down and you get the view from each site.  
+Left to right is compass direction, and up is height.  
+The grey shape is the ground. It's the real skyline at that site.  
+It comes from NASA's LOLA data, laser height readings from orbit.  
+When the Sun is above the grey, it's up.  
+The chart underneath tracks that over the whole 90 days.
 
-**Reader 1, 1:33** (Shackleton crater, then the numbers table)
+**Reader 1, 1:45** (Shackleton crater, then the numbers table)
 
-Here is why the terrain matters.  
-These two points are at Shackleton crater,  
-10 kilometres apart.  
-Over 90 days, the rim is in sunlight 91 percent of the time.  
-The floor gets none.  
-With a flat horizon, the tool gives 53 and 47 percent.
+This is why we added the terrain.  
+These two points are at Shackleton crater, at the south pole.  
+They're 10 km apart.  
+Over 90 days, the rim gets sunlight 91 percent of the time.  
+The floor gets zero.  
+Turn the terrain off, and the tool says 53 and 47 percent.  
+Without the terrain, you'd get the wrong answer.
 
-**Reader 2, 1:55** (IM-1 on landing day and two weeks later)
+**Reader 2, 2:11** (IM-1 on landing day and two weeks later)
 
-The same check works for dates.  
-Land at the IM-1 site on its landing day,  
-and the Sun stays up for 8 days and 15 hours.  
-Land two weeks later, and you arrive in the dark.  
-Sunrise is 12 days and 2 hours away.
+You can also compare two dates at the same site.  
+Say you land at the IM-1 site on its real landing day.  
+You get 8 days and 15 hours of Sun before it sets.  
+Now land two weeks late.  
+You land in the dark, and sunrise is 12 days and 2 hours away.
 
-**Reader 1, 2:13** (the numbers table)
+**Reader 1, 2:33** (the numbers table)
 
-The table also adds up solar energy.  
-That is sunlight reaching a panel that follows the Sun.  
-It gives the longest dark stretch too,  
-which a battery has to cover.  
-At the IM-1 site, that is 18 days and 14 hours.
+The table has the rest of the numbers.  
+This row is solar energy, how much sunlight hits a panel  
+that stays pointed at the Sun.  
+And this row is the longest stretch with no Sun.  
+At the IM-1 site that's 18 days and 14 hours.  
+A battery would have to last that long.
 
-**Reader 2, 2:32** (the slide with our checks)
+**Reader 2, 2:55** (the slide with our checks)
 
-We checked the numbers.  
-The Sun and Earth positions match NASA's JPL Horizons  
-within 0.0073 degrees, over 852 time steps.  
-The skyline code agrees with a second version  
-written in Python.  
-All 39 tests run with one command.
+We checked the numbers a few ways.  
+We compared our Sun and Earth positions with NASA's JPL Horizons.  
+The biggest difference was 0.0073 degrees.  
+A second version of the skyline code, in Python,  
+gives the same result within 0.05 degrees.  
+There are 39 tests, and one command runs them all.
 
-**Reader 1, 2:52** (the notes under the charts, then the foot of the page)
+**Reader 1, 3:20** (the notes under the charts, then the foot of the page)
 
-The tool stops at geometry.  
-It has no solar panel model and no antenna model,  
-and the terrain grid smooths out small craters.  
-We built it with an AI coding tool, Claude Code.  
-The idea is ours, and we directed the work.
+Here's what it doesn't do.  
+It doesn't model the solar panels or the antenna.  
+And the terrain data is too coarse to show small craters.  
+We used an AI coding tool, Claude Code, to write the code.  
+The idea was ours, and we told it what to build.
 
-**Reader 2, 3:11** (the last slide)
+**Reader 2, 3:40** (the last slide)
 
-It gives a mission planner a first answer in about a minute,  
-before a full terrain study.  
-It opens in a browser, with nothing to install.  
-Thank you.  
+It's for a mission planner who needs a quick first answer  
+when a date or a site changes.  
+It runs in a browser. There's nothing to install.  
+Thanks for watching.  

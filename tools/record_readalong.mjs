@@ -251,10 +251,10 @@ const SCENES = {
       x.vars.pair = await x.run(topOf, '.chart-pair', 24);
     },
     state: (c, v) => ({
-      scroll: c.speak < c.L(4) - 0.9 ? glide(c, -0.9, 1.0, v.from, v.charts) : glide(c, c.L(4) - 0.9, 0.8, v.charts, v.pair),
+      scroll: c.speak < c.L(5) - 0.9 ? glide(c, -0.9, 1.0, v.from, v.charts) : glide(c, c.L(5) - 0.9, 0.8, v.charts, v.pair),
       scrub: sweep(c, c.L(1), c.D),
-      marks: !c.on ? [] : c.line === 2 || c.line === 3 ? [{ sel: '[data-role=panorama]' }]
-        : c.line >= 4 ? [{ sel: '[data-role=timeline]' }] : []
+      marks: !c.on ? [] : c.line >= 2 && c.line <= 4 ? [{ sel: '[data-role=panorama]' }]
+        : c.line >= 5 ? [{ sel: '[data-role=timeline]' }] : []
     })
   },
   shackleton: {
@@ -283,7 +283,7 @@ const SCENES = {
     },
     state: (c, v) => ({
       scroll: v.row, scrub: 0,
-      marks: !c.on ? [] : c.line <= 1 ? [{ row: 'Solar energy in' }] : [{ row: 'Longest time without the Sun' }]
+      marks: !c.on || c.line === 0 ? [] : c.line <= 2 ? [{ row: 'Solar energy in' }] : [{ row: 'Longest time without the Sun' }]
     })
   },
   checks: {

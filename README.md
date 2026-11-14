@@ -108,7 +108,7 @@ The Space Apps demo is seven slides or a video of 30 seconds or less. Submit
 one of the two.
 
 `demo/Lunar-Landing-Site-Navigator-read-along.mp4` is a longer video, 3
-minutes 27 seconds, for the team to narrate. It shows the tool with our script
+minutes 56 seconds, for the team to narrate. It shows the tool with our script
 in a band underneath, and an underline moves from word to word at reading
 pace. `docs/READ_ALONG.md` has the script and the recording steps. It is too
 long for the Demo field, so it would go in the project description or to the
