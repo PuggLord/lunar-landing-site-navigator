@@ -107,6 +107,16 @@ takes about ten minutes):
 The Space Apps demo is seven slides or a video of 30 seconds or less. Submit
 one of the two.
 
+`demo/Lunar-Landing-Site-Navigator-read-along.mp4` is a longer video, 3
+minutes 27 seconds, for the team to narrate. It shows the tool with our script
+in a band underneath, and an underline moves from word to word at reading
+pace. `docs/READ_ALONG.md` has the script and the recording steps. It is too
+long for the Demo field, so it would go in the project description or to the
+Dallas organisers. The words are in `tools/readalong_script.mjs`. After a
+change, record it again (about five minutes):
+
+    node tools/record_readalong.mjs
+
 `SUBMISSION.md` holds drafts of the eight fields on the Space Apps project
 page.
 
@@ -162,8 +172,9 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | `vendor/fonts/` | Mona Sans (GitHub, SIL Open Font License 1.1) and its license text |
 | `deck/` | The seven-slide demo, its PDF, and the screenshots it uses |
 | `tools/build_deck_pdf.ps1` | Prints the deck to PDF with a Chromium browser |
-| `demo/` | The 29-second demo video |
+| `demo/` | The 29-second demo video, and the read-along video for the team to narrate |
 | `tools/record_demo.mjs` | Records the video: drives the page in a headless browser and joins the screenshots with ffmpeg |
+| `tools/record_readalong.mjs`, `tools/readalong.html`, `tools/readalong_script.mjs` | Record the read-along video: the recorder, the frame it draws in, and the script |
 | `SUBMISSION.md` | Draft text for the Space Apps project page |
 
 ## Sources and credits

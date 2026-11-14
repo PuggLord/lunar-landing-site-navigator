@@ -1,0 +1,177 @@
+<!doctype html>
+<!--
+  SI disclosure: this page was written with an AI coding tool (Claude Code,
+  Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026,
+  directed and reviewed by team Ksig UNT. See SI_USE.md.
+
+  The stage for the read-along video. The top of the frame holds the real page
+  or the real slides. The band underneath shows the script one line at a time
+  and underlines the word to say. tools/record_readalong.mjs drives it.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Read-along stage</title>
+  <meta name="generator" content="Written with Claude Code (AI tool); see SI_USE.md">
+  <link rel="stylesheet" href="../css/fonts.css">
+  <style>
+    :root {
+      --page: #050608; --surface: #0b0d11; --ink: #f1f2f4; --muted: #878c96;
+      --rule: rgba(241, 242, 244, 0.26);
+      --font: "Mona Sans", "Segoe UI", system-ui, sans-serif;
+    }
+    html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; background: var(--page); color: var(--ink); font-family: var(--font); }
+    #screen { position: absolute; left: 0; top: 0; width: 1600px; height: 720px; overflow: hidden; background: var(--page); }
+    #view { position: absolute; left: 0; top: 0; width: 1600px; height: 720px; border: 0; }
+    /* The slides are drawn at 1600 by 900 and shown at four fifths of that. */
+    #screen.deck #view { left: 160px; height: 900px; transform: scale(0.8); transform-origin: 0 0; }
+    #marks { position: absolute; inset: 0; pointer-events: none; }
+    #marks i { position: absolute; box-sizing: border-box; border: 2px solid var(--ink); border-radius: 3px; }
+
+    #band { position: absolute; left: 0; top: 720px; width: 1600px; height: 180px; box-sizing: border-box; padding: 36px 40px 0; display: grid; grid-template-columns: 200px 1fr; background: var(--surface); border-top: 1px solid var(--rule); }
+    #who { padding-top: 13px; font: 600 15px/1.2 var(--font); font-stretch: 112%; letter-spacing: 0.01em; }
+    #dots { display: flex; gap: 7px; margin-top: 14px; }
+    #dots i { box-sizing: border-box; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--muted); }
+    #dots i.on { background: var(--ink); border-color: var(--ink); }
+    #cur { margin: 0; font: 500 35px/1.2 var(--font); letter-spacing: -0.012em; white-space: nowrap; }
+    #cur .said { color: var(--muted); }
+    #cur .now { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 9px; }
+    #next { margin: 16px 0 0; font: 400 21px/1.3 var(--font); color: var(--muted); white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div id="screen" class="tool">
+    <iframe id="view" title="The page being shown"></iframe>
+    <div id="marks"></div>
+  </div>
+  <div id="band">
+    <div><div id="who"></div><div id="dots"><i></i><i></i><i></i></div></div>
+    <div><p id="cur"></p><p id="next"></p></div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+      var view = document.getElementById('view');
+      var screen = document.getElementById('screen');
+      var marks = document.getElementById('marks');
+      var who = document.getElementById('who');
+      var dots = document.getElementById('dots');
+      var cur = document.getElementById('cur');
+      var next = document.getElementById('next');
+      var S = { page: null, mode: null, blocks: [], readers: {}, cap: null };
+
+      function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+      function frames(w) { return new Promise(function (r) { w.requestAnimationFrame(function () { w.requestAnimationFrame(r); }); }); }
+      function doc() { return view.contentDocument; }
+      function win() { return view.contentWindow; }
+
+      /* Find what a mark points at: a row of the numbers table by the start of its label, or a selector, which `has` narrows to elements holding that text. */
+      function find(spec) {
+        var d = doc();
+        if (spec.row) {
+          return Array.prototype.filter.call(d.querySelectorAll('#metrics-body tr'), function (tr) {
+            return tr.firstElementChild && tr.firstElementChild.textContent.indexOf(spec.row) === 0;
+          });
+        }
+        return Array.prototype.filter.call(d.querySelectorAll(spec.sel), function (el) {
+          return !spec.has || el.textContent.indexOf(spec.has) >= 0;
+        });
+      }
+
+      function drawMarks(specs) {
+        marks.textContent = '';
+        if (S.mode !== 'tool') return;
+        specs.forEach(function (spec) {
+          find(spec).forEach(function (el) {
+            var r = el.getBoundingClientRect();
+            var pad = spec.pad == null ? 7 : spec.pad;
+            if (r.width === 0 || r.bottom < 0 || r.top > 720) return;
+            var box = document.createElement('i');
+            box.style.left = (r.left - pad) + 'px';
+            box.style.top = (r.top - pad) + 'px';
+            box.style.width = (r.width + 2 * pad) + 'px';
+            box.style.height = (r.height + 2 * pad) + 'px';
+            marks.appendChild(box);
+          });
+        });
+      }
+
+      function caption(c) {
+        var key = JSON.stringify(c);
+        if (key === S.cap) return;
+        S.cap = key;
+        cur.textContent = '';
+        next.textContent = '';
+        who.textContent = '';
+        dots.style.visibility = 'hidden';
+        if (!c) return;
+        var block = S.blocks[c.b];
+        who.textContent = S.readers[block.who];
+        if (c.dots != null) {
+          dots.style.visibility = 'visible';
+          Array.prototype.forEach.call(dots.children, function (d, i) { d.className = i < c.dots ? 'on' : ''; });
+        }
+        block.lines[c.line].split(' ').forEach(function (word, i) {
+          var s = document.createElement('span');
+          s.textContent = word;
+          if (i < c.word) s.className = 'said';
+          if (i === c.word) s.className = 'now';
+          if (i) cur.appendChild(document.createTextNode(' '));
+          cur.appendChild(s);
+        });
+        if (c.line + 1 < block.lines.length) next.textContent = block.lines[c.line + 1];
+        else if (S.blocks[c.b + 1]) next.textContent = S.readers[S.blocks[c.b + 1].who] + ' is next';
+      }
+
+      window.stage = {
+        doc: doc,
+        win: win,
+        setScript: function (blocks, readers) { S.blocks = blocks; S.readers = readers; },
+
+        /* Show a page of the project. Loads it only when the page changes; a new case is a new hash. */
+        open: async function (page, hash, mode, settle) {
+          if (S.page !== page || S.mode !== mode) {
+            screen.className = mode;
+            marks.textContent = '';
+            await new Promise(function (ok) { view.onload = ok; view.src = '../' + page + (hash ? '#' + hash : ''); });
+            S.page = page;
+            S.mode = mode;
+            await sleep(settle);
+          } else if (hash && win().location.hash.slice(1) !== hash) {
+            win().location.hash = hash;
+            await sleep(1500);
+          }
+        },
+
+        /* Put the tool and the caption in one state, and wait until both are drawn. */
+        apply: async function (st) {
+          var w = win(), d = doc();
+          if (S.mode === 'tool') {
+            var want = st.horizon || 'terrain';
+            var radio = d.querySelector('input[name=horizon][value=' + want + ']');
+            if (radio && !radio.checked) { radio.click(); await sleep(900); }
+            if (st.scroll != null) w.scrollTo(0, st.scroll);
+            if (st.scrub != null) {
+              var s = d.getElementById('scrub');
+              if (Number(s.value) !== st.scrub) {
+                s.value = st.scrub;
+                s.dispatchEvent(new w.Event('input', { bubbles: true }));
+              }
+            }
+          }
+          if (st.zoom != null) {
+            var m = d.querySelector('.title .moon');
+            m.style.transformOrigin = '60% 60%';
+            m.style.transform = 'scale(' + st.zoom + ')';
+          }
+          await frames(w);
+          drawMarks(st.marks || []);
+          caption(st.cap || null);
+          await frames(window);
+        }
+      };
+    })();
+  </script>
+</body>
+</html>
