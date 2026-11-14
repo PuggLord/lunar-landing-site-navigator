@@ -175,6 +175,22 @@ b { color: var(--ink); font-weight: 600; white-space: nowrap; }
 }
 .crop { width: 164rem; aspect-ratio: 1600 / 670; overflow: hidden; outline: 1px solid var(--hairline); outline-offset: -1px; }
 .crop img { display: block; width: 100%; margin-top: -10.4%; }
+.wide .head p { font-size: 2.8rem; }
+
+/* ---------- 5: the ground ---------- */
+
+.ground {
+  display: grid;
+  grid-template-columns: 58rem minmax(0, 1fr);
+  column-gap: 8rem;
+  align-items: center;
+  height: 100%;
+  padding: 8rem 8rem 13rem;
+}
+.ground h2 { margin-bottom: 4.4rem; font-size: 6rem; }
+.ground .words p { font-size: 2.8rem; }
+.views { display: grid; row-gap: 4.4rem; }
+.views figcaption { margin-bottom: 1.4rem; color: var(--ink-2); font-size: 2.4rem; line-height: 1.35; }
 
 /* ---------- 6: checks ---------- */
 
@@ -194,7 +210,7 @@ b { color: var(--ink); font-weight: 600; white-space: nowrap; }
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 4rem;
   align-items: center;
-  padding: 2.4rem 0 2.6rem;
+  padding: 1.8rem 0 2rem;
   border-bottom: 1px solid var(--hairline);
 }
 .ledger dt { color: var(--ink-2); font-size: 2.8rem; line-height: 1.35; }

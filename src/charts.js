@@ -59,31 +59,39 @@
     return 15;
   }
 
-  function drawElevationAxis(svg, box, scale) {
+  /* ownGround: the caller draws the ground itself, so leave out the flat one. */
+  function drawElevationAxis(svg, box, scale, ownGround) {
     function y(v) { return box.top + (scale.max - v) / (2 * scale.max) * box.height; }
     svg.appendChild(el('rect', { class: 'frame', x: box.left, y: box.top, width: box.width, height: box.height }));
-    svg.appendChild(el('rect', { class: 'ground', x: box.left, y: y(0), width: box.width, height: box.top + box.height - y(0) }));
+    if (!ownGround) {
+      svg.appendChild(el('rect', { class: 'ground', x: box.left, y: y(0), width: box.width, height: box.top + box.height - y(0) }));
+    }
     for (var v = -scale.max; v <= scale.max + 0.001; v += scale.tick) {
       if (Math.abs(v) > 0.001) {
         svg.appendChild(el('line', { class: 'grid', x1: box.left, x2: box.left + box.width, y1: y(v), y2: y(v) }));
       }
       svg.appendChild(el('text', { x: box.left - 8, y: y(v) + 4, 'text-anchor': 'end' }, fmtDeg(v)));
     }
-    svg.appendChild(el('line', { class: 'horizon', x1: box.left, x2: box.left + box.width, y1: y(0), y2: y(0) }));
+    if (!ownGround) {
+      svg.appendChild(el('line', { class: 'horizon', x1: box.left, x2: box.left + box.width, y1: y(0), y2: y(0) }));
+    }
     return y;
   }
 
   /* ---------- timeline ---------- */
 
   /*
-   * model: { samples, startMs, windowDays, scale }
+   * model: { samples, startMs, windowDays, scale, zeroLabel }
+   * Heights are clearDeg: height above the horizon in use, flat or terrain.
+   * zeroLabel names the zero line, 'horizon' or 'skyline'.
    * Returns { setCursor(index), indexAt(clientX) }.
    */
   function timeline(host, model) {
     var W = widthOf(host);
     var H = 230;
     var box = { left: 44, top: 10, width: W - 44 - 58, height: H - 10 - 28 };
-    var svg = svgRoot(host, W, H, 'Height of the Sun and Earth above the horizon over ' + model.windowDays + ' days');
+    var zero = model.zeroLabel || 'horizon';
+    var svg = svgRoot(host, W, H, 'Height of the Sun and Earth above the ' + zero + ' over ' + model.windowDays + ' days');
     var y = drawElevationAxis(svg, box, model.scale);
     var spanMs = model.windowDays * DAY_MS;
     function x(ms) { return box.left + (ms - model.startMs) / spanMs * box.width; }
@@ -105,22 +113,22 @@
       var d = '';
       for (var i = 0; i < model.samples.length; i++) {
         var s = model.samples[i];
-        d += (i ? 'L' : 'M') + x(s.ms).toFixed(1) + ' ' + y(s[body].elevationDeg).toFixed(1);
+        d += (i ? 'L' : 'M') + x(s.ms).toFixed(1) + ' ' + y(s[body].clearDeg).toFixed(1);
       }
       svg.appendChild(el('path', { class: 'line ' + body, d: d }));
     });
 
     // Direct labels at the right end, only when the two lines end far enough apart.
     var last = model.samples[model.samples.length - 1];
-    var ySun = y(last.sun.elevationDeg);
-    var yEarth = y(last.earth.elevationDeg);
+    var ySun = y(last.sun.clearDeg);
+    var yEarth = y(last.earth.clearDeg);
     var yZero = y(0);
     var clear = Math.abs(ySun - yEarth) >= 14 && Math.abs(ySun - yZero) >= 14 && Math.abs(yEarth - yZero) >= 14;
     if (clear) {
       svg.appendChild(el('text', { class: 'label', x: box.left + box.width + 6, y: ySun + 4 }, 'Sun'));
       svg.appendChild(el('text', { class: 'label', x: box.left + box.width + 6, y: yEarth + 4 }, 'Earth'));
     }
-    svg.appendChild(el('text', { class: 'label-2', x: box.left + box.width + 6, y: yZero + 4 }, 'horizon'));
+    svg.appendChild(el('text', { class: 'label-2', x: box.left + box.width + 6, y: yZero + 4 }, zero));
 
     var cursor = el('line', { class: 'cursor', y1: box.top, y2: box.top + box.height, x1: -10, x2: -10 });
     var dotEarth = el('circle', { class: 'marker earth', r: 5, cx: -10, cy: -10 });
@@ -135,9 +143,9 @@
       cursor.setAttribute('x1', cx);
       cursor.setAttribute('x2', cx);
       dotSun.setAttribute('cx', cx);
-      dotSun.setAttribute('cy', y(s.sun.elevationDeg));
+      dotSun.setAttribute('cy', y(s.sun.clearDeg));
       dotEarth.setAttribute('cx', cx);
-      dotEarth.setAttribute('cy', y(s.earth.elevationDeg));
+      dotEarth.setAttribute('cy', y(s.earth.clearDeg));
     }
 
     function indexAt(clientX) {
@@ -154,7 +162,11 @@
   /* ---------- panorama ---------- */
 
   /*
-   * model: { samples, scale, centerAz }  centerAz is 0 (north) or 180 (south).
+   * model: { samples, scale, centerAz, skyline }
+   * centerAz is 0 (north) or 180 (south). skyline is a function from compass
+   * direction to the height of the ground there, in degrees, or null for a
+   * flat horizon. Heights here are true heights, so the Sun and Earth paths
+   * pass behind the ground where a ridge stands higher than they do.
    * Returns { setCursor(index) }.
    */
   function panorama(host, model) {
@@ -162,7 +174,8 @@
     var H = 190;
     var box = { left: 44, top: 10, width: W - 44 - 58, height: H - 10 - 26 };
     var svg = svgRoot(host, W, H, 'Compass direction and height of the Sun and Earth as seen from the site');
-    var y = drawElevationAxis(svg, box, model.scale);
+    var sky = model.skyline || null;
+    var y = drawElevationAxis(svg, box, model.scale, !!sky);
     var c = model.centerAz;
     function rel(az) { return ((az - c + 540) % 360) - 180; } // -180..180 around the centre
     function x(az) { return box.left + (rel(az) + 180) / 360 * box.width; }
@@ -191,6 +204,21 @@
       svg.appendChild(el('path', { class: 'path ' + body, d: d }));
     });
 
+    // The ground goes over the paths, so a path behind a ridge drops out of sight.
+    if (sky) {
+      var bottom = box.top + box.height;
+      var edge = '';
+      for (var a = -180; a <= 180; a += 0.5) {
+        var py = Math.min(bottom, Math.max(box.top, y(sky(c + a))));
+        edge += (edge ? 'L' : 'M') + (box.left + (a + 180) / 360 * box.width).toFixed(1) + ' ' + py.toFixed(1);
+      }
+      svg.appendChild(el('path', {
+        class: 'terrain',
+        d: edge + 'L' + (box.left + box.width) + ' ' + bottom + 'L' + box.left + ' ' + bottom + 'Z'
+      }));
+      svg.appendChild(el('path', { class: 'skyline', d: edge }));
+    }
+
     var marks = {};
     ['earth', 'sun'].forEach(function (body) {
       var g = el('g', {});
@@ -209,6 +237,10 @@
         pos[body] = { x: x(s[body].azimuthDeg), y: y(s[body].elevationDeg) };
         marks[body].dot.setAttribute('cx', pos[body].x);
         marks[body].dot.setAttribute('cy', pos[body].y);
+        // A body behind the ground is drawn as an empty ring.
+        var up = (typeof s[body].clearDeg === 'number' ? s[body].clearDeg : s[body].elevationDeg) > 0;
+        marks[body].dot.setAttribute('class', 'marker ' + body + (up ? '' : ' behind'));
+        marks[body].text.setAttribute('class', up ? 'label' : 'label-2');
       });
       // Keep the two labels from sitting on each other: one above, one below when close.
       var close = Math.abs(pos.sun.x - pos.earth.x) < 46 && Math.abs(pos.sun.y - pos.earth.y) < 16;
@@ -256,9 +288,9 @@
   }
 
   function visibility(samples) {
-    var sun = intervals(samples, function (s) { return s.sun.elevationDeg; });
-    var earth = intervals(samples, function (s) { return s.earth.elevationDeg; });
-    var both = intervals(samples, function (s) { return Math.min(s.sun.elevationDeg, s.earth.elevationDeg); });
+    var sun = intervals(samples, function (s) { return s.sun.clearDeg; });
+    var earth = intervals(samples, function (s) { return s.earth.clearDeg; });
+    var both = intervals(samples, function (s) { return Math.min(s.sun.clearDeg, s.earth.clearDeg); });
     return {
       sun: sun, earth: earth, both: both,
       sunHours: hoursIn(sun), earthHours: hoursIn(earth), bothHours: hoursIn(both)

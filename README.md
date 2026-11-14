@@ -5,8 +5,9 @@ Team Ksig UNT, 2026 NASA Space Apps Challenge (Dallas), challenge
 Built during the event, Nov 14-15, 2026.
 
 Pick a place on the Moon and a time. The tool tells you where the Sun and the
-Earth sit in that sky, whether each is above the horizon, and how long until it
-sets.
+Earth sit in that sky, whether each is above the horizon, how long until it
+sets, and how much solar energy arrives. Near the poles the horizon is the
+real skyline, worked out from NASA's LOLA laser altimeter terrain.
 
 Then it does the same for a second scenario and puts the two side by side:
 another site on the same date, or the same site on another date. It says which
@@ -22,13 +23,14 @@ night line sweeps the globe while the charts follow.
 Open `index.html` in a browser. There is nothing to install and no server to
 start. It works with no network connection.
 
-Under the Moon, "Start from a real case" lists three comparisons that load
-with one click: a site moved 175 km, a landing two weeks late, and the pole
-beside Apollo 11.
+Under the Moon, "Start from a real case" lists four comparisons that load
+with one click: a site moved 175 km, a landing two weeks late, the rim of
+Shackleton crater against its floor, and the pole beside Apollo 11.
 
 The address bar holds the whole comparison, so a copied link reopens the same
 two scenarios. Add `&g=latitude,longitude,zoom` to the end of a link to aim the
-globe, for example `&g=-90,0,1.6` for the south pole.
+globe, for example `&g=-90,0,1.6` for the south pole. `&h=flat` turns the
+terrain skyline off.
 
 The page has one dark theme: the Moon fills the first screen, the answer is
 the headline beside it, and the two bars on the time slider mark when the Sun
@@ -43,10 +45,17 @@ Needs Node.js 20 or newer. Nothing to install.
 
     node --test
 
-The tests compare our numbers with tables saved from NASA JPL Horizons in
-`reference/horizons/`. Six cases, 1,032 time steps, at four places on the Moon.
-The largest difference found on 2026-11-14 was 0.0073 degrees, and the sunset
-time at the IM-1 site differs from Horizons by 4 seconds.
+There are 39 tests. The position tests compare our numbers with tables saved
+from NASA JPL Horizons in `reference/horizons/`: six tables, 852 time steps,
+at four places on the Moon. The largest difference found on 2026-11-14 was
+0.0073 degrees, and with a flat horizon the sunset time at the IM-1 site
+differs from Horizons by 4 seconds.
+
+The terrain tests build made-up ground with a known answer (flat, a wall, a
+bowl) and compare the browser's skyline code with a second calculation in
+Python, saved in `reference/terrain/check-960m.json`. The two agree within
+0.05 degrees over 2,160 directions. The energy tests check the sunlight sum
+and the longest-gap search.
 
 The point where the Sun is overhead lights the 3D Moon, so it is tested too:
 278 time steps in `reference/horizons-subpoints/`, largest difference 0.0067
@@ -61,6 +70,18 @@ To rebuild the Moon maps from NASA's files (needs Pillow and NumPy, downloads
 about 15 MB):
 
     python tools/build_moon_maps.py
+
+To rebuild the terrain files from NASA's LOLA grids (needs Pillow and NumPy,
+downloads about 240 MB the first time, and needs the Moon maps download above
+for its orientation check):
+
+    python -I tools/build_terrain.py
+
+## How it works, and questions a judge might ask
+
+`docs/HOW_IT_WORKS.md` follows the calculation step by step, with each formula
+and the function that runs it. `docs/FAQ.md` answers the questions we expect.
+`docs/PITCH.md` has a 60 second and a 3 minute script.
 
 ## Slides and submission text
 
@@ -86,13 +107,21 @@ page.
 
 ## What the numbers mean
 
-- Azimuth is measured clockwise from local north. Elevation is the angle above
-  a flat horizon, for the centre of the Sun or Earth disk.
-- "Above the horizon" is geometry. It does not promise solar power or a radio
-  link. Hills, crater rims, lander tilt, and antenna pointing are not modelled.
-- The horizon is flat. Near the south pole the real horizon can sit degrees
-  higher or lower, which moves sunrise and sunset by hours or days.
-- The Moon is treated as a sphere of radius 1737.4 km, the same as Horizons.
+- Azimuth is measured clockwise from local north. Heights are for the centre
+  of the Sun or Earth disk.
+- Within 17 degrees of either pole, "up" means higher than the ground in that
+  compass direction. The ground is NASA LOLA terrain out to 200 km, seen from
+  2 m above the surface: a 240 m grid for the listed polar sites and a 960 m
+  grid for any other polar point. Farther from the poles the horizon is flat.
+- The grids smooth narrow ridges. At the IM-1 site the two grids give first
+  sunsets 4 hours apart, and on a narrow peak the coarse one can understate
+  sunlight by a quarter of the year.
+- Solar energy is sunlight arriving on one square metre that faces the Sun. It
+  is not electricity: panel angle, efficiency and temperature are left out.
+- "Earth in view" does not promise a radio link. Lander tilt and antenna
+  pointing are not modelled.
+- For the Sun and Earth geometry the Moon is a sphere of radius 1737.4 km, the
+  same as Horizons.
 
 - The 3D Moon is a picture, and the numbers do not come from it. It shades
   each point by its slope, drawn 3 times steeper than life, and nothing on it
@@ -106,17 +135,23 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | --- | --- |
 | `index.html`, `css/style.css` | The page |
 | `css/fonts.css` | The typeface, Mona Sans, stored inside a stylesheet so the page needs no network. Made by `tools/build_fonts_css.py` |
-| `src/lunar-sky.js` | Sun and Earth sky position, horizon crossings, timelines |
-| `src/sites.js` | The curated landing sites, each with its source |
-| `src/charts.js` | The horizon view, the timeline, and the visibility bars (plain SVG) |
+| `src/lunar-sky.js` | Sun and Earth sky position, horizon crossings, timelines, solar energy, longest gaps |
+| `src/terrain.js` | The skyline: reads the LOLA grid and finds the height of the ground in each compass direction |
+| `src/sites.js` | The curated landing sites and reference places, each with its source |
+| `src/charts.js` | The horizon view with its skyline, the timeline, and the visibility bars (plain SVG) |
 | `src/globe.js` | The 3D Moon: a WebGL sphere with no library behind it |
 | `src/app.js` | Reads the form, runs the calculation, writes the page |
-| `test/` | Tests against the Horizons tables |
+| `test/` | 39 tests: positions against the Horizons tables, the skyline on made-up terrain and against the Python reference, energy and gaps |
 | `tools/fetch_horizons.py`, `tools/fetch_subpoints.py` | Download the reference tables from NASA JPL Horizons |
 | `tools/build_moon_maps.py` | Turns NASA's Moon colour and elevation files into `vendor/moon-maps.js` |
+| `tools/build_terrain.py` | Downloads NASA's LOLA polar grids, checks their orientation, and writes the three terrain files in `vendor/` and the checks in `reference/terrain/` |
 | `reference/horizons/`, `reference/horizons-subpoints/` | Saved Horizons answers, with the request URLs inside each file |
+| `reference/terrain/` | The Python skylines the tests compare against, and the build report with every check |
 | `vendor/astronomy.browser.js` | Astronomy Engine 2.1.19 (MIT), copied in so the page works offline |
 | `vendor/moon-maps.js` | NASA LRO colour and elevation maps of the Moon, stored inside a script so the page can open straight from disk |
+| `vendor/site-horizons.js` | Skylines of the four listed polar places from the 240 m LOLA grid |
+| `vendor/lola-south.js`, `vendor/lola-north.js` | NASA LOLA polar elevation at 960 m, loaded only when a typed or clicked polar point needs a skyline |
+| `docs/` | How the calculation works, questions and answers, and pitch scripts |
 | `vendor/fonts/` | Mona Sans (GitHub, SIL Open Font License 1.1) and its license text |
 | `deck/` | The seven-slide demo, its PDF, and the screenshots it uses |
 | `tools/build_deck_pdf.ps1` | Prints the deck to PDF with a Chromium browser |

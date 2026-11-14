@@ -12,8 +12,11 @@
  *   - Moon orientation: IAU WGCCRE 2009 pole and prime meridian series, as
  *     implemented by Astronomy Engine's RotationAxis(Body.Moon).
  *   - Moon shape: sphere of radius 1737.4 km. Site height is added to it.
- *   - Horizon: flat, at 0 degrees elevation. No terrain. A real horizon near
- *     the south pole can sit degrees above or below this.
+ *   - Horizon: the default is a flat horizon at 0 degrees elevation. A real
+ *     horizon near the south pole can sit degrees above or below that, so
+ *     nextCrossing, timeline and visibilityHours accept a skyline function
+ *     (azimuth in degrees to horizon height in degrees). src/terrain.js
+ *     builds one from NASA LOLA terrain.
  *   - Elevation refers to the centre of the Sun or Earth disk.
  *   - No atmosphere, so no refraction.
  * Azimuth is measured clockwise from local north. Longitude is east-positive.
@@ -35,6 +38,10 @@
   // Mean angular radius of each disk as seen from the Moon, for reference.
   var SUN_RADIUS_KM = 695700;
   var EARTH_RADIUS_KM = 6378.137;
+
+  // Sunlight at 1 astronomical unit, and the length of that unit.
+  var SOLAR_CONSTANT_W_M2 = 1361;
+  var AU_KM = 149597870.7;
 
   function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
   function cross(a, b) {
@@ -159,8 +166,16 @@
     return { utc: d.toISOString(), sun: point(bodies.sun), earth: point(bodies.earth) };
   }
 
-  function elevation(site, body, ms) {
-    return skyAt(site, new Date(ms))[body].elevationDeg;
+  /* Skyline function from an options object, or null for a flat horizon. */
+  function skylineOf(options) {
+    return options && typeof options.horizon === 'function' ? options.horizon : null;
+  }
+
+  /* Degrees between the centre of a body and the horizon in its direction. */
+  function clearance(site, body, ms, horizonDeg, skyline) {
+    var s = skyAt(site, new Date(ms))[body];
+    var f = s.elevationDeg - horizonDeg;
+    return skyline ? f - skyline(s.azimuthDeg) : f;
   }
 
   /*
@@ -168,6 +183,8 @@
    * body: 'sun' or 'earth'.  options.direction: 'set' (default), 'rise', or 'any'.
    * options.maxDays: how far ahead to look (default 60).
    * options.horizonDeg: elevation that counts as the horizon (default 0).
+   * options.horizon: skyline function, azimuth in degrees to horizon height in
+   * degrees. It is added on top of horizonDeg. Leave it out for a flat horizon.
    * Returns { utc, hoursFromStart, direction } or null when nothing crosses
    * inside the window. Near the poles a body can stay up, or down, for months.
    */
@@ -177,20 +194,21 @@
     var opt = options || {};
     var want = opt.direction || 'set';
     var horizon = opt.horizonDeg || 0;
+    var skyline = skylineOf(opt);
     var maxMs = (opt.maxDays || 60) * 24 * HOUR_MS;
     var start = toDate(date).getTime();
     var step = HOUR_MS;
 
     var t0 = start;
-    var f0 = elevation(site, body, t0) - horizon;
+    var f0 = clearance(site, body, t0, horizon, skyline);
     for (var t1 = start + step; t1 <= start + maxMs; t1 += step) {
-      var f1 = elevation(site, body, t1) - horizon;
+      var f1 = clearance(site, body, t1, horizon, skyline);
       var crossed = (f0 > 0 && f1 <= 0) ? 'set' : (f0 <= 0 && f1 > 0) ? 'rise' : null;
       if (crossed && (want === 'any' || want === crossed)) {
         var lo = t0, hi = t1, flo = f0;
         while (hi - lo > 1000) {
           var mid = (lo + hi) / 2;
-          var fm = elevation(site, body, mid) - horizon;
+          var fm = clearance(site, body, mid, horizon, skyline);
           if ((flo > 0) === (fm > 0)) { lo = mid; flo = fm; } else { hi = mid; }
         }
         var when = Math.round((lo + hi) / 2 / 1000) * 1000;
@@ -208,10 +226,17 @@
 
   /*
    * Elevation and azimuth samples from `start`, every `stepHours`, for `hours`.
-   * Returns [{ utc, hoursFromStart, sun: {azimuthDeg, elevationDeg}, earth: {...} }].
+   * options.horizon: skyline function, azimuth in degrees to horizon height in
+   * degrees. Leave it out for a flat horizon at 0.
+   * Returns [{ utc, hoursFromStart,
+   *            sun: { azimuthDeg, elevationDeg, clearDeg, distanceKm },
+   *            earth: { azimuthDeg, elevationDeg, clearDeg } }].
+   * clearDeg is the elevation of the disk centre above the skyline in its
+   * direction. With no skyline it equals elevationDeg.
    */
-  function timeline(site, start, hours, stepHours) {
+  function timeline(site, start, hours, stepHours, options) {
     checkSite(site);
+    var skyline = skylineOf(options);
     var step = (stepHours || 1) * HOUR_MS;
     var t0 = toDate(start).getTime();
     var basis = siteBasis(site);
@@ -223,8 +248,17 @@
       out.push({
         utc: new Date(t).toISOString(),
         hoursFromStart: (t - t0) / HOUR_MS,
-        sun: { azimuthDeg: sun.azimuthDeg, elevationDeg: sun.elevationDeg },
-        earth: { azimuthDeg: earth.azimuthDeg, elevationDeg: earth.elevationDeg }
+        sun: {
+          azimuthDeg: sun.azimuthDeg,
+          elevationDeg: sun.elevationDeg,
+          clearDeg: skyline ? sun.elevationDeg - skyline(sun.azimuthDeg) : sun.elevationDeg,
+          distanceKm: sun.distanceKm
+        },
+        earth: {
+          azimuthDeg: earth.azimuthDeg,
+          elevationDeg: earth.elevationDeg,
+          clearDeg: skyline ? earth.elevationDeg - skyline(earth.azimuthDeg) : earth.elevationDeg
+        }
       });
     }
     return out;
@@ -232,15 +266,16 @@
 
   /*
    * Hours each body spends above the horizon inside a window, from samples.
+   * options.horizon: skyline function, as in timeline. Flat when left out.
    * Returns { sunHours, earthHours, bothHours, windowHours }.
    */
-  function visibilityHours(site, start, hours, stepHours) {
+  function visibilityHours(site, start, hours, stepHours, options) {
     var step = stepHours || 0.25;
-    var samples = timeline(site, start, hours, step);
+    var samples = timeline(site, start, hours, step, options);
     var sun = 0, earth = 0, both = 0;
     for (var i = 0; i < samples.length - 1; i++) {
-      var s = samples[i].sun.elevationDeg > 0;
-      var e = samples[i].earth.elevationDeg > 0;
+      var s = samples[i].sun.clearDeg > 0;
+      var e = samples[i].earth.clearDeg > 0;
       if (s) sun += step;
       if (e) earth += step;
       if (s && e) both += step;
@@ -248,12 +283,107 @@
     return { sunHours: sun, earthHours: earth, bothHours: both, windowHours: hours };
   }
 
+  /* Sunlight in W/m2 on a surface facing the Sun, at a distance in km. */
+  function solarIrradiance(distanceKm) {
+    var ratio = AU_KM / distanceKm;
+    return SOLAR_CONSTANT_W_M2 * ratio * ratio;
+  }
+
+  /*
+   * Share of a disk that shows above a straight horizon, 0 to 1.
+   * marginDeg: height of the disk centre above the horizon.
+   * radiusDeg: angular radius of the disk.
+   */
+  function diskFraction(marginDeg, radiusDeg) {
+    if (!(radiusDeg > 0)) return marginDeg > 0 ? 1 : (marginDeg < 0 ? 0 : 0.5);
+    var x = marginDeg / radiusDeg;
+    if (x >= 1) return 1;
+    if (x <= -1) return 0;
+    return 0.5 + (x * Math.sqrt(1 - x * x) + Math.asin(x)) / Math.PI;
+  }
+
+  /* Power in W/m2 on a panel that follows the Sun, for one timeline sample. */
+  function sunPower(sample) {
+    var sun = sample.sun;
+    var dist = sun.distanceKm > 0 ? sun.distanceKm : AU_KM; // a sample with no distance counts as 1 AU
+    var radiusDeg = Math.asin(SUN_RADIUS_KM / dist) / DEG;
+    return solarIrradiance(dist) * diskFraction(sun.clearDeg, radiusDeg);
+  }
+
+  /*
+   * Solar energy collected over a run of timeline samples by a panel that
+   * always faces the Sun. The Sun counts in proportion to how much of its
+   * disk clears the skyline. Trapezoid rule over hoursFromStart.
+   * Returns { kwhPerM2, meanWPerM2 }, the mean taken over the whole span.
+   * This is sunlight arriving, before any panel efficiency.
+   */
+  function solarEnergy(samples) {
+    if (!samples || samples.length === 0) return { kwhPerM2: 0, meanWPerM2: 0 };
+    var wh = 0;
+    var prev = sunPower(samples[0]);
+    for (var i = 1; i < samples.length; i++) {
+      var p = sunPower(samples[i]);
+      wh += (prev + p) / 2 * (samples[i].hoursFromStart - samples[i - 1].hoursFromStart);
+      prev = p;
+    }
+    var span = samples[samples.length - 1].hoursFromStart - samples[0].hoursFromStart;
+    return { kwhPerM2: wh / 1000, meanWPerM2: span > 0 ? wh / span : prev };
+  }
+
+  /*
+   * Longest unbroken stretch in which a body's centre is at or below the
+   * skyline (clearDeg <= 0). body: 'sun' or 'earth'.
+   * The start and end are interpolated linearly between samples. A stretch
+   * that is already under way at the first sample starts at that sample.
+   * Returns { hours, startHours, endHours, openEnded }, in hoursFromStart.
+   * openEnded is true when the stretch runs to the last sample, so the real
+   * gap may be longer. All zero and null when the body never goes down.
+   */
+  function longestGap(samples, body) {
+    var best = { hours: 0, startHours: null, endHours: null, openEnded: false };
+    if (!samples || samples.length === 0) return best;
+    var found = false;
+    var down = false;
+    var startH = 0;
+
+    function close(endH, open) {
+      var len = endH - startH;
+      if (!found || len > best.hours) {
+        best = { hours: len, startHours: startH, endHours: endH, openEnded: open };
+        found = true;
+      }
+    }
+
+    for (var i = 0; i < samples.length; i++) {
+      var t = samples[i].hoursFromStart;
+      var c = samples[i][body].clearDeg;
+      var isDown = c <= 0;
+      if (i > 0 && isDown !== down) {
+        var tPrev = samples[i - 1].hoursFromStart;
+        var cPrev = samples[i - 1][body].clearDeg;
+        var cross = tPrev + (t - tPrev) * (cPrev / (cPrev - c));
+        if (isDown) startH = cross; else close(cross, false);
+      } else if (i === 0 && isDown) {
+        startH = t;
+      }
+      down = isDown;
+    }
+    if (down) close(samples[samples.length - 1].hoursFromStart, true);
+    return best;
+  }
+
   return {
     MOON_RADIUS_KM: MOON_RADIUS_KM,
+    AU_KM: AU_KM,
+    SOLAR_CONSTANT_W_M2: SOLAR_CONSTANT_W_M2,
     skyAt: skyAt,
     subPoints: subPoints,
     nextCrossing: nextCrossing,
     timeline: timeline,
-    visibilityHours: visibilityHours
+    visibilityHours: visibilityHours,
+    solarIrradiance: solarIrradiance,
+    diskFraction: diskFraction,
+    solarEnergy: solarEnergy,
+    longestGap: longestGap
   };
 });

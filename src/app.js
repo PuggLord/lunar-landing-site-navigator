@@ -14,12 +14,15 @@
   var Charts = window.LunarCharts;
   var SITES = window.LunarSites.SITES;
   var KIND_NOTE = window.LunarSites.KIND_NOTE;
+  var Terrain = window.LunarTerrain || null;
+  var SITE_HORIZONS = window.SITE_HORIZONS || null;   // skylines for the listed polar sites
 
   var HOUR_MS = 3600000;
   var DAY_MS = 24 * HOUR_MS;
   var SAMPLES = 720;          // points per timeline
   var SEARCH_DAYS = 90;       // how far ahead to look for the next rise or set
   var PLAY_MS = 16000;        // Play runs the whole look-ahead period in this long
+  var TERRAIN_MIN_LAT = 73;   // terrain is used poleward of this latitude, north or south
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var COMPASS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 
@@ -40,6 +43,9 @@
   var framed = false;   // true once the globe has been turned to show both sites
   var playing = null;   // { from, t0, raf } while Play is running
   var linkView = null;  // a link can aim the globe: g=latitude,longitude,zoom
+  var grids = { S: null, N: null };           // LOLA polar grids, loaded when a custom polar point needs one
+  var gridState = { S: 'idle', N: 'idle' };   // idle, loading, ready, failed
+  var maskCache = {};                         // skylines already worked out
   var playButton = document.getElementById('play');
   var scrub = document.getElementById('scrub');
 
@@ -86,9 +92,13 @@
     return Math.round(hours).toLocaleString('en-US') + ' h';
   }
 
-  function fmtHeight(deg) {
+  function fmtHeight(deg, word) {
     var a = Math.abs(deg).toFixed(1) + '°';
-    return deg > 0 ? a + ' above the horizon' : a + ' below the horizon';
+    return a + (deg > 0 ? ' above the ' : ' below the ') + (word || 'horizon');
+  }
+
+  function fmtEnergy(kwh) {
+    return kwh < 10 ? kwh.toFixed(1) : Math.round(kwh).toLocaleString('en-US');
   }
 
   function fmtSigned(deg) {
@@ -204,28 +214,118 @@
     return checked ? parseInt(checked.value, 10) : 30;
   }
 
+  /* ---------- horizon: flat, or the skyline from LOLA terrain ---------- */
+
+  function horizonMode() {
+    var checked = form.querySelector('[name=horizon]:checked');
+    return checked ? checked.value : 'terrain';
+  }
+
+  /*
+   * The polar grids are a few megabytes each, so one loads only when a point
+   * that is not in the site list needs it. They are scripts, not fetched
+   * files, so this works with the page opened from disk.
+   */
+  function loadGrid(pole) {
+    if (gridState[pole] !== 'idle') return;
+    gridState[pole] = 'loading';
+    var name = pole === 'S' ? 'south' : 'north';
+    function fail() { gridState[pole] = 'failed'; update(); }
+    var script = document.createElement('script');
+    script.src = 'vendor/lola-' + name + '.js';
+    script.onload = function () {
+      var entry = window.LOLA_POLAR && window.LOLA_POLAR[name];
+      if (!entry) { fail(); return; }
+      Terrain.decodeGrid(entry).then(function (grid) {
+        grids[pole] = grid;
+        gridState[pole] = 'ready';
+        update();
+      }, fail);
+    };
+    script.onerror = fail;
+    document.body.appendChild(script);
+  }
+
+  /* The highest point of a skyline, for the table. */
+  function highest(mask) {
+    var best = 0;
+    for (var i = 1; i < mask.elevDeg.length; i++) if (mask.elevDeg[i] > mask.elevDeg[best]) best = i;
+    return { deg: mask.elevDeg[best], az: best * mask.stepDeg, km: mask.distKm[best] };
+  }
+
+  /*
+   * The skyline for a scenario: { mask, kind, gridM, high }.
+   *   'site'     worked out from the full-resolution grid when the data was built
+   *   'grid'     worked out here from the coarser grid in vendor/
+   *   'flat'     the reader chose a flat horizon
+   *   'far'      too far from a pole; terrain is not used there
+   *   'loading'  the grid is on its way; flat until it arrives
+   *   'missing'  the terrain code or data did not load; flat
+   */
+  function skylineFor(scn) {
+    if (horizonMode() === 'flat') return { mask: null, kind: 'flat' };
+    if (!Terrain) return { mask: null, kind: 'missing' };
+    var lat = scn.site.latDeg, lon = scn.site.lonEastDeg;
+    var key = scn.siteId + ':' + lat + ',' + lon;
+    if (maskCache[key]) return maskCache[key];
+    var out;
+    var entry = SITE_HORIZONS && SITE_HORIZONS.sites[scn.siteId];
+    if (entry) {
+      out = { mask: Terrain.maskFromSite(entry, SITE_HORIZONS.stepDeg), kind: 'site', gridM: SITE_HORIZONS.gridM };
+    } else if (Math.abs(lat) < TERRAIN_MIN_LAT) {
+      out = { mask: null, kind: 'far' };
+    } else {
+      var pole = lat < 0 ? 'S' : 'N';
+      if (gridState[pole] === 'failed') return { mask: null, kind: 'missing' };
+      if (gridState[pole] !== 'ready') {
+        loadGrid(pole);
+        return { mask: null, kind: 'loading' };
+      }
+      var mask = Terrain.maskFromGrid(grids[pole], lat, lon);
+      out = mask
+        ? { mask: mask, kind: 'grid', gridM: Math.round(grids[pole].scaleKm * 1000) }
+        : { mask: null, kind: 'far' };
+    }
+    if (out.mask) out.high = highest(out.mask);
+    maskCache[key] = out;
+    return out;
+  }
+
   /* ---------- calculation ---------- */
 
+  /*
+   * Every height below is clearDeg: the body's height minus the height of the
+   * horizon in its compass direction. With a flat horizon the two are equal.
+   */
   function compute(scn, days) {
     var hours = days * 24;
-    var raw = Sky.timeline(scn.site, new Date(scn.startMs), hours, hours / SAMPLES);
+    var sky = skylineFor(scn);
+    var horizon = sky.mask ? Terrain.horizonFn(sky.mask) : null;
+    var raw = Sky.timeline(scn.site, new Date(scn.startMs), hours, hours / SAMPLES,
+      horizon ? { horizon: horizon } : undefined);
     var samples = raw.map(function (s) {
       return { ms: scn.startMs + s.hoursFromStart * HOUR_MS, hours: s.hoursFromStart, sun: s.sun, earth: s.earth };
     });
     var now = samples[0];
-    var out = { scn: scn, samples: samples, now: now, vis: Charts.visibility(samples), windowHours: hours };
+    var out = {
+      scn: scn, samples: samples, now: now, vis: Charts.visibility(samples), windowHours: hours,
+      sky: sky, horizon: horizon, word: horizon ? 'skyline' : 'horizon',
+      energy: Sky.solarEnergy(raw)
+    };
 
     ['sun', 'earth'].forEach(function (body) {
-      var up = now[body].elevationDeg > 0;
-      var next = Sky.nextCrossing(scn.site, body, new Date(scn.startMs),
-        { direction: up ? 'set' : 'rise', maxDays: SEARCH_DAYS });
-      var lo = Infinity, hi = -Infinity, hiMs = scn.startMs;
+      var up = now[body].clearDeg > 0;
+      var search = { direction: up ? 'set' : 'rise', maxDays: SEARCH_DAYS };
+      if (horizon) search.horizon = horizon;
+      var next = Sky.nextCrossing(scn.site, body, new Date(scn.startMs), search);
+      var lo = Infinity, hi = -Infinity, hiMs = scn.startMs, reach = 0;
       samples.forEach(function (s) {
-        var e = s[body].elevationDeg;
+        var e = s[body].clearDeg;
         if (e < lo) lo = e;
         if (e > hi) { hi = e; hiMs = s.ms; }
+        reach = Math.max(reach, Math.abs(e), Math.abs(s[body].elevationDeg));
       });
-      out[body] = { up: up, next: next, min: lo, max: hi, maxMs: hiMs };
+      out[body] = { up: up, next: next, min: lo, max: hi, maxMs: hiMs, reach: reach, gap: Sky.longestGap(raw, body) };
     });
 
     // How long Sun and Earth stay up together, counted from the chosen time.
@@ -300,10 +400,18 @@
     return first2 + second2;
   }
 
+  /* The longest unbroken time a body stays down in the period. */
+  function gapText(g) {
+    if (!g.hours) return '0 h';
+    return (g.openEnded ? 'at least ' : '') + fmtDuration(g.hours);
+  }
+
   function verdictTotals(A, B, days) {
-    return 'Over the next ' + days + ' days, A gets ' + fmtHours(A.vis.sunHours) + ' of sunlight and B gets ' +
-      fmtHours(B.vis.sunHours) + '. Sun and Earth are up together for ' + fmtHours(A.vis.bothHours) +
-      ' at A and ' + fmtHours(B.vis.bothHours) + ' at B.';
+    var first = 'Over the next ' + days + ' days, A gets ' + fmtHours(A.vis.sunHours) + ' of sunlight and B gets ' +
+      fmtHours(B.vis.sunHours) + '. ';
+    if (!A.sun.gap.hours && !B.sun.gap.hours) return first + 'Neither goes without the Sun in that time.';
+    return first + 'The longest time without the Sun is ' + gapText(A.sun.gap) + ' at A and ' +
+      gapText(B.sun.gap) + ' at B.';
   }
 
   /* The sentences are the page's headline. Durations are set brighter than the words around them. */
@@ -334,7 +442,31 @@
 
   function nowCell(R, body) {
     var p = R.now[body];
-    return cell(fmtHeight(p.elevationDeg), 'toward ' + compass(p.azimuthDeg) + ' (' + Math.round(p.azimuthDeg) + '° from north)');
+    var sub = 'toward ' + compass(p.azimuthDeg) + ' (' + Math.round(p.azimuthDeg) + '° from north)';
+    if (R.horizon) sub += ', skyline there ' + fmtSigned(R.horizon(p.azimuthDeg));
+    return cell(fmtHeight(p.clearDeg, R.word), sub);
+  }
+
+  function gapCell(R, body) {
+    var g = R[body].gap;
+    if (!g.hours) return cell('None', 'in the period');
+    var text = gapText(g);
+    return cell(text.charAt(0).toUpperCase() + text.slice(1),
+      'from ' + fmtUtc(R.scn.startMs + g.startHours * HOUR_MS, false) +
+      (g.openEnded ? ', still going when the period ends' : ''));
+  }
+
+  function horizonCell(R) {
+    var sky = R.sky;
+    if (sky.mask) {
+      return cell('LOLA terrain, ' + sky.gridM + ' m grid',
+        'highest ' + fmtSigned(sky.high.deg) + ' toward ' + compass(sky.high.az) + ', ' +
+        (sky.high.km < 10 ? sky.high.km.toFixed(1) : Math.round(sky.high.km)) + ' km away');
+    }
+    if (sky.kind === 'loading') return cell('Flat for now', 'the terrain grid is loading');
+    if (sky.kind === 'missing') return cell('Flat', 'the terrain data did not load');
+    if (sky.kind === 'far') return cell('Flat', 'terrain is used within ' + (90 - TERRAIN_MIN_LAT) + '° of a pole');
+    return cell('Flat', 'chosen under Horizon');
   }
 
   function nextCell(R, body) {
@@ -382,6 +514,11 @@
     row('Highest Sun in ' + period, function (R) {
       return cell(fmtSigned(R.sun.max), fmtUtc(R.sun.maxMs, false));
     });
+    row('Solar energy in ' + period, function (R) {
+      return cell(fmtEnergy(R.energy.kwhPerM2) + ' kWh per m²',
+        'on a panel facing the Sun, average ' + Math.round(R.energy.meanWPerM2).toLocaleString('en-US') + ' W per m²');
+    });
+    row('Longest time without the Sun', function (R) { return gapCell(R, 'sun'); });
 
     group('earth', 'Earth: direct radio link');
     row('Earth at the chosen time', function (R) { return nowCell(R, 'earth'); });
@@ -390,6 +527,7 @@
     row('Earth height range in ' + period, function (R) {
       return cell(fmtSigned(R.earth.min) + ' to ' + fmtSigned(R.earth.max));
     });
+    row('Longest time without the Earth', function (R) { return gapCell(R, 'earth'); });
 
     group('both', 'Sun and Earth together');
     row('Both up, unbroken from the chosen time', function (R) {
@@ -398,6 +536,9 @@
       return cell(fmtDuration(R.bothFromStart));
     });
     row('Both up in ' + period, function (R) { return shareCell(R.vis.bothHours, R.windowHours); });
+
+    group('ground', 'Horizon');
+    row('Horizon used', horizonCell);
   }
 
   /* ---------- charts ---------- */
@@ -412,7 +553,7 @@
       var v = node('span', 'v');
       v.appendChild(node('span', 'key key-' + b[0]));
       v.appendChild(node('span', 'name', b[1]));
-      v.appendChild(node('b', null, fmtSigned(s[b[0]].elevationDeg)));
+      v.appendChild(node('b', null, fmtSigned(s[b[0]].clearDeg)));
       v.appendChild(node('span', 'name', compass(s[b[0]].azimuthDeg)));
       p.appendChild(v);
     });
@@ -485,7 +626,7 @@
       var prev = null;
       function colour(up) { return up ? 'var(--sun)' : 'transparent'; }
       for (var i = 0; i <= SAMPLES; i++) {
-        var up = samples[i].sun.elevationDeg > 0;
+        var up = samples[i].sun.clearDeg > 0;
         if (up === prev) continue;
         var at = (i / SAMPLES * 100).toFixed(2) + '%';
         if (prev !== null) stops.push(colour(prev) + ' ' + at);
@@ -594,10 +735,14 @@
       var R = results[key];
       var col = chartCols[key];
       $(col, '[data-role=title]').textContent = R.scn.name + ', from ' + fmtUtc(R.scn.startMs, true);
-      var base = { samples: R.samples, startMs: R.scn.startMs, windowDays: results.windowDays, scale: R.scale };
+      var base = { samples: R.samples, startMs: R.scn.startMs, windowDays: results.windowDays, scale: R.scale, zeroLabel: R.word };
+      $(col, '[data-role=cap-panorama]').textContent = R.horizon
+        ? 'Looking out from the site: compass direction across, height up. The ground is the skyline from LOLA terrain.'
+        : 'Looking out from the site: compass direction across, height above the horizon up';
+      $(col, '[data-role=cap-timeline]').textContent = 'Height above the ' + R.word + ' over time';
       drawn[key] = {
         panorama: Charts.panorama($(col, '[data-role=panorama]'), {
-          samples: R.samples, scale: R.scale, centerAz: R.scn.site.latDeg < 0 ? 0 : 180
+          samples: R.samples, scale: R.scale, centerAz: R.scn.site.latDeg < 0 ? 0 : 180, skyline: R.horizon
         }),
         timeline: Charts.timeline($(col, '[data-role=timeline]'), base)
       };
@@ -638,8 +783,8 @@
       tr.appendChild(node('td', null, i === 0 ? 'Chosen time' : fmtDuration(A.samples[i].hours)));
       tr.appendChild(node('td', null, fmtUtc(A.samples[i].ms, false)));
       [A, B].forEach(function (R) {
-        tr.appendChild(node('td', null, fmtSigned(R.samples[i].sun.elevationDeg)));
-        tr.appendChild(node('td', null, fmtSigned(R.samples[i].earth.elevationDeg)));
+        tr.appendChild(node('td', null, fmtSigned(R.samples[i].sun.clearDeg)));
+        tr.appendChild(node('td', null, fmtSigned(R.samples[i].earth.clearDeg)));
       });
       body.appendChild(tr);
     }
@@ -652,10 +797,13 @@
     var items = [
       ['NASA JPL Horizons System', 'https://ssd.jpl.nasa.gov/horizons/', 'reference positions used to check every calculation'],
       ['Astronomy Engine 2.1.19 by Don Cross (MIT license)', 'https://github.com/cosinekitty/astronomy', 'Sun, Earth, and Moon positions and the Moon’s rotation'],
+      ['NASA Planetary Data System, LOLA Gridded Data Records, polar grids at 240 m', 'https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/', 'the skyline at sites near the poles, from the Lunar Orbiter Laser Altimeter on the Lunar Reconnaissance Orbiter'],
       ['NASA Scientific Visualization Studio, CGI Moon Kit', 'https://svs.gsfc.nasa.gov/4720/', 'the 3D Moon’s colour map (LROC wide-angle camera) and heights (LOLA laser altimeter), both from the Lunar Reconnaissance Orbiter']
     ];
     var seen = {};
     SITES.forEach(function (s) {
+      // A source already in the list above is not repeated for a site.
+      if (items.some(function (it) { return it[1] === s.sourceUrl && !Array.isArray(it[2]); })) return;
       if (seen[s.sourceUrl]) { seen[s.sourceUrl].push(s.name); return; }
       seen[s.sourceUrl] = [s.name];
       items.push([s.sourceName, s.sourceUrl, seen[s.sourceUrl]]);
@@ -682,7 +830,8 @@
     }
     var same = $(fieldsets.b, '[name=sameTime]').checked;
     var hash = 'a=' + part(A) + '&ta=' + toInputValue(A.scn.startMs) +
-      '&b=' + part(B) + '&tb=' + (same ? 'same' : toInputValue(B.scn.startMs)) + '&w=' + days;
+      '&b=' + part(B) + '&tb=' + (same ? 'same' : toInputValue(B.scn.startMs)) + '&w=' + days +
+      (horizonMode() === 'flat' ? '&h=flat' : '');
     try { history.replaceState(null, '', '#' + hash); } catch (e) { /* file:// in some browsers */ }
   }
 
@@ -725,6 +874,7 @@
     $(fieldsets.b, '[name=sameTime]').checked = !h.tb || h.tb === 'same';
     var radio = form.querySelector('[name=window][value="' + (parseInt(h.w, 10) || 30) + '"]');
     if (radio) radio.checked = true;
+    form.querySelector('[name=horizon][value="' + (h.h === 'flat' ? 'flat' : 'terrain') + '"]').checked = true;
   }
 
   /* ---------- main update ---------- */
@@ -739,10 +889,16 @@
     // Each site gets the tightest scale that fits it. Polar sites live within a
     // few degrees of the horizon and would flatten to nothing on a 90-degree axis.
     [A, B].forEach(function (R) {
-      R.scale = Charts.elevationScale(Math.max(
-        Math.abs(R.sun.min), Math.abs(R.sun.max), Math.abs(R.earth.min), Math.abs(R.earth.max)));
+      // The skyline's highest point counts too, so a crater wall fits in the picture.
+      R.scale = Charts.elevationScale(Math.max(R.sun.reach, R.earth.reach, R.sky.mask ? R.sky.high.deg : 0));
     });
     results = { a: A, b: B, windowDays: days };
+    var waiting = A.sky.kind === 'loading' || B.sky.kind === 'loading';
+    var lost = A.sky.kind === 'missing' || B.sky.kind === 'missing';
+    var status = document.getElementById('terrain-status');
+    status.hidden = !waiting && !lost;
+    status.textContent = waiting ? 'Loading the LOLA terrain grid. The horizon is flat until it arrives.'
+      : lost ? 'The terrain data did not load, so the horizon is flat.' : '';
     document.getElementById('scale-note').hidden = A.scale.max === B.scale.max;
     document.getElementById('verdict-note').hidden = a.startMs === b.startMs;
 
@@ -799,7 +955,7 @@
       }
     });
     $(fieldsets.b, '[name=sameTime]').addEventListener('change', update);
-    form.querySelectorAll('[name=window]').forEach(function (r) { r.addEventListener('change', update); });
+    form.querySelectorAll('[name=window], [name=horizon]').forEach(function (r) { r.addEventListener('change', update); });
 
     document.getElementById('copy-link').addEventListener('click', function () {
       var status = document.getElementById('copied');

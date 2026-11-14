@@ -9,7 +9,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lunar Landing Site Navigator</title>
-  <meta name="description" content="Compare two lunar landing scenarios: where the Sun and Earth sit above the horizon, and how long each stays in view.">
+  <meta name="description" content="Compare two lunar landing scenarios: where the Sun and Earth sit above the real skyline, how long each stays in view, and how much solar energy arrives.">
   <meta name="generator" content="Written with Claude Code (AI tool); see SI_USE.md">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#050608">
@@ -28,7 +28,7 @@
         <button type="button" data-view="a">Site A</button>
         <button type="button" data-view="b">Site B</button>
       </div>
-      <p class="lede">Two landing sites, one date. See both in that day's sunlight, and how long the Sun and the Earth stay above each horizon.</p>
+      <p class="lede">Two landing sites, one date. See both in that day's sunlight, and how long the Sun and the Earth stay above each site's real skyline.</p>
     </header>
 
     <div class="globe" id="globe" tabindex="0" role="group" aria-label="3D Moon lit from the Sun's real direction. Drag or use the arrow keys to turn it, plus and minus to zoom. A click moves a site.">
@@ -48,7 +48,7 @@
         <span class="lit-name lit-name-b" aria-hidden="true">B</span>
         <span class="lit lit-b" id="lit-b" aria-hidden="true"></span>
         <input type="range" id="scrub" min="0" max="720" step="1" value="0" aria-label="Time within the look-ahead period">
-        <span class="lit-key" aria-hidden="true"><i></i>Sun above the horizon</span>
+        <span class="lit-key" aria-hidden="true"><i></i>Sun up</span>
       </div>
       <div class="globe-zoom">
         <button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>
@@ -116,6 +116,12 @@
           <label><input type="radio" name="window" value="30" checked><span>30 days</span></label>
           <label><input type="radio" name="window" value="90"><span>90 days</span></label>
         </fieldset>
+        <fieldset class="segmented" id="horizon-choice">
+          <legend>Horizon</legend>
+          <label><input type="radio" name="horizon" value="terrain" checked><span>LOLA terrain</span></label>
+          <label><input type="radio" name="horizon" value="flat"><span>Flat</span></label>
+        </fieldset>
+        <p class="hint" id="terrain-status" role="status" hidden></p>
         <div class="share">
           <button type="button" class="link" id="copy-link">Copy link to this comparison</button>
           <span class="copied" id="copied" role="status" aria-live="polite"></span>
@@ -132,15 +138,19 @@
         <ol class="cases">
           <li>
             <a data-case href="#a=-80.13,1.44,2.579,im1&amp;ta=2024-02-22T23:24&amp;b=-84.78,29.13,0,im2&amp;tb=same&amp;w=90">Move the site 175 km</a>
-            <p>The IM-1 landing site against the planned IM-2 site, same day, 90 days ahead. The Earth never sets at the first. At the second it sets after <b>8 days</b> and stays out of view for a quarter of the period.</p>
+            <p>The IM-1 landing site against the planned IM-2 site, same day, 90 days ahead. The Earth never sets at the first. At the second it sets after <b>9 days</b>, and the longest break in the radio link lasts <b>5 d 17 h</b>.</p>
           </li>
           <li>
             <a data-case href="#a=-80.13,1.44,2.579,im1&amp;ta=2024-02-22T23:24&amp;b=-80.13,1.44,2.579,im1&amp;tb=2024-03-07T23:24&amp;w=30">Land two weeks late</a>
-            <p>The IM-1 site on its landing day and 14 days after. On the day the Sun stays up for <b>9 d 8 h</b>. Two weeks on, the lander arrives in the dark and waits <b>9 d 10 h</b> for sunrise.</p>
+            <p>The IM-1 site on its landing day and 14 days after. On the day the Sun stays above the ridges for <b>8 d 15 h</b>. Two weeks on, the lander arrives in the dark and waits <b>12 d 2 h</b> for sunrise.</p>
+          </li>
+          <li>
+            <a data-case href="#a=-89.7786,-155.7256,1.735,shackleton-rim&amp;ta=2024-02-22T23:24&amp;b=-89.67,129.78,-2.786,shackleton-floor&amp;tb=same&amp;w=90">Stand on the rim of Shackleton, then on its floor</a>
+            <p>Two places 10 km apart at the south pole, 90 days ahead. The rim has sunlight <b>91%</b> of the time. The floor has none: its walls stand 20° to 24° high on every side and the polar Sun stays under 2°. Set Horizon to Flat and both places read about half lit, which is the error the terrain removes.</p>
           </li>
           <li>
             <a data-case href="#a=-80.13,1.44,2.579,im1&amp;ta=2024-02-22T23:24&amp;b=0.67416,23.47314,0,a11&amp;tb=same&amp;w=30">Set the pole beside Apollo 11</a>
-            <p>Same day, two latitudes. At the Apollo 11 site the Sun stands <b>86°</b> up and the Earth sits <b>68°</b> high. At the IM-1 site the Sun is <b>10.5°</b> up and the Earth stays between 3° and 16°, low enough for one ridge to hide either.</p>
+            <p>Same day, two latitudes. At the Apollo 11 site the Sun stands <b>86°</b> up and the Earth sits <b>68°</b> high. At the IM-1 site the Sun clears the skyline by <b>10.3°</b> and the Earth stays between 2.5° and 16.4° above it, low enough for one ridge to hide either.</p>
           </li>
         </ol>
       </div>
@@ -179,11 +189,11 @@
           <h3><span class="tag">A</span> <span data-role="title"></span></h3>
           <p class="readout" data-role="readout" aria-live="off"></p>
           <figure>
-            <figcaption>Looking out from the site: compass direction across, height above the horizon up</figcaption>
+            <figcaption data-role="cap-panorama">Looking out from the site: compass direction across, height above the horizon up</figcaption>
             <div class="plot" data-role="panorama"></div>
           </figure>
           <figure>
-            <figcaption>Height above the horizon over time</figcaption>
+            <figcaption data-role="cap-timeline">Height above the horizon over time</figcaption>
             <div class="plot" data-role="timeline" tabindex="0"></div>
           </figure>
           <div class="plot strips" data-role="strips"></div>
@@ -192,11 +202,11 @@
           <h3><span class="tag">B</span> <span data-role="title"></span></h3>
           <p class="readout" data-role="readout" aria-live="off"></p>
           <figure>
-            <figcaption>Looking out from the site: compass direction across, height above the horizon up</figcaption>
+            <figcaption data-role="cap-panorama">Looking out from the site: compass direction across, height above the horizon up</figcaption>
             <div class="plot" data-role="panorama"></div>
           </figure>
           <figure>
-            <figcaption>Height above the horizon over time</figcaption>
+            <figcaption data-role="cap-timeline">Height above the horizon over time</figcaption>
             <div class="plot" data-role="timeline" tabindex="0"></div>
           </figure>
           <div class="plot strips" data-role="strips"></div>
@@ -227,15 +237,22 @@
       <h2 id="notes-h">Read this before trusting a number</h2>
       <div class="band-body notes-grid">
         <div>
-          <h3>What "above the horizon" means here</h3>
-          <p>It is geometry only. The horizon is flat and the Moon is a smooth sphere of radius 1737.4 km. Hills, crater rims, lander tilt, solar panel angle, and antenna pointing are not modelled.</p>
-          <p>Near the south pole the Sun and Earth skim the horizon, so a ridge a few degrees high can hide either one for days. Treat a height under about 5° as "check the terrain".</p>
-          <p>Sunlight above the horizon does not promise power. Earth above the horizon does not promise a radio link.</p>
+          <h3>Which horizon the numbers use</h3>
+          <p>Within 17° of either pole the horizon is the real skyline: the height of the ground in every compass direction out to 200 km, taken from NASA's LOLA laser altimeter and seen from 2 m above the surface. The Sun or the Earth counts as up when it stands higher than the ground in its direction.</p>
+          <p>The listed polar sites use the 240 m LOLA grid. Any other polar point uses a 960 m grid, which rounds off nearby ridges. At the IM-1 site the two skylines differ by 1.1° on average and move the first sunset by 4 hours. On a narrow peak the coarse grid can understate sunlight by a quarter of the year.</p>
+          <p>Farther from the poles the horizon is flat, because there the Sun crosses it steeply: a ridge 2° high moves sunrise by about 4 hours. The Horizon control turns the skyline off anywhere, to show what terrain changes.</p>
+          <p>The lander is a point with no tilt. A coordinate given to 0.01° places a site within about 300 m, and the nearest few hundred metres of ground set part of the skyline.</p>
         </div>
         <div>
           <h3>How the numbers are made</h3>
-          <p>Positions come from Astronomy Engine. The Moon's orientation uses the IAU 2009 rotation model. Heights refer to the centre of the Sun or Earth disk. The Sun's disk is about 0.5° across and the Earth's about 1.9°, so each takes time to cross the horizon.</p>
-          <p>We check the calculation against NASA JPL Horizons at four places on the Moon. The largest difference found was 0.0073°, and the sunset time at the IM-1 site differed by 4 seconds.</p>
+          <p>Positions come from Astronomy Engine. The Moon's orientation uses the IAU 2009 rotation model. Heights refer to the centre of the Sun or Earth disk. The Sun's disk is about 0.5° across and the Earth's about 1.9°, so each takes time to cross the skyline.</p>
+          <p>We check the positions against NASA JPL Horizons at four places on the Moon. The largest difference found was 0.0073°, and with a flat horizon the sunset time at the IM-1 site differed by 4 seconds.</p>
+          <p>The skyline code is tested on made-up terrain with known answers and against a second calculation written in Python; the two agree within 0.05°. The LOLA grid puts the IM-1 site 2,588 m up, where NASA gives 2,579 m, and the floor of Shackleton crater, a place in permanent shadow, gets no sunlight in the tool.</p>
+        </div>
+        <div>
+          <h3>What the energy number means</h3>
+          <p>Solar energy is the sunlight arriving on one square metre that faces the Sun the whole time: 1,361 W per m² at the Earth's distance from the Sun, scaled for the Moon's distance that day and for how much of the Sun's disk clears the skyline. A real panel delivers a share of it, set by its efficiency, its angle, and its temperature.</p>
+          <p>Earth in view means the centre of the Earth's disk clears the skyline. It does not promise a radio link: antenna pointing, ground stations, and data rate are not modelled.</p>
         </div>
         <div>
           <h3>Why the pole is different</h3>
@@ -243,8 +260,8 @@
         </div>
         <div>
           <h3>What the 3D Moon shows</h3>
-          <p id="globe-credit">Imagery and elevation come from NASA's Lunar Reconnaissance Orbiter (LROC colour mosaic, LOLA heights) through NASA's CGI Moon Kit. Slopes are drawn <span id="relief-x">3</span> times steeper than they are so craters show. Nothing casts a shadow here, so a lit crater floor on the globe can be dark on the real Moon. Near the poles the NASA mosaic also carries the shadows from the day each strip was photographed.</p>
-          <p>The bars beside the time slider mark when the Sun is above the horizon at each site. One lunar day lasts about 29.5 Earth days.</p>
+          <p id="globe-credit">Imagery and elevation come from NASA's Lunar Reconnaissance Orbiter (LROC colour mosaic, LOLA heights) through NASA's CGI Moon Kit. Slopes are drawn <span id="relief-x">3</span> times steeper than they are so craters show. Nothing casts a shadow on the globe, so a crater floor can look lit there while the numbers and charts, which do use the terrain, say it is dark. Near the poles the NASA mosaic also carries the shadows from the day each strip was photographed.</p>
+          <p>The bars beside the time slider mark when the Sun is above each site's horizon. One lunar day lasts about 29.5 Earth days.</p>
         </div>
       </div>
     </section>
@@ -264,6 +281,8 @@
 
   <script src="vendor/astronomy.browser.js"></script>
   <script src="src/lunar-sky.js"></script>
+  <script src="src/terrain.js"></script>
+  <script src="vendor/site-horizons.js"></script>
   <script src="src/sites.js"></script>
   <script src="src/charts.js"></script>
   <script src="src/globe.js"></script>

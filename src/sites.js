@@ -1,6 +1,7 @@
 /*
  * sites.js
- * Curated landing sites. Every entry carries the page its coordinates came from.
+ * Curated landing sites, and two reference places at Shackleton crater. Every
+ * entry carries the page its coordinates came from.
  *
  * SI disclosure: this file was assembled with an AI coding tool (Claude Code,
  * Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026,
@@ -11,8 +12,10 @@
  *   'landed'   position measured after landing
  *   'intended' the planned site, not the measured touchdown
  *   'region'   centre of the landing region, not a touchdown point
+ *   'place'    a reference place for comparison, not a landing site
  * elevationKm is height above the 1737.4 km reference sphere. It is 0 where
- * the source gives no elevation.
+ * the source gives no elevation. For the two Shackleton places it is read
+ * from the LOLA 240 m grid by tools/build_terrain.py.
  */
 (function (root) {
   'use strict';
@@ -84,13 +87,36 @@
       kind: 'landed',
       sourceName: 'NASA NSSDCA, Apollo Landing Site Coordinates',
       sourceUrl: 'https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html'
+    },
+    {
+      id: 'shackleton-floor',
+      name: 'Shackleton crater, floor',
+      place: 'centre of Shackleton crater, 10 km from the south pole',
+      latDeg: -89.67,
+      lonEastDeg: 129.78,
+      elevationKm: -2.786,
+      kind: 'place',
+      sourceName: 'USGS Gazetteer of Planetary Nomenclature, Shackleton',
+      sourceUrl: 'https://planetarynames.wr.usgs.gov/Feature/5450'
+    },
+    {
+      id: 'shackleton-rim',
+      name: 'Shackleton crater, rim',
+      place: 'the highest point of the LOLA 240 m grid within 14 km of the crater centre',
+      latDeg: -89.7786,
+      lonEastDeg: -155.7256,
+      elevationKm: 1.735,
+      kind: 'place',
+      sourceName: 'NASA Planetary Data System, LOLA Gridded Data Records',
+      sourceUrl: 'https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/'
     }
   ];
 
   var KIND_NOTE = {
     landed: 'Position measured after landing.',
     intended: 'Planned site, not the measured touchdown.',
-    region: 'Centre of the landing region, not a touchdown point.'
+    region: 'Centre of the landing region, not a touchdown point.',
+    place: 'A reference place for comparison, not a landing site.'
   };
 
   var api = { SITES: SITES, KIND_NOTE: KIND_NOTE };

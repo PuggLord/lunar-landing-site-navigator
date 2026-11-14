@@ -16,6 +16,23 @@ LOLA 4 pixels per degree grid (NASA/GSFC). `tools/build_moon_maps.py` makes
 this file; do not edit it by hand. NASA material is not copyrighted in the
 United States; see https://www.nasa.gov/nasa-brand-center/images-and-media/.
 
+## site-horizons.js, lola-south.js, lola-north.js
+
+NASA LOLA elevation of the Moon's polar regions, from the Lunar Orbiter Laser
+Altimeter Gridded Data Records `LDEM_60S_240M` and `LDEM_60N_240M`, NASA
+Planetary Data System Geosciences Node,
+https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/.
+
+`site-horizons.js` holds the skyline of four listed places, worked out from
+the full 240 m grid: the height of the ground in 720 compass directions and
+the distance to the ground that sets it. `lola-south.js` and `lola-north.js`
+hold the elevation itself at 960 m (4 by 4 block means), poleward of 66
+degrees, compressed and stored as text. The page loads one of them only when
+a typed or clicked polar point needs a skyline.
+
+`tools/build_terrain.py` makes all three; do not edit them by hand. NASA
+material is not copyrighted in the United States.
+
 ## fonts/
 
 `MonaSans-latin-variable.woff2` is Mona Sans by GitHub, the Latin subset that

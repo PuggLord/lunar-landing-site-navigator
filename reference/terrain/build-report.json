@@ -1,0 +1,152 @@
+{
+  "_note": "SI disclosure: written with an AI coding tool (Claude Code, Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026, directed and reviewed by team Ksig UNT. See SI_USE.md.",
+  "productVersions": {
+    "S": "V2.0",
+    "N": "V2.1"
+  },
+  "orientation": {
+    "S": "as stored (contract holds)",
+    "N": "as stored (contract holds)"
+  },
+  "blockSize": 4,
+  "gridSize": 1540,
+  "scaleKm": 0.96,
+  "vendorFileBytes": {
+    "lola-south.js": 3404083,
+    "lola-north.js": 3361244,
+    "site-horizons.js": 30964
+  },
+  "correlationVsGlobalMap": {
+    "S": 0.9983,
+    "N": 0.989
+  },
+  "correlationStoredGridVsGlobalMap": {
+    "S": 0.9983,
+    "N": 0.9882
+  },
+  "shackleton": {
+    "centreKm": -2.7858,
+    "ring12to16MeanKm": 0.5028,
+    "depthKm": 3.2886,
+    "rim": {
+      "latDeg": -89.7786,
+      "lonDeg": -155.7256,
+      "heightKm": 1.7345
+    }
+  },
+  "sites": {
+    "im1": {
+      "latDeg": -80.13,
+      "lonDeg": 1.44,
+      "grid240": {
+        "groundKm": 2.5881,
+        "highestDeg": 11.199,
+        "highestAzDeg": 133.0,
+        "highestDistKm": 0.2,
+        "lowestDeg": -0.228,
+        "lowestAzDeg": 10.5,
+        "lowestDistKm": 49.1,
+        "meanDeg": 4.911
+      },
+      "grid960": {
+        "groundKm": 2.5959,
+        "highestDeg": 9.333,
+        "highestAzDeg": 135.5,
+        "highestDistKm": 0.2,
+        "lowestDeg": -0.603,
+        "lowestAzDeg": 4.5,
+        "lowestDistKm": 2.9,
+        "meanDeg": 3.827
+      },
+      "diff240vs960SingleRayDeg": {
+        "meanAbs": 1.0843,
+        "maxAbs": 2.4518
+      }
+    },
+    "im2": {
+      "latDeg": -84.78,
+      "lonDeg": 29.13,
+      "grid240": {
+        "groundKm": 5.3117,
+        "highestDeg": 4.001,
+        "highestAzDeg": 118.0,
+        "highestDistKm": 16.8,
+        "lowestDeg": -1.454,
+        "lowestAzDeg": 328.0,
+        "lowestDistKm": 14.8,
+        "meanDeg": 0.997
+      },
+      "grid960": {
+        "groundKm": 5.3052,
+        "highestDeg": 3.945,
+        "highestAzDeg": 118.5,
+        "highestDistKm": 16.5,
+        "lowestDeg": -1.505,
+        "lowestAzDeg": 327.0,
+        "lowestDistKm": 14.8,
+        "meanDeg": 0.953
+      },
+      "diff240vs960SingleRayDeg": {
+        "meanAbs": 0.1176,
+        "maxAbs": 0.3714
+      }
+    },
+    "shackleton-floor": {
+      "latDeg": -89.67,
+      "lonDeg": 129.78,
+      "grid240": {
+        "groundKm": -2.7858,
+        "highestDeg": 23.541,
+        "highestAzDeg": 144.5,
+        "highestDistKm": 10.0,
+        "lowestDeg": 19.757,
+        "lowestAzDeg": 358.0,
+        "lowestDistKm": 11.0,
+        "meanDeg": 21.302
+      },
+      "grid960": {
+        "groundKm": -2.7686,
+        "highestDeg": 23.269,
+        "highestAzDeg": 142.5,
+        "highestDistKm": 10.1,
+        "lowestDeg": 19.471,
+        "lowestAzDeg": 356.5,
+        "lowestDistKm": 10.9,
+        "meanDeg": 21.016
+      },
+      "diff240vs960SingleRayDeg": {
+        "meanAbs": 0.2862,
+        "maxAbs": 0.531
+      }
+    },
+    "shackleton-rim": {
+      "latDeg": -89.7786,
+      "lonDeg": -155.7256,
+      "grid240": {
+        "groundKm": 1.7345,
+        "highestDeg": 1.028,
+        "highestAzDeg": 30.5,
+        "highestDistKm": 10.0,
+        "lowestDeg": -2.646,
+        "lowestAzDeg": 115.5,
+        "lowestDistKm": 92.4,
+        "meanDeg": -1.485
+      },
+      "grid960": {
+        "groundKm": 1.6116,
+        "highestDeg": 1.605,
+        "highestAzDeg": 30.0,
+        "highestDistKm": 10.1,
+        "lowestDeg": -1.75,
+        "lowestAzDeg": 130.5,
+        "lowestDistKm": 0.3,
+        "meanDeg": -0.415
+      },
+      "diff240vs960SingleRayDeg": {
+        "meanAbs": 1.0703,
+        "maxAbs": 2.7364
+      }
+    }
+  },
+  "buildSeconds": 12.4
+}
