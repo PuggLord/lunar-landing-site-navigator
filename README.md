@@ -22,6 +22,10 @@ night line sweeps the globe while the charts follow.
 Open `index.html` in a browser. There is nothing to install and no server to
 start. It works with no network connection.
 
+Under the Moon, "Start from a real case" lists three comparisons that load
+with one click: a site moved 175 km, a landing two weeks late, and the pole
+beside Apollo 11.
+
 The address bar holds the whole comparison, so a copied link reopens the same
 two scenarios. Add `&g=latitude,longitude,zoom` to the end of a link to aim the
 globe, for example `&g=-90,0,1.6` for the south pole.
@@ -58,6 +62,18 @@ about 15 MB):
 
     python tools/build_moon_maps.py
 
+## Slides and submission text
+
+`deck/index.html` is the seven-slide demo. Open it in a browser and use the
+arrow keys. `deck/Lunar-Landing-Site-Navigator.pdf` is the same deck, one
+slide per page. To make the PDF again after an edit (Windows, needs Brave,
+Chrome or Edge):
+
+    powershell -File tools/build_deck_pdf.ps1
+
+`SUBMISSION.md` holds drafts of the eight fields on the Space Apps project
+page.
+
 ## What the numbers mean
 
 - Azimuth is measured clockwise from local north. Elevation is the angle above
@@ -92,6 +108,9 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | `vendor/astronomy.browser.js` | Astronomy Engine 2.1.19 (MIT), copied in so the page works offline |
 | `vendor/moon-maps.js` | NASA LRO colour and elevation maps of the Moon, stored inside a script so the page can open straight from disk |
 | `vendor/fonts/` | Mona Sans (GitHub, SIL Open Font License 1.1) and its license text |
+| `deck/` | The seven-slide demo, its PDF, and the screenshots it uses |
+| `tools/build_deck_pdf.ps1` | Prints the deck to PDF with a Chromium browser |
+| `SUBMISSION.md` | Draft text for the Space Apps project page |
 
 ## Sources and credits
 

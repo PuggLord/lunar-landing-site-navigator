@@ -125,7 +125,7 @@ a:hover { text-decoration-thickness: 2px; }
   pointer-events: none;
   background:
     linear-gradient(to left, var(--page) calc(var(--rail) + var(--m) + 12px), rgba(5, 6, 8, 0) calc(var(--rail) + var(--m) + 150px)),
-    radial-gradient(110% 80% at 0% 100%, rgba(5, 6, 8, 0.94) 0, rgba(5, 6, 8, 0.7) 34%, rgba(5, 6, 8, 0) 64%),
+    radial-gradient(118% 88% at 0% 100%, rgba(5, 6, 8, 0.95) 0, rgba(5, 6, 8, 0.82) 38%, rgba(5, 6, 8, 0) 68%),
     linear-gradient(to top, var(--page) 84px, rgba(5, 6, 8, 0) 210px),
     radial-gradient(70% 46% at 0% 0%, rgba(5, 6, 8, 0.9) 0, rgba(5, 6, 8, 0.62) 38%, rgba(5, 6, 8, 0) 70%),
     linear-gradient(to bottom, rgba(5, 6, 8, 0.92), rgba(5, 6, 8, 0.72) 64px, rgba(5, 6, 8, 0) 170px);
@@ -274,7 +274,8 @@ a:hover { text-decoration-thickness: 2px; }
   padding-bottom: 30px;
   pointer-events: none;
 }
-.answer li { color: var(--ink-2); font-size: 15px; line-height: 1.45; max-width: 52ch; }
+/* The words can sit over lit ground, so they carry their own dark halo. */
+.answer li { color: var(--ink-2); font-size: 15px; line-height: 1.45; max-width: 52ch; text-shadow: 0 0 18px rgba(5, 6, 8, 0.9), 0 0 4px rgba(5, 6, 8, 0.7); }
 .answer li + li { margin-top: 10px; }
 .answer li b { color: var(--ink); font-weight: 500; }
 .answer li:first-child {
@@ -637,6 +638,29 @@ main { padding: 0 var(--m); }
 .band > .band-body { grid-column: 4 / -1; min-width: 0; }
 .band-wide > * { grid-column: 1 / -1; }
 
+/* ---------- cases: three comparisons to open ---------- */
+
+.cases-intro { max-width: 54ch; color: var(--ink-2); }
+.cases { margin: 28px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+.cases li {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+  column-gap: 20px;
+  row-gap: 6px;
+  align-items: baseline;
+  padding: 18px 0 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+.cases a {
+  justify-self: start;
+  padding: 2px 0;
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+.cases p { max-width: 54ch; color: var(--ink-2); }
+.cases b { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
 /* ---------- tables ---------- */
 
 .table-scroll { overflow-x: auto; }
@@ -863,6 +887,7 @@ svg .track { fill: var(--ground); }
 
 @media (max-width: 700px) {
   .setup, .shared { grid-template-columns: 1fr; }
+  .cases li { grid-template-columns: 1fr; }
   .views { gap: 2px 22px; }
   #metrics .metric-col { width: 34%; }
   th, td { padding-right: 12px; }

@@ -824,6 +824,15 @@
       update();
     });
 
+    // A case link changes the part after the #, which the listener above picks
+    // up. The answer is at the top of the page, so go there.
+    document.querySelectorAll('[data-case]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+      });
+    });
+
     playButton.addEventListener('click', function () { setPlaying(!playing); });
     scrub.max = SAMPLES;
     scrub.addEventListener('input', function () {

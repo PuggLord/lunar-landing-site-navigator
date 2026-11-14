@@ -1,0 +1,167 @@
+<!doctype html>
+<!--
+  SI disclosure: these slides were drafted with an AI coding tool (Claude Code,
+  Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026,
+  directed and reviewed by team Ksig UNT. See SI_USE.md.
+
+  The pictures are screenshots of the project's own page. The Moon in them is
+  NASA Lunar Reconnaissance Orbiter imagery drawn by the project's code. No
+  image model made any part of them.
+
+  Seven slides: the Space Apps limit for a slide demo.
+  To make the PDF, see "Slides" in README.md.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lunar Landing Site Navigator: slides</title>
+  <meta name="generator" content="Drafted with Claude Code (AI tool); see SI_USE.md">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../css/fonts.css">
+  <link rel="stylesheet" href="deck.css">
+</head>
+<body>
+
+  <div class="frame">
+    <section class="slide title" aria-label="Slide 1 of 7">
+      <img class="moon" src="img/moon.png" alt="The Moon's south pole region, half in sunlight, with two landing sites marked A and B">
+      <p class="who"><b>Team Ksig UNT</b>2026 NASA Space Apps Challenge, Dallas</p>
+      <div class="what">
+        <h1>Lunar Landing Site Navigator</h1>
+        <p>Two landing sites or two landing dates on the Moon, compared on one screen, with the answer written as a sentence.</p>
+      </div>
+      <p class="credit">Moon imagery: NASA Lunar Reconnaissance Orbiter, drawn by our code</p>
+      <footer class="chrome"><span>1 / 7</span></footer>
+    </section>
+  </div>
+
+  <div class="frame">
+    <section class="slide" aria-label="Slide 2 of 7">
+      <div class="problem">
+        <h2>When the landing date moves, the sunlight and the radio link move with it.</h2>
+        <div class="copy">
+          <p class="lead">At the Moon's south pole the Sun and the Earth both stay within a few degrees of the horizon. A new date, or a site a little closer to the pole, can cost a lander its power or its link to Earth for days.</p>
+          <p>The data to check this is public, in JPL Horizons, Quickmap and Moon Trek. The challenge statement names the gap: judging each site and date means moving between several interfaces and reading raw numbers.</p>
+          <p>A planner with two options has to run that twice and work out the difference by hand.</p>
+        </div>
+      </div>
+      <footer class="chrome"><span>Lunar Landing Site Navigator</span><span>2 / 7</span></footer>
+    </section>
+  </div>
+
+  <div class="frame">
+    <section class="slide" aria-label="Slide 3 of 7">
+      <div class="beside">
+        <div class="words">
+          <h2>Pick two scenarios and read the answer.</h2>
+          <ul class="points">
+            <li>The headline is the result: which one loses the Sun or the Earth first, and by how long.</li>
+            <li>Six landing sites with sourced coordinates, or click the Moon to place your own.</li>
+            <li>Press Play and the line between day and night crosses the Moon while the charts follow.</li>
+          </ul>
+        </div>
+        <img class="shot" src="img/tool.png" alt="The tool: a 3D Moon with sites A and B near the south pole, the result as a headline on the left, and the two scenarios on the right">
+      </div>
+      <footer class="chrome"><span>Lunar Landing Site Navigator</span><span>3 / 7</span></footer>
+    </section>
+  </div>
+
+  <div class="frame">
+    <section class="slide" aria-label="Slide 4 of 7">
+      <div class="wide">
+        <div class="head">
+          <h2>Move the site 175 km and the Earth starts to set.</h2>
+          <p>Left, the IM-1 landing site: the Earth stays up for all <b>90 days</b>. Right, the planned IM-2 site: the Earth sets after <b>8 days</b> and is in view <b>74%</b> of the time. A lander there needs a relay or a plan for the gaps.</p>
+        </div>
+        <div class="crop"><img src="img/charts.png" alt="Two sets of charts. At the IM-1 site the blue Earth line stays above the horizon for 90 days. At the planned IM-2 site it dips below the horizon three times."></div>
+      </div>
+      <footer class="chrome"><span>Lunar Landing Site Navigator</span><span>4 / 7</span></footer>
+    </section>
+  </div>
+
+  <div class="frame">
+    <section class="slide" aria-label="Slide 5 of 7">
+      <div class="beside flip">
+        <div class="words">
+          <h2>Land two weeks late and you arrive at night.</h2>
+          <p>The same site twice: IM-1, on its landing day and 14 days after.</p>
+          <p>On the day, the Sun stays up for <b>9 d 8 h</b>.</p>
+          <p>Two weeks on, the Sun is 8° below the horizon and sunrise is <b>9 d 10 h</b> away.</p>
+        </div>
+        <img class="shot" src="img/late.png" alt="The tool comparing the IM-1 site on two dates. The headline reads: A has sunlight and loses the Sun in 9 d 8 h. B is in the dark and gets the Sun back in 9 d 10 h.">
+      </div>
+      <footer class="chrome"><span>Lunar Landing Site Navigator</span><span>5 / 7</span></footer>
+    </section>
+  </div>
+
+  <div class="frame">
+    <section class="slide" aria-label="Slide 6 of 7">
+      <div class="checks">
+        <div class="left">
+          <h2>Every number is tested against NASA JPL Horizons.</h2>
+          <div class="notes">
+            <p><b>NASA data in the tool.</b> JPL Horizons for the reference tables. Lunar Reconnaissance Orbiter colour mosaic and laser altimeter heights for the 3D Moon. Site coordinates from NASA, LROC and NSSDCA pages, each linked on the page.</p>
+            <p><b>What it leaves out.</b> The horizon is flat. Hills, crater rims and lander tilt are not modelled, and the page says so beside the numbers.</p>
+          </div>
+        </div>
+        <dl class="ledger">
+          <div><dt>Largest error in Sun or Earth position<small>1,032 time steps at four places on the Moon</small></dt><dd>0.0073°</dd></div>
+          <div><dt>Sunset time at the IM-1 site<small>difference from Horizons</small></dt><dd>4 s</dd></div>
+          <div><dt>Largest error in the Sun direction that lights the Moon<small>278 time steps</small></dt><dd>0.0067°</dd></div>
+          <div><dt>Automated tests<small>one command, nothing to install</small></dt><dd>14</dd></div>
+        </dl>
+      </div>
+      <footer class="chrome"><span>Lunar Landing Site Navigator</span><span>6 / 7</span></footer>
+    </section>
+  </div>
+
+  <div class="frame">
+    <section class="slide" aria-label="Slide 7 of 7">
+      <div class="close">
+        <h2>One page, no server, open source.</h2>
+        <div>
+        <div class="thirds">
+          <div>
+            <h3>How it is built</h3>
+            <p>Plain HTML, CSS and JavaScript. It opens from a file with no network and no account. Astronomy Engine (MIT) gives the positions. The 3D Moon is our own WebGL code with no library behind it.</p>
+          </div>
+          <div>
+            <h3>Use of AI</h3>
+            <p>The idea is the team's. The code, the tests and these slides were written with Claude Code under the team's direction. Every file is labelled and SI_USE.md logs each session. Nothing here is an AI-generated image.</p>
+          </div>
+          <div>
+            <h3>Next</h3>
+            <p>A real horizon from the laser altimeter terrain, so polar sunrise and Earthset times account for ridges. Landing sites from other countries' programs. Solar panel tilt.</p>
+          </div>
+        </div>
+        <p class="where">The live tool and the source code are at the Project link on our Space Apps page.</p>
+        </div>
+      </div>
+      <footer class="chrome"><span>Team Ksig UNT, 2026 NASA Space Apps Challenge, Dallas</span><span>7 / 7</span></footer>
+    </section>
+  </div>
+
+  <script>
+    /* Arrow keys, Page Up and Page Down, and the space bar move one slide. */
+    (function () {
+      var frames = Array.prototype.slice.call(document.querySelectorAll('.frame'));
+      function current() {
+        var best = 0, gap = Infinity;
+        frames.forEach(function (f, i) {
+          var d = Math.abs(f.getBoundingClientRect().top);
+          if (d < gap) { gap = d; best = i; }
+        });
+        return best;
+      }
+      document.addEventListener('keydown', function (e) {
+        var step = { ArrowRight: 1, ArrowDown: 1, PageDown: 1, ' ': 1, ArrowLeft: -1, ArrowUp: -1, PageUp: -1 }[e.key];
+        if (!step) return;
+        e.preventDefault();
+        var next = Math.max(0, Math.min(frames.length - 1, current() + step));
+        frames[next].scrollIntoView();
+      });
+    })();
+  </script>
+</body>
+</html>

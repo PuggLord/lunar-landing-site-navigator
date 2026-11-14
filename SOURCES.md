@@ -11,7 +11,7 @@ last checked the source.
 | IM-1 Odysseus resting position: 80.13 S, 1.44 E, 2,579 m; landed Feb 22, 2024 at 6:24 p.m. EST (23:24 UTC) | https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/ | Curated site and reference cases. "Odysseus came to rest at 80.13 degrees south latitude, 1.44 degrees east longitude, 8,461 feet (2,579 meters) elevation" | 2026-11-14 |
 | Apollo 11, 15, and 17 Lunar Module coordinates | https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html | Curated sites. NSSDCA table, Mean Earth/Polar Axis frame, from LRO images (Wagner et al., Icarus 283, 2017). Apollo 11 LM 0.67416 N, 23.47314 E; Apollo 15 LM 26.13239 N, 3.63330 E; Apollo 17 LM 20.1911 N, 30.7723 E | 2026-11-14 |
 | IM-2 Athena intended landing site: 84.78 S, 29.13 E, Mons Mouton | https://www.lroc.asu.edu/images/1401 | Curated site, labeled as the planned site. LROC (NASA/GSFC/Arizona State University): "intended landing site (-84.78°, 29.13°E) is 160 kilometers from the south pole" | 2026-11-14 |
-| Blue Ghost Mission 1 landing region: 18.56 N, 61.81 E, eastern Mare Crisium | https://www.lroc.asu.edu/images/1400 | Curated site, labeled as a region centre. Read from the search-result excerpt of the LROC page, not the full page; open the page and confirm before submission | 2026-11-14 |
+| Blue Ghost Mission 1 landing region: 18.56 N, 61.81 E, eastern Mare Crisium | https://www.lroc.asu.edu/images/1400 | Curated site, labeled as a region centre. LROC (NASA/GSFC/Arizona State University): "The Blue Ghost landing region (image center, 18.56°N, 61.81°E)". Read from the full page | 2026-11-14 |
 | CGI Moon Kit, NASA Scientific Visualization Studio (Ernie Wright, Noah Petro). Colour: LROC Wide Angle Camera mosaic (NASA/GSFC/Arizona State University). Elevation: LOLA laser altimeter grid, 4 pixels per degree (NASA/GSFC). Both instruments fly on the Lunar Reconnaissance Orbiter | https://svs.gsfc.nasa.gov/4720/ | The 3D Moon. `tools/build_moon_maps.py` downloads `lroc_color_poles_4k.tif` and `ldem_4_uint.tif`, and writes `vendor/moon-maps.js`. Also gives the height when a site is picked by clicking the globe | 2026-11-14 |
 | JPL Horizons System (API), sub-solar and sub-Earth points on the Moon | https://ssd.jpl.nasa.gov/api/horizons.api | Reference for the Sun direction that lights the 3D Moon (`COMMAND='301'`, `CENTER='500@399'`, `QUANTITIES='14,15'`, frame MOON_ME). Saved in `reference/horizons-subpoints/` | 2026-11-14 |
 | Challenge statement and Resources tab | https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ | What the tool has to do | 2026-11-14 |
@@ -38,6 +38,23 @@ project.
 
 Two more sites were opened and not used, because the capture showed only
 their loading screens: https://www.21hrs.space/ and https://spacetrashsigns.org/.
+
+## Past Space Apps projects we read
+
+We read these to learn what a finished project page, demo and write-up
+contain. Nothing from them is in the project.
+
+| Project | Where | What we learned | Checked |
+| --- | --- | --- | --- |
+| 2025 Global Winners list | https://www.spaceappschallenge.org/2025/meet-the-2025-global-winners | Which projects won and where their pages are | 2026-11-14 |
+| SpaceGenes+ (2025, Best Use of Science) | https://www.spaceappschallenge.org/2025/find-a-team/spacegenes/ and https://spacegenes-plus.framer.website/ | The write-up names its users and gives worked use cases; the summary runs three short paragraphs | 2026-11-14 |
+| Resonant Exoplanets (2025, Best Use of Data) | https://www.spaceappschallenge.org/2025/find-a-team/resonant-exoplanets/ and https://resonant-planet.vercel.app | The page links its presentation from the first screen; the AI section says what was reviewed by people | 2026-11-14 |
+| Liberty (2022) | https://space-apps-eosin.vercel.app | A globe with a time control as the whole interface | 2026-11-14 |
+
+Two more winning projects' links no longer worked on 2026-11-14:
+https://skysense.surf/ (the domain is for sale) and
+https://reactapp-860776766536.us-central1.run.app/ (server error). We host on
+an address tied to the repository for that reason.
 
 The test points named "Test point" in `tools/fetch_horizons.py` are arbitrary
 coordinates chosen to exercise the math. They are not mission sites.
