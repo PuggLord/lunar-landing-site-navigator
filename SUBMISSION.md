@@ -213,10 +213,9 @@ published websites for design reference. A web capture service, Firecrawl,
 took screenshots of those reference sites and read two NASA pages and one
 paper abstract.
 
-How we label it. Each AI-written file starts with an "SI disclosure" comment.
-The pages and the slides carry a `generator` tag in their metadata, and
-commits made with the tool carry a `Co-Authored-By: Claude` line. The file
-`SI_USE.md` in the repository logs each session with times and files.
+How we label it. Each AI-written file starts with an "SI disclosure" comment,
+and the pages and the slides carry a `generator` tag in their metadata. The
+file `SI_USE.md` in the repository logs each session with times and files.
 
 The project has no AI-generated images, video or audio. The Moon on the page
 and in the slides is NASA imagery drawn by code. The demo video is screenshots

@@ -21,7 +21,8 @@ the challenge statement.
 ## How generated code is labeled
 
 - Every AI-written source file starts with an "SI disclosure" comment.
-- Commits made with the tool carry a `Co-Authored-By: Claude` trailer.
+- Commits are made from a team member's GitHub account. The session log
+  below is the record of where the tool was used.
 - No AI-generated images, video, or audio are in the project so far. If any
   are added they carry a visible watermark. The 3D Moon is NASA imagery drawn
   by code; no image model made any part of it.
