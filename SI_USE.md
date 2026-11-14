@@ -8,8 +8,8 @@ and metadata. This file is the running log.
 
 | Tool | Used for |
 | --- | --- |
-| Claude Code (Anthropic, model Claude Fable 5.2) | Writing code, tests, and documentation under the team's direction; reading the official Space Apps pages and guides; querying NASA JPL Horizons for reference data; downloading and converting NASA's Moon maps; looking at published websites for design reference and redesigning the page |
-| Firecrawl (web page capture service) | Taking screenshots and reading the fonts and colours of the reference websites listed in SOURCES.md, and reading past Space Apps project pages. No text or image from those sites is in the project |
+| Claude Code (Anthropic, model Claude Fable 5.2) | Writing code, tests, and documentation under the team's direction; reading the official Space Apps pages and guides; querying NASA JPL Horizons for reference data; downloading and converting NASA's Moon maps and LOLA elevation grids; looking at published websites for design reference and redesigning the page. For the terrain work it ran three helper sessions of the same tool at once, one each for the data script, the skyline code and the documents, and then checked and joined their work |
+| Firecrawl (web page capture service) | Taking screenshots and reading the fonts and colours of the reference websites listed in SOURCES.md, and reading past Space Apps project pages. Reading the Dallas event page, the NASA page on the IM-1 lander, one paper abstract, and the NASA page that lists the 5 m grids. No text or image from those sites is in the project beyond the short quotes in SOURCES.md |
 
 ## Where the idea came from
 
@@ -46,6 +46,10 @@ the challenge statement.
 
 | Sat Nov 14, 12:02-12:08 | Wrote the script that records the demo video and ran it: 870 screenshots of the page and the slides, joined into 29 seconds. Tested that a click on a case loads it. | `tools/record_demo.mjs`, `demo/` |
 
+| Sat Nov 14, 12:36-12:50 | The team asked where the project could lose and told the tool to fix those points. The tool listed five weaknesses, found NASA's LOLA polar grids, and wrote a plan the team approved. | none |
+| Sat Nov 14, 12:50-13:10 | Added the terrain skyline and the power numbers. Wrote the script that downloads NASA's LOLA grids, checks their orientation and stores them; the skyline code; the energy and longest-gap calculations; 25 new tests. Wired them into the page: the Horizon control, the skyline drawn in the charts, new table rows, the Shackleton places and case. Recomputed every worked case and rewrote the page's notes. Drafted the three documents in `docs/`. | `tools/build_terrain.py`, `src/terrain.js`, `src/lunar-sky.js`, `src/app.js`, `src/charts.js`, `src/sites.js`, `index.html`, `css/style.css`, `test/terrain.test.js`, `test/power.test.js`, `vendor/site-horizons.js`, `vendor/lola-south.js`, `vendor/lola-north.js`, `reference/terrain/`, `docs/` |
+| Sat Nov 14, 13:10-13:30 | Recounted the Horizons rows after a helper session found the earlier figure wrong: 852 time steps, not 1,032. Corrected it everywhere. Rebuilt the slides with new screenshots and a terrain slide, filled the documents with numbers read from the tool, rewrote the submission drafts, and recorded the video again. | `deck/`, `docs/`, `SUBMISSION.md`, `README.md`, `SOURCES.md`, `vendor/README.md`, `tools/record_demo.mjs`, `demo/` |
+
 ## Not written by AI
 
 - `vendor/astronomy.browser.js`: Astronomy Engine by Don Cross, MIT license.
@@ -57,3 +61,7 @@ the challenge statement.
 - `vendor/moon-maps.js`: NASA imagery and elevation. The build script resizes
   the colour map, works out ground slopes from the elevation grid, and stores
   both as text.
+- `vendor/lola-south.js`, `vendor/lola-north.js`: NASA LOLA elevation. The
+  build script averages 4 by 4 blocks and stores the result as text.
+- `vendor/site-horizons.js`, `reference/terrain/*.json`: numbers the build
+  script computes from the same NASA elevation.

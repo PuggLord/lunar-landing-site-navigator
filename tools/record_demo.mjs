@@ -34,6 +34,7 @@ const VIEW = { width: 1600, height: 900, deviceScaleFactor: 1.2, mobile: false }
 
 const CASE_MOVE = 'a=-80.13,1.44,2.579,im1&ta=2024-02-22T23:24&b=-84.78,29.13,0,im2&tb=same&w=90';
 const CASE_LATE = 'a=-80.13,1.44,2.579,im1&ta=2024-02-22T23:24&b=-80.13,1.44,2.579,im1&tb=2024-03-07T23:24&w=30';
+const CASE_RIM = 'a=-89.7786,-155.7256,1.735,shackleton-rim&ta=2024-02-22T23:24&b=-89.67,129.78,-2.786,shackleton-floor&tb=same&w=90';
 
 const BROWSERS = [
   process.argv[2],
@@ -155,16 +156,19 @@ async function main() {
         await shoot();
       }
     };
-    /* Runs in the page: a caption in the empty corner under the form. */
-    const caption = (title, line) => {
+    /* Runs in the page: a caption in the empty corner under the form, or above the chart legend. */
+    const caption = (title, line, atTop) => {
       let c = document.getElementById('demo-caption');
       if (!c) {
         c = document.createElement('div');
         c.id = 'demo-caption';
-        c.style.cssText = 'position:fixed;right:40px;bottom:38px;width:372px;z-index:9;padding-top:14px;' +
+        c.style.cssText = 'position:fixed;right:40px;width:372px;z-index:9;padding-top:14px;' +
           'border-top:1px solid rgba(241,242,244,.26);color:#f1f2f4;pointer-events:none';
         document.body.appendChild(c);
       }
+      c.style.top = atTop ? '22px' : 'auto';
+      c.style.bottom = atTop ? 'auto' : '38px';
+      c.style.width = atTop ? '560px' : '372px';
       c.style.display = title ? 'block' : 'none';
       c.innerHTML = '<div style="font:600 19px/1.25 \'Mona Sans\';font-stretch:112%;letter-spacing:-0.01em"></div>' +
         '<div style="margin-top:4px;font:400 14px/1.4 \'Mona Sans\';color:#b6bac2"></div>';
@@ -184,15 +188,15 @@ async function main() {
       await shoot();
     }
 
-    /* 2. Move the site 175 km: 9 s. */
+    /* 2. Move the site 175 km: 7.6 s. */
     await open(`index.html#${CASE_MOVE}`, 5000);
     await run(caption, 'Move the site 175 km', 'IM-1 landing site against the planned IM-2 site, 90 days');
     await run(setTime, 0);
     await hold(24);
-    await sweep(216);
-    await hold(30);
+    await sweep(180);
+    await hold(24);
 
-    /* 3. The same case in the charts: 5.5 s. */
+    /* 3. The same case in the charts, with the ground as the real skyline: 4.6 s. */
     await run(caption, '', '');
     const top = await run(() => document.querySelector('.charts').getBoundingClientRect().top + scrollY + 60);
     for (let i = 0; i < 30; i++) {
@@ -200,27 +204,37 @@ async function main() {
       await shoot();
     }
     await run(setTime, 0);
-    await hold(15);
-    await sweep(105);
-    await hold(15);
+    await hold(12);
+    await sweep(84);
+    await hold(12);
 
-    /* 4. Land two weeks late: 7.5 s. */
+    /* 4. Rim against floor at Shackleton, still in the charts: 4 s. */
+    await run((h) => { location.hash = h; }, CASE_RIM);
+    await sleep(1500);
+    await run((y) => { scrollTo(0, y); }, top);
+    await run(caption, 'Shackleton crater: the rim against the floor', 'The skyline is NASA LOLA terrain. The floor never sees the Sun.', true);
+    await run(setTime, 0);
+    await hold(20);
+    await sweep(80);
+    await hold(20);
+
+    /* 5. Land two weeks late: 6 s. */
     await run((h) => { scrollTo(0, 0); location.hash = h; }, CASE_LATE);
     await sleep(1500);
     await run(caption, 'Land two weeks late', 'The IM-1 site on its landing day and 14 days after');
     await run(setTime, 0);
-    await hold(30);
-    await sweep(165);
-    await hold(30);
+    await hold(24);
+    await sweep(132);
+    await hold(24);
 
-    /* 5. The checks, then the name: 3 s and 2 s. */
+    /* 6. The checks, then the name: 2.8 s and 2 s. */
     await open('deck/index.html', 1200);
     await run(() => {
       document.documentElement.style.scrollSnapType = 'none';
       document.querySelectorAll('.frame')[5].scrollIntoView();
     });
     await sleep(300);
-    await hold(90);
+    await hold(84);
     await run(() => {
       document.querySelectorAll('.frame')[0].scrollIntoView();
       const note = document.querySelector('.title .chrome span');
