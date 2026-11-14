@@ -4,6 +4,8 @@ Team Ksig UNT, 2026 NASA Space Apps Challenge (Dallas), challenge
 [Lunar Landing Site Navigator](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/).
 Built during the event, Nov 14-15, 2026.
 
+Live page: https://pugglord.github.io/lunar-landing-site-navigator/
+
 Pick a place on the Moon and a time. The tool tells you where the Sun and the
 Earth sit in that sky, whether each is above the horizon, how long until it
 sets, and how much solar energy arrives. Near the poles the horizon is the
@@ -20,8 +22,9 @@ night line sweeps the globe while the charts follow.
 
 ## Open it
 
-Open `index.html` in a browser. There is nothing to install and no server to
-start. It works with no network connection.
+Use the live page above, or download the files and open `index.html` in a
+browser. There is nothing to install and no server to start, and the
+downloaded copy works with no network connection.
 
 Under the Moon, "Start from a real case" lists four comparisons that load
 with one click: a site moved 175 km, a landing two weeks late, the rim of
