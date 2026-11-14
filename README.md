@@ -8,10 +8,18 @@ Pick a place on the Moon and a time. The tool tells you where the Sun and the
 Earth sit in that sky, whether each is above the horizon, and how long until it
 sets.
 
-## Status
+Then it does the same for a second scenario and puts the two side by side:
+another site on the same date, or the same site on another date. It says which
+one loses the Sun or the Earth first, and by how long.
 
-Saturday morning: the calculation works and agrees with NASA JPL Horizons. The
-web page comes next.
+## Open it
+
+Open `index.html` in a browser. There is nothing to install and no server to
+start. It works with no network connection.
+
+The address bar holds the whole comparison, so a copied link reopens the same
+two scenarios. Add `?theme=light` or `?theme=dark` before the `#` to force a
+colour theme.
 
 ## Run the tests
 
@@ -44,7 +52,11 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 
 | Path | What it is |
 | --- | --- |
+| `index.html`, `css/style.css` | The page |
 | `src/lunar-sky.js` | Sun and Earth sky position, horizon crossings, timelines |
+| `src/sites.js` | The curated landing sites, each with its source |
+| `src/charts.js` | The horizon view, the timeline, and the visibility bars (plain SVG) |
+| `src/app.js` | Reads the form, runs the calculation, writes the page |
 | `test/` | Tests against the Horizons tables |
 | `tools/fetch_horizons.py` | Downloads the reference tables from NASA JPL Horizons |
 | `reference/horizons/` | Saved Horizons answers, with the request URLs inside each file |

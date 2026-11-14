@@ -1,0 +1,200 @@
+<!doctype html>
+<!--
+  SI disclosure: this page was written with an AI coding tool (Claude Code,
+  Anthropic) during the 2026 NASA Space Apps Challenge, Nov 14-15, 2026,
+  directed and reviewed by team Ksig UNT. See SI_USE.md.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lunar Landing Site Navigator</title>
+  <meta name="description" content="Compare two lunar landing scenarios: where the Sun and Earth sit above the horizon, and how long each stays in view.">
+  <meta name="generator" content="Written with Claude Code (AI tool); see SI_USE.md">
+  <script>
+    (function () {
+      var m = /[?&]theme=(light|dark)(&|$)/.exec(location.search);
+      if (m) document.documentElement.setAttribute('data-theme', m[1]);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <h1>Lunar Landing Site Navigator</h1>
+      <p class="lede">Two landing scenarios, side by side. See where the Sun and the Earth sit above each horizon, and how long each one stays up.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form class="setup" id="setup" aria-label="Scenarios to compare" onsubmit="return false">
+      <fieldset class="scenario" data-scenario="a">
+        <legend><span class="tag">A</span> First scenario</legend>
+        <label class="field field-site">
+          <span>Landing site</span>
+          <select name="site"></select>
+        </label>
+        <div class="coords">
+          <label class="field"><span>Latitude, °N</span><input name="lat" type="number" step="any" min="-90" max="90" inputmode="decimal" required></label>
+          <label class="field"><span>Longitude, °E</span><input name="lon" type="number" step="any" min="-360" max="360" inputmode="decimal" required></label>
+          <label class="field"><span>Height, km</span><input name="elev" type="number" step="any" min="-10" max="11" inputmode="decimal"></label>
+        </div>
+        <p class="source" data-role="source"></p>
+        <div class="when">
+          <label class="field"><span>Date and time, UTC</span><input name="time" type="datetime-local" step="60" required></label>
+          <button type="button" class="quiet" data-action="now">Now</button>
+          <button type="button" class="quiet" data-action="landing" hidden>Landing time</button>
+        </div>
+        <p class="error" data-role="error" role="alert" hidden></p>
+      </fieldset>
+
+      <fieldset class="scenario" data-scenario="b">
+        <legend><span class="tag">B</span> Second scenario</legend>
+        <label class="field field-site">
+          <span>Landing site</span>
+          <select name="site"></select>
+        </label>
+        <div class="coords">
+          <label class="field"><span>Latitude, °N</span><input name="lat" type="number" step="any" min="-90" max="90" inputmode="decimal" required></label>
+          <label class="field"><span>Longitude, °E</span><input name="lon" type="number" step="any" min="-360" max="360" inputmode="decimal" required></label>
+          <label class="field"><span>Height, km</span><input name="elev" type="number" step="any" min="-10" max="11" inputmode="decimal"></label>
+        </div>
+        <p class="source" data-role="source"></p>
+        <div class="when">
+          <label class="field"><span>Date and time, UTC</span><input name="time" type="datetime-local" step="60" required></label>
+          <label class="check"><input name="sameTime" type="checkbox" checked> Same time as A</label>
+        </div>
+        <p class="error" data-role="error" role="alert" hidden></p>
+      </fieldset>
+
+      <div class="shared">
+        <fieldset class="segmented" id="window-choice">
+          <legend>Look ahead</legend>
+          <label><input type="radio" name="window" value="3"><span>3 days</span></label>
+          <label><input type="radio" name="window" value="14"><span>14 days</span></label>
+          <label><input type="radio" name="window" value="30" checked><span>30 days</span></label>
+          <label><input type="radio" name="window" value="90"><span>90 days</span></label>
+        </fieldset>
+        <p class="hint">One lunar day lasts about 29.5 Earth days.</p>
+        <button type="button" class="quiet" id="copy-link">Copy link to this comparison</button>
+        <span class="copied" id="copied" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <section class="verdict" aria-labelledby="verdict-h">
+      <h2 id="verdict-h">What changes between A and B</h2>
+      <ul id="verdict"></ul>
+      <p class="hint" id="verdict-note" hidden>A and B start at different times. Each duration counts from that scenario's own chosen time.</p>
+    </section>
+
+    <section class="numbers" aria-labelledby="numbers-h">
+      <h2 id="numbers-h">The numbers</h2>
+      <div class="table-scroll">
+        <table id="metrics">
+          <thead>
+            <tr>
+              <th scope="col" class="metric-col">Measured from the chosen time</th>
+              <th scope="col"><span class="tag">A</span> <span id="head-a"></span></th>
+              <th scope="col"><span class="tag">B</span> <span id="head-b"></span></th>
+            </tr>
+          </thead>
+          <tbody id="metrics-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="charts" aria-labelledby="charts-h">
+      <div class="charts-head">
+        <h2 id="charts-h">The sky over the look-ahead period</h2>
+        <ul class="legend" aria-label="Legend">
+          <li><span class="key key-sun"></span>Sun</li>
+          <li><span class="key key-earth"></span>Earth</li>
+          <li><span class="key key-ground"></span>Below the horizon</li>
+        </ul>
+      </div>
+      <p class="hint scale-note" id="scale-note" hidden>The two sites need different vertical scales. Read the degree labels on each chart before comparing heights.</p>
+      <div class="chart-pair">
+        <div class="chart-col" data-scenario="a">
+          <h3><span class="tag">A</span> <span data-role="title"></span></h3>
+          <p class="readout" data-role="readout" aria-live="off"></p>
+          <figure>
+            <figcaption>Looking out from the site: compass direction across, height above the horizon up</figcaption>
+            <div class="plot" data-role="panorama"></div>
+          </figure>
+          <figure>
+            <figcaption>Height above the horizon over time</figcaption>
+            <div class="plot" data-role="timeline" tabindex="0"></div>
+          </figure>
+          <div class="plot strips" data-role="strips"></div>
+        </div>
+        <div class="chart-col" data-scenario="b">
+          <h3><span class="tag">B</span> <span data-role="title"></span></h3>
+          <p class="readout" data-role="readout" aria-live="off"></p>
+          <figure>
+            <figcaption>Looking out from the site: compass direction across, height above the horizon up</figcaption>
+            <div class="plot" data-role="panorama"></div>
+          </figure>
+          <figure>
+            <figcaption>Height above the horizon over time</figcaption>
+            <div class="plot" data-role="timeline" tabindex="0"></div>
+          </figure>
+          <div class="plot strips" data-role="strips"></div>
+        </div>
+      </div>
+      <p class="hint">Move the pointer over either timeline, or focus it and use the arrow keys. Both scenarios move together.</p>
+      <details class="data-table">
+        <summary>Show the values as a table</summary>
+        <div class="table-scroll">
+          <table id="samples">
+            <thead>
+              <tr>
+                <th scope="col">After the chosen time</th>
+                <th scope="col">Time at A, UTC</th>
+                <th scope="col">A Sun</th>
+                <th scope="col">A Earth</th>
+                <th scope="col">B Sun</th>
+                <th scope="col">B Earth</th>
+              </tr>
+            </thead>
+            <tbody id="samples-body"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="notes" aria-labelledby="notes-h">
+      <h2 id="notes-h">Read this before trusting a number</h2>
+      <div class="notes-grid">
+        <div>
+          <h3>What "above the horizon" means here</h3>
+          <p>It is geometry only. The horizon is flat and the Moon is a smooth sphere of radius 1737.4 km. Hills, crater rims, lander tilt, solar panel angle, and antenna pointing are not modelled.</p>
+          <p>Near the south pole the Sun and Earth skim the horizon, so a ridge a few degrees high can hide either one for days. Treat a height under about 5° as "check the terrain".</p>
+          <p>Sunlight above the horizon does not promise power. Earth above the horizon does not promise a radio link.</p>
+        </div>
+        <div>
+          <h3>How the numbers are made</h3>
+          <p>Positions come from Astronomy Engine. The Moon's orientation uses the IAU 2009 rotation model. Heights refer to the centre of the Sun or Earth disk. The Sun's disk is about 0.5° across and the Earth's about 1.9°, so each takes time to cross the horizon.</p>
+          <p>We check the calculation against NASA JPL Horizons at four places on the Moon. The largest difference found was 0.0073°, and the sunset time at the IM-1 site differed by 4 seconds.</p>
+        </div>
+        <div>
+          <h3>Why the pole is different</h3>
+          <p>The Moon's axis is tilted only 1.5°, so at the poles the Sun never climbs high. It circles the horizon once a month. The Earth barely moves in the lunar sky; it rocks a few degrees up and down, which at a polar site can take it below the horizon for days.</p>
+        </div>
+      </div>
+      <h3>Sources</h3>
+      <ul class="sources" id="sources"></ul>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Team Ksig UNT, 2026 NASA Space Apps Challenge, Dallas. Reference data: NASA JPL Horizons. Code and tests written with an AI coding tool under the team's direction; details in SI_USE.md.</p>
+  </footer>
+
+  <script src="vendor/astronomy.browser.js"></script>
+  <script src="src/lunar-sky.js"></script>
+  <script src="src/sites.js"></script>
+  <script src="src/charts.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
