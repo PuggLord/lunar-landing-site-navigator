@@ -190,7 +190,7 @@ async function main() {
 
     /* 2. Move the site 175 km: 7.6 s. */
     await open(`index.html#${CASE_MOVE}`, 5000);
-    await run(caption, 'Move the site 175 km', 'The IM-1 landing site and the planned IM-2 site, over 90 days');
+    await run(caption, 'Move the site 175 km', 'The IM-1 site and the planned IM-2 site, 90 days');
     await run(setTime, 0);
     await hold(24);
     await sweep(180);
