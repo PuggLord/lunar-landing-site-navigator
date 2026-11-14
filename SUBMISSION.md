@@ -42,11 +42,15 @@ Horizons, and the largest difference we found was 0.0073 degrees.
 
 ## 3. Link to project demo
 
-`[paste one public link: deck/Lunar-Landing-Site-Navigator.pdf (seven slides), or demo/Lunar-Landing-Site-Navigator-demo.mp4 (29 seconds, silent), or the narrated 30-second video once the team has recorded its voices over demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4. Check that the narrated file is 30 seconds or less before linking it.]`
+Paste one of these. Each opens with no login.
+
+- Seven slides: https://pugglord.github.io/lunar-landing-site-navigator/deck/Lunar-Landing-Site-Navigator.pdf
+- 29-second video, silent: https://pugglord.github.io/lunar-landing-site-navigator/demo/Lunar-Landing-Site-Navigator-demo.mp4
+- `[the narrated 30-second video, once the team has recorded its voices over demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4. Check that it is 30 seconds or less before linking it.]`
 
 ## 4. Link to final project
 
-`[paste the public link to the live page; the source code link goes in the description below]`
+https://pugglord.github.io/lunar-landing-site-navigator/
 
 ## 5. Detailed project description
 
@@ -181,7 +185,7 @@ Pillow for the data scripts, Astronomy Engine 2.1.19, Mona Sans typeface.
 
 **Source code**
 
-`[paste the public repository link]`. License: `[the license the team picked]`.
+https://github.com/PuggLord/lunar-landing-site-navigator. License: `[the license the team picked]`.
 
 ## 6. Use of SI (AI)
 

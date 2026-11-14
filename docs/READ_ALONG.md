@@ -7,12 +7,12 @@
 
 ## How to record
 
-1. Read the script below once, and change any line that is not how you would say it. The words are in `tools/readalong_script.mjs`, and Jake can make the video again after a change.
+1. Read the script below once, and change any line that is not how you would say it. The words are in `tools/readalong_script.mjs`, and the video can be made again after a change.
 2. Sit together with one phone between you. Start a voice recording on the phone first.
 3. Play the video from the start and leave it running. Do not pause it, because the pauses would put the voices out of step with the picture.
 4. Three dots fill before each turn. Start on the first word when it gets its underline, and say each word as the underline reaches it. Words turn grey once they are said, and the next line waits underneath.
 5. If someone slips, keep going and finish the take. Then record the whole thing again and keep the better take.
-6. Send the audio file to Jake.
+6. Send the audio file to the teammate who runs the recorder.
 
 ## Adding the voices
 

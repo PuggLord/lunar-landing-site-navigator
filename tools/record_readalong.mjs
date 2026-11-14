@@ -156,12 +156,12 @@ function writeDoc(tl, short) {
   out.push('');
   out.push('## How to record');
   out.push('');
-  out.push('1. Read the script below once, and change any line that is not how you would say it. The words are in `tools/readalong_script.mjs`, and Jake can make the video again after a change.');
+  out.push('1. Read the script below once, and change any line that is not how you would say it. The words are in `tools/readalong_script.mjs`, and the video can be made again after a change.');
   out.push('2. Sit together with one phone between you. Start a voice recording on the phone first.');
   out.push('3. Play the video from the start and leave it running. Do not pause it, because the pauses would put the voices out of step with the picture.');
   out.push('4. Three dots fill before each turn. Start on the first word when it gets its underline, and say each word as the underline reaches it. Words turn grey once they are said, and the next line waits underneath.');
   out.push('5. If someone slips, keep going and finish the take. Then record the whole thing again and keep the better take.');
-  out.push('6. Send the audio file to Jake.');
+  out.push('6. Send the audio file to the teammate who runs the recorder.');
   out.push('');
   out.push('## Adding the voices');
   out.push('');
