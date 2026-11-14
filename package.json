@@ -1,0 +1,10 @@
+{
+  "name": "lunar-landing-site-navigator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Compare lunar landing sites and dates by Sun and Earth position. NASA Space Apps Challenge 2026, team Ksig UNT.",
+  "scripts": {
+    "test": "node --test",
+    "reference": "python tools/fetch_horizons.py"
+  }
+}

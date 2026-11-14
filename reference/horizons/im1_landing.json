@@ -1,0 +1,57 @@
+{
+ "source": "NASA/JPL Horizons API",
+ "retrieved_utc": "2026-11-14T16:05:06Z",
+ "request_urls": {
+  "sun": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27coord%40301%27&COORD_TYPE=%27GEODETIC%27&SITE_COORD=%271.44%2C-80.13%2C2.579%27&START_TIME=%272024-02-22+23%3A00%27&STOP_TIME=%272024-02-23+01%3A00%27&STEP_SIZE=%271+h%27&QUANTITIES=%274%27&CSV_FORMAT=%27YES%27",
+  "earth": "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27399%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27coord%40301%27&COORD_TYPE=%27GEODETIC%27&SITE_COORD=%271.44%2C-80.13%2C2.579%27&START_TIME=%272024-02-22+23%3A00%27&STOP_TIME=%272024-02-23+01%3A00%27&STEP_SIZE=%271+h%27&QUANTITIES=%274%27&CSV_FORMAT=%27YES%27"
+ },
+ "quantity": "4: apparent azimuth and elevation, airless, degrees; azimuth clockwise from north",
+ "horizons": {
+  "api_version": "1.2",
+  "frame": "MEAN_ME (high precision)",
+  "ephemeris": "DE441",
+  "center_radii_km": "1737.4, 1737.4, 1737.4",
+  "refraction": "NO (AIRLESS)"
+ },
+ "site": {
+  "label": "IM-1 Odysseus site (NASA/LRO)",
+  "lon_east_deg": 1.44,
+  "lat_deg": -80.13,
+  "alt_km": 2.579
+ },
+ "rows": [
+  {
+   "utc": "2024-02-22T23:00:00Z",
+   "sun": {
+    "az": 18.808294,
+    "el": 10.462036
+   },
+   "earth": {
+    "az": 1.586793,
+    "el": 15.4436
+   }
+  },
+  {
+   "utc": "2024-02-23T00:00:00Z",
+   "sun": {
+    "az": 18.294591,
+    "el": 10.48889
+   },
+   "earth": {
+    "az": 1.536086,
+    "el": 15.414511
+   }
+  },
+  {
+   "utc": "2024-02-23T01:00:00Z",
+   "sun": {
+    "az": 17.780806,
+    "el": 10.515003
+   },
+   "earth": {
+    "az": 1.485184,
+    "el": 15.384979
+   }
+  }
+ ]
+}
