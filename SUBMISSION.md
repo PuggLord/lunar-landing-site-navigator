@@ -37,7 +37,7 @@ NASA JPL Horizons; the largest difference we found is 0.0073 degrees.
 
 ## 3. Link to project demo
 
-`[paste the public link to deck/Lunar-Landing-Site-Navigator.pdf, seven slides]`
+`[paste one public link: deck/Lunar-Landing-Site-Navigator.pdf (seven slides) or demo/Lunar-Landing-Site-Navigator-demo.mp4 (29 seconds)]`
 
 ## 4. Link to final project
 
@@ -152,7 +152,9 @@ commits made with the tool carry a `Co-Authored-By: Claude` line, and the file
 `SI_USE.md` in the repository logs each session with times and files.
 
 No AI-generated images, video or audio are in the project. The Moon on the
-page and in the slides is NASA imagery drawn by code. Nothing uses NASA logos,
+page and in the slides is NASA imagery drawn by code. The demo video is
+screenshots of the page joined by a script the tool wrote, and its last card
+says so. Nothing uses NASA logos,
 flags or mission identifiers.
 
 ## 7. NASA data

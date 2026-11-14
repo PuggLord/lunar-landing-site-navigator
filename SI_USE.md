@@ -25,6 +25,9 @@ the challenge statement.
 - No AI-generated images, video, or audio are in the project so far. If any
   are added they carry a visible watermark. The 3D Moon is NASA imagery drawn
   by code; no image model made any part of it.
+- The demo video is screenshots of the page and the slides, joined by a
+  script the AI tool wrote. No video model made any frame. Its last card says
+  so on screen.
 - Nothing generated uses NASA logos, flags, or mission identifiers.
 
 ## Log
@@ -39,7 +42,9 @@ the challenge statement.
 
 | Sat Nov 14, 11:05-11:50 | Redesigned the page after the team said the first design looked machine-made. Captured three reference sites and noted their typefaces, colours, and layout. Rebuilt the page around them: the Moon fills the first screen, the answer is the headline, the form is a column on the right, the time slider carries Sun bars for both sites. Dropped the light theme. Chose and embedded the typeface. Loaded the Moon map after the numbers so the page shows sooner. Checked it with screenshots at four sizes, a scripted click and Play test, and a design checker. | `index.html`, `css/style.css`, `css/fonts.css`, `src/app.js`, `src/globe.js`, `tools/build_fonts_css.py`, `vendor/fonts/` |
 
-| Sat Nov 14, 11:50-12:10 | Read the past Space Apps winners a teammate sent (listed in SOURCES.md) to see what a finished project page, demo and write-up contain. Added the three one-click cases under the Moon, with numbers read from the tool. Made the headline easier to read over lit ground. Wrote the seven slides from screenshots of the page, the script that prints them to PDF, and first drafts of the eight submission fields. | `index.html`, `css/style.css`, `src/app.js`, `deck/`, `tools/build_deck_pdf.ps1`, `SUBMISSION.md`, `README.md`, `SOURCES.md` |
+| Sat Nov 14, 11:50-12:02 | Read the past Space Apps winners a teammate sent (listed in SOURCES.md) to see what a finished project page, demo and write-up contain. Added the three one-click cases under the Moon, with numbers read from the tool. Made the headline easier to read over lit ground. Wrote the seven slides from screenshots of the page, the script that prints them to PDF, and first drafts of the eight submission fields. | `index.html`, `css/style.css`, `src/app.js`, `deck/`, `tools/build_deck_pdf.ps1`, `SUBMISSION.md`, `README.md`, `SOURCES.md` |
+
+| Sat Nov 14, 12:02-12:08 | Wrote the script that records the demo video and ran it: 870 screenshots of the page and the slides, joined into 29 seconds. Tested that a click on a case loads it. | `tools/record_demo.mjs`, `demo/` |
 
 ## Not written by AI
 

@@ -71,6 +71,16 @@ Chrome or Edge):
 
     powershell -File tools/build_deck_pdf.ps1
 
+`demo/Lunar-Landing-Site-Navigator-demo.mp4` is a 29-second video of the
+tool with no sound. Every frame is a screenshot of the page or the slides. To
+record it again (needs Node.js 22 or newer, ffmpeg, and a Chromium browser;
+takes about ten minutes):
+
+    node tools/record_demo.mjs
+
+The Space Apps demo is seven slides or a video of 30 seconds or less. Submit
+one of the two.
+
 `SUBMISSION.md` holds drafts of the eight fields on the Space Apps project
 page.
 
@@ -110,6 +120,8 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | `vendor/fonts/` | Mona Sans (GitHub, SIL Open Font License 1.1) and its license text |
 | `deck/` | The seven-slide demo, its PDF, and the screenshots it uses |
 | `tools/build_deck_pdf.ps1` | Prints the deck to PDF with a Chromium browser |
+| `demo/` | The 29-second demo video |
+| `tools/record_demo.mjs` | Records the video: drives the page in a headless browser and joins the screenshots with ffmpeg |
 | `SUBMISSION.md` | Draft text for the Space Apps project page |
 
 ## Sources and credits
