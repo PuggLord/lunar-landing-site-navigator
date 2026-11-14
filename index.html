@@ -11,57 +11,61 @@
   <title>Lunar Landing Site Navigator</title>
   <meta name="description" content="Compare two lunar landing scenarios: where the Sun and Earth sit above the horizon, and how long each stays in view.">
   <meta name="generator" content="Written with Claude Code (AI tool); see SI_USE.md">
-  <script>
-    (function () {
-      var m = /[?&]theme=(light|dark)(&|$)/.exec(location.search);
-      if (m) document.documentElement.setAttribute('data-theme', m[1]);
-    })();
-  </script>
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050608">
+  <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="masthead">
-    <div class="wrap">
-      <h1>Lunar Landing Site Navigator</h1>
-      <p class="lede">Pick two landing sites and a date. See both on the Moon in that day's sunlight, and how long the Sun and the Earth stay above each horizon.</p>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <div class="stage">
-    <section class="moon" aria-labelledby="moon-h">
-      <h2 id="moon-h">Both sites on the Moon</h2>
-      <p class="moon-time" id="moon-time"></p>
-      <div class="globe" id="globe" tabindex="0" role="group" aria-label="3D Moon lit from the Sun's real direction. Drag or use the arrow keys to turn it, plus and minus to zoom. A click moves a site.">
-        <div class="globe-zoom">
-          <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
-          <button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>
-        </div>
-        <p class="globe-msg" id="globe-msg">Loading the Moon map</p>
-      </div>
-      <div class="transport">
-        <button type="button" class="quiet" id="play" aria-pressed="false">Play</button>
-        <input type="range" id="scrub" min="0" max="720" step="1" value="0" aria-label="Time within the look-ahead period">
-      </div>
+  <div class="stage" id="stage">
+    <header class="top">
+      <h1 class="mark">Lunar Landing Site Navigator</h1>
       <div class="views" role="group" aria-label="Turn the Moon to">
-        <button type="button" class="quiet" data-view="near">Near side</button>
-        <button type="button" class="quiet" data-view="far">Far side</button>
-        <button type="button" class="quiet" data-view="south">South pole</button>
-        <button type="button" class="quiet" data-view="north">North pole</button>
-        <button type="button" class="quiet" data-view="a">Site A</button>
-        <button type="button" class="quiet" data-view="b">Site B</button>
+        <button type="button" data-view="near">Near side</button>
+        <button type="button" data-view="far">Far side</button>
+        <button type="button" data-view="south">South pole</button>
+        <button type="button" data-view="north">North pole</button>
+        <button type="button" data-view="a">Site A</button>
+        <button type="button" data-view="b">Site B</button>
       </div>
-      <fieldset class="segmented" id="pick-choice">
-        <legend>A click on the Moon moves</legend>
-        <label><input type="radio" name="pick" value="a" checked><span>Site A</span></label>
-        <label><input type="radio" name="pick" value="b"><span>Site B</span></label>
-      </fieldset>
-      <p class="hint" id="globe-credit">Imagery and elevation: NASA Lunar Reconnaissance Orbiter (LROC colour mosaic, LOLA heights) from NASA's CGI Moon Kit. Slopes are drawn <span id="relief-x">3</span> times steeper than they are so craters show. Nothing casts a shadow here, so a lit crater floor on the globe can be dark on the real Moon. Near the poles the NASA mosaic also carries the shadows from the day each strip was photographed.</p>
+      <p class="lede">Two landing sites, one date. See both in that day's sunlight, and how long the Sun and the Earth stay above each horizon.</p>
+    </header>
+
+    <div class="globe" id="globe" tabindex="0" role="group" aria-label="3D Moon lit from the Sun's real direction. Drag or use the arrow keys to turn it, plus and minus to zoom. A click moves a site.">
+      <div class="moon-slot" id="moon-slot"></div>
+      <p class="globe-msg" id="globe-msg">Loading the Moon map</p>
+    </div>
+
+    <div class="transport">
+      <button type="button" class="solid" id="play" aria-pressed="false">Play</button>
+      <p class="clock" id="moon-time">
+        <span id="moon-clock"></span>
+        <small id="moon-offset"></small>
+      </p>
+      <div class="scrubber">
+        <span class="lit-name" aria-hidden="true">A</span>
+        <span class="lit" id="lit-a" aria-hidden="true"></span>
+        <span class="lit-name lit-name-b" aria-hidden="true">B</span>
+        <span class="lit lit-b" id="lit-b" aria-hidden="true"></span>
+        <input type="range" id="scrub" min="0" max="720" step="1" value="0" aria-label="Time within the look-ahead period">
+        <span class="lit-key" aria-hidden="true"><i></i>Sun above the horizon</span>
+      </div>
+      <div class="globe-zoom">
+        <button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>
+        <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+      </div>
+    </div>
+
+    <section class="answer" aria-labelledby="verdict-h">
+      <h2 id="verdict-h" class="sr">What changes between A and B</h2>
+      <ul id="verdict"></ul>
+      <p class="hint" id="verdict-note" hidden>A and B start at different times. Each duration counts from that scenario's own chosen time.</p>
     </section>
 
     <form class="setup" id="setup" aria-label="Scenarios to compare" onsubmit="return false">
       <fieldset class="scenario" data-scenario="a">
         <legend><span class="tag">A</span> First scenario</legend>
+        <label class="pick"><input type="radio" name="pick" value="a" checked><span>Moon click places A</span></label>
         <label class="field field-site">
           <span>Landing site</span>
           <select name="site"></select>
@@ -74,14 +78,17 @@
         <p class="source" data-role="source"></p>
         <div class="when">
           <label class="field"><span>Date and time, UTC</span><input name="time" type="datetime-local" step="60" required></label>
-          <button type="button" class="quiet" data-action="now">Now</button>
-          <button type="button" class="quiet" data-action="landing" hidden>Landing time</button>
+          <div class="when-actions">
+            <button type="button" class="link" data-action="landing" hidden>Landing time</button>
+            <button type="button" class="link" data-action="now">Now</button>
+          </div>
         </div>
         <p class="error" data-role="error" role="alert" hidden></p>
       </fieldset>
 
       <fieldset class="scenario" data-scenario="b">
         <legend><span class="tag">B</span> Second scenario</legend>
+        <label class="pick"><input type="radio" name="pick" value="b"><span>Moon click places B</span></label>
         <label class="field field-site">
           <span>Landing site</span>
           <select name="site"></select>
@@ -94,7 +101,9 @@
         <p class="source" data-role="source"></p>
         <div class="when">
           <label class="field"><span>Date and time, UTC</span><input name="time" type="datetime-local" step="60" required></label>
-          <label class="check"><input name="sameTime" type="checkbox" checked> Same time as A</label>
+          <div class="when-actions">
+            <label class="check"><input name="sameTime" type="checkbox" checked><span>Same time as A</span></label>
+          </div>
         </div>
         <p class="error" data-role="error" role="alert" hidden></p>
       </fieldset>
@@ -107,36 +116,34 @@
           <label><input type="radio" name="window" value="30" checked><span>30 days</span></label>
           <label><input type="radio" name="window" value="90"><span>90 days</span></label>
         </fieldset>
-        <p class="hint">One lunar day lasts about 29.5 Earth days.</p>
-        <button type="button" class="quiet" id="copy-link">Copy link to this comparison</button>
-        <span class="copied" id="copied" role="status" aria-live="polite"></span>
+        <div class="share">
+          <button type="button" class="link" id="copy-link">Copy link to this comparison</button>
+          <span class="copied" id="copied" role="status" aria-live="polite"></span>
+        </div>
       </div>
     </form>
-    </div>
+  </div>
 
-    <section class="verdict" aria-labelledby="verdict-h">
-      <h2 id="verdict-h">What changes between A and B</h2>
-      <ul id="verdict"></ul>
-      <p class="hint" id="verdict-note" hidden>A and B start at different times. Each duration counts from that scenario's own chosen time.</p>
-    </section>
-
-    <section class="numbers" aria-labelledby="numbers-h">
+  <main>
+    <section class="band" aria-labelledby="numbers-h">
       <h2 id="numbers-h">The numbers</h2>
-      <div class="table-scroll">
-        <table id="metrics">
-          <thead>
-            <tr>
-              <th scope="col" class="metric-col">Measured from the chosen time</th>
-              <th scope="col"><span class="tag">A</span> <span id="head-a"></span></th>
-              <th scope="col"><span class="tag">B</span> <span id="head-b"></span></th>
-            </tr>
-          </thead>
-          <tbody id="metrics-body"></tbody>
-        </table>
+      <div class="band-body">
+        <div class="table-scroll">
+          <table id="metrics">
+            <thead>
+              <tr>
+                <th scope="col" class="metric-col">Measured from the chosen time</th>
+                <th scope="col"><span class="tag">A</span> <span id="head-a"></span></th>
+                <th scope="col"><span class="tag">B</span> <span id="head-b"></span></th>
+              </tr>
+            </thead>
+            <tbody id="metrics-body"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
-    <section class="charts" aria-labelledby="charts-h">
+    <section class="band band-wide charts" aria-labelledby="charts-h">
       <div class="charts-head">
         <h2 id="charts-h">The sky over the look-ahead period</h2>
         <ul class="legend" aria-label="Legend">
@@ -195,9 +202,9 @@
       </details>
     </section>
 
-    <section class="notes" aria-labelledby="notes-h">
+    <section class="band notes" aria-labelledby="notes-h">
       <h2 id="notes-h">Read this before trusting a number</h2>
-      <div class="notes-grid">
+      <div class="band-body notes-grid">
         <div>
           <h3>What "above the horizon" means here</h3>
           <p>It is geometry only. The horizon is flat and the Moon is a smooth sphere of radius 1737.4 km. Hills, crater rims, lander tilt, solar panel angle, and antenna pointing are not modelled.</p>
@@ -213,13 +220,24 @@
           <h3>Why the pole is different</h3>
           <p>The Moon's axis is tilted only 1.5°, so at the poles the Sun never climbs high. It circles the horizon once a month. The Earth barely moves in the lunar sky; it rocks a few degrees up and down, which at a polar site can take it below the horizon for days.</p>
         </div>
+        <div>
+          <h3>What the 3D Moon shows</h3>
+          <p id="globe-credit">Imagery and elevation come from NASA's Lunar Reconnaissance Orbiter (LROC colour mosaic, LOLA heights) through NASA's CGI Moon Kit. Slopes are drawn <span id="relief-x">3</span> times steeper than they are so craters show. Nothing casts a shadow here, so a lit crater floor on the globe can be dark on the real Moon. Near the poles the NASA mosaic also carries the shadows from the day each strip was photographed.</p>
+          <p>The bars beside the time slider mark when the Sun is above the horizon at each site. One lunar day lasts about 29.5 Earth days.</p>
+        </div>
       </div>
-      <h3>Sources</h3>
-      <ul class="sources" id="sources"></ul>
+    </section>
+
+    <section class="band" aria-labelledby="sources-h">
+      <h2 id="sources-h">Sources</h2>
+      <div class="band-body">
+        <ul class="sources" id="sources"></ul>
+      </div>
     </section>
   </main>
 
-  <footer class="wrap foot">
+  <footer class="foot">
+    <p class="mark">Lunar Landing Site Navigator</p>
     <p>Team Ksig UNT, 2026 NASA Space Apps Challenge, Dallas. Reference data: NASA JPL Horizons. Code and tests written with an AI coding tool under the team's direction; details in SI_USE.md.</p>
   </footer>
 
@@ -227,7 +245,6 @@
   <script src="src/lunar-sky.js"></script>
   <script src="src/sites.js"></script>
   <script src="src/charts.js"></script>
-  <script src="vendor/moon-maps.js"></script>
   <script src="src/globe.js"></script>
   <script src="src/app.js"></script>
 </body>

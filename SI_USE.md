@@ -8,7 +8,8 @@ and metadata. This file is the running log.
 
 | Tool | Used for |
 | --- | --- |
-| Claude Code (Anthropic, model Claude Fable 5.2) | Writing code, tests, and documentation under the team's direction; reading the official Space Apps pages and guides; querying NASA JPL Horizons for reference data; downloading and converting NASA's Moon maps |
+| Claude Code (Anthropic, model Claude Fable 5.2) | Writing code, tests, and documentation under the team's direction; reading the official Space Apps pages and guides; querying NASA JPL Horizons for reference data; downloading and converting NASA's Moon maps; looking at published websites for design reference and redesigning the page |
+| Firecrawl (web page capture service) | Taking screenshots and reading the fonts and colours of the reference websites listed in SOURCES.md. No text or image from those sites is in the project |
 
 ## Where the idea came from
 
@@ -36,11 +37,16 @@ the challenge statement.
 
 | Sat Nov 14, 10:25-11:00 | Added the 3D Moon: wrote the script that converts NASA's colour and elevation maps, the WebGL globe, the sub-solar point calculation and its Horizons tests, the Play button and time slider. Moved the form beside the globe. Checked clicks, drag, zoom, and Play in a browser. | `src/globe.js`, `tools/build_moon_maps.py`, `tools/fetch_subpoints.py`, `src/lunar-sky.js`, `src/app.js`, `index.html`, `css/style.css`, `test/lunar-sky.test.js` |
 
+| Sat Nov 14, 11:05-11:50 | Redesigned the page after the team said the first design looked machine-made. Captured three reference sites and noted their typefaces, colours, and layout. Rebuilt the page around them: the Moon fills the first screen, the answer is the headline, the form is a column on the right, the time slider carries Sun bars for both sites. Dropped the light theme. Chose and embedded the typeface. Loaded the Moon map after the numbers so the page shows sooner. Checked it with screenshots at four sizes, a scripted click and Play test, and a design checker. | `index.html`, `css/style.css`, `css/fonts.css`, `src/app.js`, `src/globe.js`, `tools/build_fonts_css.py`, `vendor/fonts/` |
+
 ## Not written by AI
 
 - `vendor/astronomy.browser.js`: Astronomy Engine by Don Cross, MIT license.
 - `reference/horizons/*.json`, `reference/horizons-subpoints/*.json`: numbers
   returned by NASA JPL Horizons. The scripts only reformat them.
+- `vendor/fonts/MonaSans-latin-variable.woff2`: the Mona Sans typeface by
+  GitHub, SIL Open Font License 1.1. `css/fonts.css` is the same file stored
+  as text.
 - `vendor/moon-maps.js`: NASA imagery and elevation. The build script resizes
   the colour map, works out ground slopes from the elevation grid, and stores
   both as text.

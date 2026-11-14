@@ -306,18 +306,19 @@
       ' at A and ' + fmtHours(B.vis.bothHours) + ' at B.';
   }
 
+  /* The sentences are the page's headline. Durations are set brighter than the words around them. */
+  var DURATION = /(\d[\d,]* (?:d \d+ h|days|min|d|h))(?![a-z])/;
+
   function renderVerdict(A, B, days) {
     var list = document.getElementById('verdict');
     list.textContent = '';
-    [['sun', 'Sun', verdictFor('sun', A, B)],
-     ['earth', 'Earth', verdictFor('earth', A, B)],
-     ['both', 'Total', verdictTotals(A, B, days)]].forEach(function (row) {
+    [verdictFor('sun', A, B), verdictFor('earth', A, B), verdictTotals(A, B, days)].forEach(function (sentence) {
       var li = node('li');
-      var who = node('span', 'who');
-      who.appendChild(node('span', 'dot dot-' + row[0]));
-      who.appendChild(document.createTextNode(row[1]));
-      li.appendChild(who);
-      li.appendChild(node('span', null, row[2]));
+      sentence.split(DURATION).forEach(function (part, i) {
+        if (!part) return;
+        // A duration never breaks across lines.
+        li.appendChild(i % 2 ? node('b', null, part.replace(/ /g, ' ')) : document.createTextNode(part));
+      });
       list.appendChild(li);
     });
   }
@@ -437,7 +438,10 @@
     var text = 'Sunlight as of ' + fmtUtc(s.ms, true) +
       (cursorIndex === 0 ? ', the chosen time' : ', ' + fmtDuration(s.hours) + ' later');
     if (A.scn.startMs !== B.scn.startMs) text += '. The globe follows scenario A’s clock.';
-    document.getElementById('moon-time').textContent = text;
+    document.getElementById('moon-clock').textContent = fmtUtc(s.ms, true);
+    document.getElementById('moon-offset').textContent =
+      (cursorIndex === 0 ? 'the chosen time' : fmtDuration(s.hours) + ' later') +
+      (A.scn.startMs !== B.scn.startMs ? ', on scenario A’s clock' : '');
     scrub.value = cursorIndex;
     scrub.setAttribute('aria-valuetext', text);
     if (!globe) return;
@@ -473,6 +477,27 @@
     framed = true;
   }
 
+  /* The two bars behind the time slider: when the Sun is above the horizon at A and at B. */
+  function renderSunBars() {
+    ['a', 'b'].forEach(function (key) {
+      var samples = results[key].samples;
+      var stops = [];
+      var prev = null;
+      function colour(up) { return up ? 'var(--sun)' : 'transparent'; }
+      for (var i = 0; i <= SAMPLES; i++) {
+        var up = samples[i].sun.elevationDeg > 0;
+        if (up === prev) continue;
+        var at = (i / SAMPLES * 100).toFixed(2) + '%';
+        if (prev !== null) stops.push(colour(prev) + ' ' + at);
+        stops.push(colour(up) + ' ' + at);
+        prev = up;
+      }
+      stops.push(colour(prev) + ' 100%');
+      document.getElementById('lit-' + key).style.backgroundImage =
+        'linear-gradient(to right, ' + stops.join(', ') + ')';
+    });
+  }
+
   function setPlaying(on) {
     if (on === !!playing) return;
     playButton.textContent = on ? 'Pause' : 'Play';
@@ -499,20 +524,39 @@
     playing.raf = requestAnimationFrame(playStep);
   }
 
+  /*
+   * The Moon map is 3.9 MB, so it loads after the numbers are on the page.
+   * It is a script, not an image, so the page still works opened from disk.
+   */
+  function loadMoon() {
+    function start() {
+      initGlobe();
+      if (globe && results) update();
+    }
+    if (window.MoonMaps) { start(); return; }
+    var script = document.createElement('script');
+    script.src = 'vendor/moon-maps.js';
+    script.onload = start;
+    script.onerror = start;
+    document.body.appendChild(script);
+  }
+
   function initGlobe() {
     var host = document.getElementById('globe');
     try {
-      globe = window.LunarGlobe ? window.LunarGlobe.create(host, window.MoonMaps) : null;
+      globe = window.LunarGlobe
+        ? window.LunarGlobe.create(host, window.MoonMaps, { slot: document.getElementById('moon-slot') })
+        : null;
     } catch (e) {
       globe = null;
     }
     if (!globe) {
-      host.classList.add('is-off');
+      document.getElementById('stage').classList.add('no-globe');
       host.removeAttribute('tabindex');
       document.getElementById('globe-msg').textContent =
         'This browser cannot draw the 3D Moon. Everything else on the page still works.';
       document.querySelector('.views').hidden = true;
-      document.getElementById('pick-choice').hidden = true;
+      document.querySelectorAll('.pick').forEach(function (label) { label.hidden = true; });
       return;
     }
     document.getElementById('relief-x').textContent = globe.reliefExaggeration;
@@ -528,7 +572,7 @@
       update();
     };
 
-    host.querySelectorAll('[data-zoom]').forEach(function (b) {
+    document.querySelectorAll('[data-zoom]').forEach(function (b) {
       b.addEventListener('click', function () { globe.zoomBy(b.getAttribute('data-zoom') === 'in' ? 1.6 : 1 / 1.6); });
     });
     document.querySelectorAll('[data-view]').forEach(function (b) {
@@ -708,6 +752,7 @@
     renderMetrics(A, B, days);
     renderCharts();
     renderSamples(A, B);
+    renderSunBars();
     writeHash(A, B, days);
     // Turn the globe when it has not been aimed yet, or when a site has gone round the back.
     var wasFramed = framed;
@@ -787,8 +832,8 @@
     });
 
     renderSources();
-    initGlobe();
     update();
+    loadMoon();
 
     var resizeTimer = null;
     var lastWidth = document.documentElement.clientWidth;

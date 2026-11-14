@@ -23,9 +23,12 @@ Open `index.html` in a browser. There is nothing to install and no server to
 start. It works with no network connection.
 
 The address bar holds the whole comparison, so a copied link reopens the same
-two scenarios. Add `?theme=light` or `?theme=dark` before the `#` to force a
-colour theme. Add `&g=latitude,longitude,zoom` to the end of a link to aim the
+two scenarios. Add `&g=latitude,longitude,zoom` to the end of a link to aim the
 globe, for example `&g=-90,0,1.6` for the south pole.
+
+The page has one dark theme: the Moon fills the first screen, the answer is
+the headline beside it, and the two bars on the time slider mark when the Sun
+is up at each site.
 
 The 3D Moon needs WebGL 2, which every current browser has. Without it the
 rest of the page still works.
@@ -76,6 +79,7 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | Path | What it is |
 | --- | --- |
 | `index.html`, `css/style.css` | The page |
+| `css/fonts.css` | The typeface, Mona Sans, stored inside a stylesheet so the page needs no network. Made by `tools/build_fonts_css.py` |
 | `src/lunar-sky.js` | Sun and Earth sky position, horizon crossings, timelines |
 | `src/sites.js` | The curated landing sites, each with its source |
 | `src/charts.js` | The horizon view, the timeline, and the visibility bars (plain SVG) |
@@ -87,6 +91,7 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | `reference/horizons/`, `reference/horizons-subpoints/` | Saved Horizons answers, with the request URLs inside each file |
 | `vendor/astronomy.browser.js` | Astronomy Engine 2.1.19 (MIT), copied in so the page works offline |
 | `vendor/moon-maps.js` | NASA LRO colour and elevation maps of the Moon, stored inside a script so the page can open straight from disk |
+| `vendor/fonts/` | Mona Sans (GitHub, SIL Open Font License 1.1) and its license text |
 
 ## Sources and credits
 
@@ -95,4 +100,5 @@ See [SOURCES.md](SOURCES.md). How AI tools were used is in [SI_USE.md](SI_USE.md
 ## License
 
 The team picks an OSI-approved license before submission. Astronomy Engine in
-`vendor/` keeps its own MIT license.
+`vendor/` keeps its own MIT license, and Mona Sans in `vendor/fonts/` keeps the
+SIL Open Font License.

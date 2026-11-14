@@ -18,6 +18,10 @@
  *   - The night side is drawn very faintly instead of black, so places stay
  *     findable.
  *   - The view is from far away with no perspective. Longitude is east-positive.
+ *
+ * The canvas fills its host. The page marks where the Moon sits with a second
+ * element, the slot: at zoom 1 the disk fills the slot, and zooming grows the
+ * disk past it, across the whole host.
  */
 (function (root) {
   'use strict';
@@ -89,9 +93,12 @@
 
   /*
    * host: an element with a size. maps: window.MoonMaps.
+   * options.slot: an element inside the host that the disk fills at zoom 1.
+   * Without it the disk fills the host.
    * Returns null when the browser has no WebGL 2.
    */
-  function create(host, maps) {
+  function create(host, maps, options) {
+    var slot = (options && options.slot) || null;
     var canvas = document.createElement('canvas');
     var gl = canvas.getContext('webgl2', { alpha: true, antialias: false });
     if (!gl || !maps) return null;
@@ -104,7 +111,7 @@
     var view = { lat: 0, lon: 0, zoom: 1 };
     var sun = [1, 0, 0];
     var markers = [];
-    var cssSize = 0;
+    var frame = { w: 0, h: 0, cx: 0, cy: 0, base: 0 };  // CSS pixels, relative to the host
     var dpr = 1;
     var program = null;
     var uniforms = {};
@@ -195,30 +202,43 @@
       };
     }
 
-    function radiusCss() { return cssSize * 0.46 * view.zoom; }
+    function radiusCss() { return frame.base * view.zoom; }
 
     function resize() {
       var box = host.getBoundingClientRect();
-      var next = Math.max(1, Math.round(Math.min(box.width, box.height || box.width)));
+      var w = Math.max(1, Math.round(box.width));
+      var h = Math.max(1, Math.round(box.height || box.width));
+      var s = slot ? slot.getBoundingClientRect() : box;
+      if (!s.width || !s.height) s = box;
+      var next = {
+        w: w,
+        h: h,
+        cx: s.left - box.left + s.width / 2,
+        cy: s.top - box.top + s.height / 2,
+        base: Math.max(1, Math.min(s.width, s.height) / 2)
+      };
+      // At most two device pixels per CSS pixel, and about four million pixels
+      // in all, so a large screen stays smooth.
       var ratio = Math.min(window.devicePixelRatio || 1, 2);
-      if (next === cssSize && ratio === dpr) return;
-      cssSize = next;
+      ratio = Math.max(0.75, Math.min(ratio, Math.sqrt(4e6 / (w * h))));
+      if (next.w === frame.w && next.h === frame.h && next.cx === frame.cx &&
+          next.cy === frame.cy && next.base === frame.base && ratio === dpr) return;
+      frame = next;
       dpr = ratio;
-      canvas.width = Math.round(cssSize * dpr);
-      canvas.height = Math.round(cssSize * dpr);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       draw();
     }
 
     function placeMarkers(ax) {
       var r = radiusCss();
-      var c = cssSize / 2;
       var pairs = { site: [], body: [] };
       markers.forEach(function (m) {
         var p = unit(m.latDeg, m.lonEastDeg);
         var depth = dot(p, ax.fwd);
-        var x = c + dot(p, ax.right) * r;
-        var y = c - dot(p, ax.up) * r;
-        var shown = depth > 0.03 && x > -20 && x < cssSize + 20 && y > -20 && y < cssSize + 20;
+        var x = frame.cx + dot(p, ax.right) * r;
+        var y = frame.cy - dot(p, ax.up) * r;
+        var shown = depth > 0.03 && x > -20 && x < frame.w + 20 && y > -20 && y < frame.h + 20;
         m.el.hidden = !shown;
         m.x = x;
         m.shown = shown;
@@ -237,14 +257,15 @@
 
     function render() {
       frameRequested = false;
-      if (!cssSize) return;
+      if (!frame.w) return;
       var ax = axes();
       placeMarkers(ax);
       if (!images.color || !images.relief || gl.isContextLost()) return;
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform2f(uniforms.uCenter, canvas.width / 2, canvas.height / 2);
+      // WebGL counts rows from the bottom of the canvas.
+      gl.uniform2f(uniforms.uCenter, frame.cx * dpr, canvas.height - frame.cy * dpr);
       gl.uniform1f(uniforms.uRadius, radiusCss() * dpr);
       gl.uniform3fv(uniforms.uRight, ax.right);
       gl.uniform3fv(uniforms.uUp, ax.up);
@@ -262,8 +283,8 @@
     /* Screen position (CSS pixels inside the host) to a place on the Moon, or null off the disk. */
     function placeAt(x, y) {
       var r = radiusCss();
-      var qx = (x - cssSize / 2) / r;
-      var qy = -(y - cssSize / 2) / r;
+      var qx = (x - frame.cx) / r;
+      var qy = -(y - frame.cy) / r;
       var d2 = qx * qx + qy * qy;
       if (d2 > 1) return null;
       var z = Math.sqrt(1 - d2);
@@ -413,7 +434,11 @@
     setup();
     load('color', 0, 'uColorRows');
     load('relief', 1, 'uReliefRows');
-    if (window.ResizeObserver) new ResizeObserver(resize).observe(host);
+    if (window.ResizeObserver) {
+      var watcher = new ResizeObserver(resize);
+      watcher.observe(host);
+      if (slot) watcher.observe(slot);
+    }
     window.addEventListener('resize', resize);
     resize();
 
