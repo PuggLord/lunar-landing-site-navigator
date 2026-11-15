@@ -11,8 +11,8 @@ links must open with no login. The demo is either seven slides or a video of
 30 seconds or less; going over either limit takes the project out of Global
 Judging.
 
-Still to fill in by the team: the two links, the license line once the team
-has picked one, and the list under "What the team decided" in field 6.
+Still to do: record the voices for the 30-second video and add them, then
+check the narrated file is 30 seconds or less before pasting its link.
 
 ---
 
@@ -42,11 +42,14 @@ Horizons, and the largest difference we found was 0.0073 degrees.
 
 ## 3. Link to project demo
 
-Paste one of these. Each opens with no login.
+Our pick is the narrated 30-second video:
+
+https://pugglord.github.io/lunar-landing-site-navigator/demo/Lunar-Landing-Site-Navigator-30s-narrated.mp4
+
+`[That file does not exist until the voices are recorded and added. docs/READ_ALONG.md has the steps. If the voices are not ready in time, paste one of the two links below. Each opens with no login.]`
 
 - Seven slides: https://pugglord.github.io/lunar-landing-site-navigator/deck/Lunar-Landing-Site-Navigator.pdf
 - 29-second video, silent: https://pugglord.github.io/lunar-landing-site-navigator/demo/Lunar-Landing-Site-Navigator-demo.mp4
-- `[the narrated 30-second video, once the team has recorded its voices over demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4. Check that it is 30 seconds or less before linking it.]`
 
 ## 4. Link to final project
 
@@ -185,7 +188,7 @@ Pillow for the data scripts, Astronomy Engine 2.1.19, Mona Sans typeface.
 
 **Source code**
 
-https://github.com/PuggLord/lunar-landing-site-navigator. License: `[the license the team picked]`.
+https://github.com/PuggLord/lunar-landing-site-navigator. License: MIT.
 
 ## 6. Use of SI (AI)
 
@@ -195,7 +198,7 @@ The idea is ours: pick a landing site and a time, see where the Sun and the
 Earth are, and compare two scenarios. Comparing sites and dates comes from the
 challenge statement.
 
-What the team decided `[team: edit this list so every line is true, and add who checked which numbers]`:
+Jake Manis ran the sessions with the tool. What the team decided:
 
 - The challenge, and the idea of comparing two scenarios side by side.
 - To make a new build during the event.
@@ -208,6 +211,13 @@ What the team decided `[team: edit this list so every line is true, and add who 
 - That the first drafts of the text read as machine-written, that they should
   be rewritten in plain language, and that the site needed a page explaining
   our thinking.
+- To narrate the video ourselves with the script on screen, and that the
+  first script did not sound like us and had to be rewritten.
+- To make the code public under the MIT license, and to use the narrated
+  30-second video as the demo.
+
+The checks on the numbers are automated tests. The tool wrote them and ran
+them, and reported the results to us.
 
 We directed the tool as it wrote the code, the tests, the documentation, the
 slides and the first draft of this page. The tool read the Space Apps guides

@@ -26,7 +26,7 @@ ffmpeg -i demo/Lunar-Landing-Site-Navigator-read-along.mp4 -i voice.m4a -map 0:v
 
 531 words, about 137 words a minute with the pauses counted. The time beside each turn is when its first word starts.
 
-**Reader 1, 0:02** (the title)
+**Caden, 0:02** (the title)
 
 Hi, we're team Ksig UNT.  
 This is our project, Lunar Landing Site Navigator.  
@@ -35,7 +35,7 @@ Near the south pole, that can mean no sunlight,
 or no view of the Earth.  
 Our tool lets you check.
 
-**Reader 2, 0:22** (the first screen, IM-1 against the planned IM-2 site)
+**Jeremey, 0:22** (the first screen, IM-1 against the planned IM-2 site)
 
 You start with two scenarios.  
 Each one is a spot on the Moon and a start time.  
@@ -46,7 +46,7 @@ B loses the Sun first, 23 hours before A.
 B also loses the Earth after 9 days.  
 A can see the Earth for all 90.
 
-**Reader 1, 0:52** (the Moon, with the 90 days running)
+**Caden, 0:52** (the Moon, with the 90 days running)
 
 The Moon on screen is NASA imagery.  
 We light it from the Sun's real position  
@@ -57,7 +57,7 @@ Top bar is site A, bottom bar is B.
 The numbers don't come from this picture.  
 We calculate them on their own.
 
-**Reader 2, 1:18** (the view from each site)
+**Jeremey, 1:18** (the view from each site)
 
 Scroll down and you get the view from each site.  
 Left to right is compass direction, and up is height.  
@@ -66,7 +66,7 @@ It comes from NASA's LOLA data, laser height readings from orbit.
 When the Sun is above the grey, it's up.  
 The chart underneath tracks that over the whole 90 days.
 
-**Reader 1, 1:45** (Shackleton crater, then the numbers table)
+**Caden, 1:45** (Shackleton crater, then the numbers table)
 
 This is why we added the terrain.  
 These two points are at Shackleton crater, at the south pole.  
@@ -76,7 +76,7 @@ The floor gets zero.
 Turn the terrain off, and the tool says 53 and 47 percent.  
 Without the terrain, you'd get the wrong answer.
 
-**Reader 2, 2:11** (IM-1 on landing day and two weeks later)
+**Jeremey, 2:11** (IM-1 on landing day and two weeks later)
 
 You can also compare two dates at the same site.  
 Say you land at the IM-1 site on its real landing day.  
@@ -84,7 +84,7 @@ You get 8 days and 15 hours of Sun before it sets.
 Now land two weeks late.  
 You land in the dark, and sunrise is 12 days and 2 hours away.
 
-**Reader 1, 2:33** (the numbers table)
+**Caden, 2:33** (the numbers table)
 
 The table has the rest of the numbers.  
 This row is solar energy, how much sunlight hits a panel  
@@ -93,7 +93,7 @@ And this row is the longest stretch with no Sun.
 At the IM-1 site that's 18 days and 14 hours.  
 A battery would have to last that long.
 
-**Reader 2, 2:55** (the slide with our checks)
+**Jeremey, 2:55** (the slide with our checks)
 
 We checked the numbers a few ways.  
 We compared our Sun and Earth positions with NASA's JPL Horizons.  
@@ -102,7 +102,7 @@ A second version of the skyline code, in Python,
 gives the same result within 0.05 degrees.  
 There are 39 tests, and one command runs them all.
 
-**Reader 1, 3:20** (the notes under the charts, then the foot of the page)
+**Caden, 3:20** (the notes under the charts, then the foot of the page)
 
 Here's what it doesn't do.  
 It doesn't model the solar panels or the antenna.  
@@ -110,7 +110,7 @@ And the terrain data is too coarse to show small craters.
 We used an AI coding tool, Claude Code, to write the code.  
 The idea was ours, and we told it what to build.
 
-**Reader 2, 3:40** (the last slide)
+**Jeremey, 3:40** (the last slide)
 
 It's for a mission planner who needs a quick first answer  
 when a date or a site changes.  
@@ -119,16 +119,28 @@ Thanks for watching.
 
 ## The 30-second version
 
-`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` works the same way and runs 29.6 seconds, so with our voices added it fits the Space Apps limit for a video demo. Its first word starts at 1.5 seconds. It has 56 words, and there is no room to slow down, so practise it once before recording.
+`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` works the same way and runs 29.6 seconds, so with our voices added it fits the Space Apps limit for a video demo. This is the one we submit. Its first word starts at 1.5 seconds. It has 56 words, and there is no room to slow down, so practise it once before recording.
 
-**Reader 1, 0:01** (the first screen, IM-1 against the planned IM-2 site, with the 90 days running)
+To add the voices, trim the recording the same way and run:
+
+```
+ffmpeg -i demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4 -i voice.m4a -map 0:v -map 1:a -c:v copy -c:a aac -shortest demo/Lunar-Landing-Site-Navigator-30s-narrated.mp4
+```
+
+Then check the length. It has to be 30 seconds or less:
+
+```
+ffprobe -v error -show_entries format=duration -of csv=p=0 demo/Lunar-Landing-Site-Navigator-30s-narrated.mp4
+```
+
+**Caden, 0:01** (the first screen, IM-1 against the planned IM-2 site, with the 90 days running)
 
 Hi, we're team Ksig UNT.  
 Our tool compares two Moon landing sites, or two dates.  
 Here, B loses the Sun 23 hours before A,  
 and loses the Earth after 9 days.
 
-**Reader 2, 0:16** (Shackleton crater, then the numbers table)
+**Jeremey, 0:16** (Shackleton crater, then the numbers table)
 
 The skyline is real NASA terrain.  
 At Shackleton crater, the rim gets Sun 91 percent of the time.  

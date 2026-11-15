@@ -13,8 +13,8 @@
  * or remove a line, check the scene in tools/record_readalong.mjs.
  */
 
-/* Put names here in place of "Reader 1" and "Reader 2". */
-export const READERS = { 1: 'Reader 1', 2: 'Reader 2' };
+/* The label shown above each turn. */
+export const READERS = { 1: 'Caden', 2: 'Jeremey' };
 
 export const BLOCKS = [
   { who: 1, scene: 'title', lines: [

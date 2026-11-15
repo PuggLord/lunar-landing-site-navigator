@@ -1,6 +1,7 @@
 # Lunar Landing Site Navigator
 
-Team Ksig UNT, 2026 NASA Space Apps Challenge (Dallas), challenge
+Team Ksig UNT (Jake Manis, Caden Diep, Jeremey Kindle), 2026 NASA Space Apps
+Challenge (Dallas), challenge
 [Lunar Landing Site Navigator](https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/).
 Built during the event, Nov 14-15, 2026.
 
@@ -192,6 +193,7 @@ See [SOURCES.md](SOURCES.md). How AI tools were used is in [SI_USE.md](SI_USE.md
 
 ## License
 
-The team picks an OSI-approved license before submission. Astronomy Engine in
+Our code is under the MIT license, in [LICENSE](LICENSE). Astronomy Engine in
 `vendor/` keeps its own MIT license, and Mona Sans in `vendor/fonts/` keeps the
-SIL Open Font License.
+SIL Open Font License. The NASA data in `vendor/` and `reference/` is NASA's
+and is listed in SOURCES.md.

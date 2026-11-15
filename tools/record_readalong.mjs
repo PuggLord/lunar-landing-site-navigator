@@ -183,7 +183,19 @@ function writeDoc(tl, short) {
   out.push('');
   out.push('## The 30-second version');
   out.push('');
-  out.push(`\`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4\` works the same way and runs ${short.total.toFixed(1)} seconds, so with our voices added it fits the Space Apps limit for a video demo. Its first word starts at ${short.blocks[0].speak0.toFixed(1)} seconds. It has ${short.words} words, and there is no room to slow down, so practise it once before recording.`);
+  out.push(`\`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4\` works the same way and runs ${short.total.toFixed(1)} seconds, so with our voices added it fits the Space Apps limit for a video demo. This is the one we submit. Its first word starts at ${short.blocks[0].speak0.toFixed(1)} seconds. It has ${short.words} words, and there is no room to slow down, so practise it once before recording.`);
+  out.push('');
+  out.push('To add the voices, trim the recording the same way and run:');
+  out.push('');
+  out.push('```');
+  out.push('ffmpeg -i demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4 -i voice.m4a -map 0:v -map 1:a -c:v copy -c:a aac -shortest demo/Lunar-Landing-Site-Navigator-30s-narrated.mp4');
+  out.push('```');
+  out.push('');
+  out.push('Then check the length. It has to be 30 seconds or less:');
+  out.push('');
+  out.push('```');
+  out.push('ffprobe -v error -show_entries format=duration -of csv=p=0 demo/Lunar-Landing-Site-Navigator-30s-narrated.mp4');
+  out.push('```');
   short.blocks.forEach((k) => {
     out.push('');
     out.push(`**${READERS[k.who]}, ${clock(k.speak0)}** (${SCENE_NOTES[k.scene]})`);

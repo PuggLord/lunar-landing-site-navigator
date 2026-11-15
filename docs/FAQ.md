@@ -10,7 +10,7 @@ The challenge statement says those three are hard to use for a quick comparison.
 
 ## Who would use this?
 
-We designed it for a mission planner who needs a first answer when a date or a site changes. Teachers and students could also use it to see why the south pole is a hard place to land. [team to fill: any feedback from someone outside the team so far, or "none yet".]
+We designed it for a mission planner who needs a first answer when a date or a site changes. Teachers and students could also use it to see why the south pole is a hard place to land. Nobody outside the team has tried it yet.
 
 ## Where do the Sun and Earth positions come from, and why should a judge trust them?
 
@@ -62,7 +62,7 @@ The page opens from a file, works offline, and needs nothing installed, so bad W
 
 ## What did the AI tool do, and what did the team do?
 
-Claude Code, an AI coding tool, wrote the code, the tests and the documentation under our direction. It also read NASA and LROC pages for coordinates and downloaded the Horizons tables. The concept comes from us and from the challenge statement. [team to fill: which member directed which part, who checked the numbers against the sources, and who chose the sites and the cases.] `SI_USE.md` logs each session with its times and files.
+Claude Code, an AI coding tool, wrote the code, the tests and the documentation under our direction. It also read NASA and LROC pages for coordinates and downloaded the Horizons tables. The concept comes from us and from the challenge statement. Jake Manis ran the sessions with the tool and made the decisions listed in field 6 of `SUBMISSION.md`. Caden Diep and Jeremey Kindle are the two readers in the demo video. The checks on the numbers are automated tests that the tool wrote and ran. `SI_USE.md` logs each session with its times and files.
 
 ## What NASA data does the project use?
 
