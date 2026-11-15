@@ -11,9 +11,6 @@ links must open with no login. The demo is either seven slides or a video of
 30 seconds or less; going over either limit takes the project out of Global
 Judging.
 
-Still to do: record the voices for the 30-second video and add them, then
-check the narrated file is 30 seconds or less before pasting its link.
-
 ---
 
 ## 1. Project name
@@ -47,14 +44,13 @@ the south pole (Mazarico and others, 2011).
 
 ## 3. Link to project demo
 
-Our pick is the narrated 30-second video:
+A 29.8-second video with the script on screen and no sound:
 
-https://pugglord.github.io/lunar-landing-site-navigator/demo/Lunar-Landing-Site-Navigator-30s-narrated.mp4
+https://pugglord.github.io/lunar-landing-site-navigator/demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4
 
-`[That file does not exist until the voices are recorded and added. docs/READ_ALONG.md has the steps. If the voices are not ready in time, paste one of the two links below. Each opens with no login.]`
-
-- Seven slides: https://pugglord.github.io/lunar-landing-site-navigator/deck/Lunar-Landing-Site-Navigator.pdf
-- 29-second video, silent: https://pugglord.github.io/lunar-landing-site-navigator/demo/Lunar-Landing-Site-Navigator-demo.mp4
+We planned to record our voices over it and did not get the recordings done in
+time. The seven slides are also public:
+https://pugglord.github.io/lunar-landing-site-navigator/deck/Lunar-Landing-Site-Navigator.pdf
 
 ## 4. Link to final project
 
@@ -235,10 +231,11 @@ Jake Manis ran the sessions with the tool. What the team decided:
 - That the first drafts of the text read as machine-written, that they should
   be rewritten in plain language, and that the site needed a page explaining
   our thinking.
-- To narrate the video ourselves with the script on screen, and that the
-  first script did not sound like us and had to be rewritten.
-- To make the code public under the MIT license, and to use the narrated
-  30-second video as the demo.
+- To put the script on screen in the video, and that the first script did
+  not sound like us and had to be rewritten. We meant to read it aloud and
+  did not record the voices in time, so the video has no sound.
+- To make the code public under the MIT license, and to use the 30-second
+  video as the demo.
 - To ask for one feature a judge would remember. The tool proposed the
   sunlight map and built it, and we chose to keep it.
 
