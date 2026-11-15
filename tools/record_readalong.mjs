@@ -48,6 +48,8 @@ const DECK = 'deck/index.html';
 const CASE_MOVE = 'a=-80.13,1.44,2.579,im1&ta=2024-02-22T23:24&b=-84.78,29.13,0,im2&tb=same&w=90';
 const CASE_LATE = 'a=-80.13,1.44,2.579,im1&ta=2024-02-22T23:24&b=-80.13,1.44,2.579,im1&tb=2024-03-07T23:24&w=30';
 const CASE_RIM = 'a=-89.7786,-155.7256,1.735,shackleton-rim&ta=2024-02-22T23:24&b=-89.67,129.78,-2.786,shackleton-floor&tb=same&w=90';
+/* The same two points on the day the sunlight map's year starts, with the map switched on and the globe turned to the south pole. */
+const CASE_MAP = 'a=-89.7786,-155.7256,1.735,shackleton-rim&ta=2026-11-15T00:00&b=-89.67,129.78,-2.786,shackleton-floor&tb=same&w=90&m=1&g=-90,0,1.6';
 
 const BROWSERS = [
   'C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe',
@@ -215,6 +217,11 @@ const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 /* The time slider moves 15 times a second, which halves the pictures to take. */
 const sweep = (c, t0, t1, from = 0, to = 720) =>
   Math.round(from + (to - from) * clamp01((Math.floor(c.speak * 15 + 1e-6) / 15 - t0) / (t1 - t0)));
+/* The sunlight map comes in over `seconds`, in 15 steps a second like the slider. */
+const fadeIn = (c, t0, seconds) => Number(clamp01((Math.floor(c.speak * 15 + 1e-6) / 15 - t0) / seconds).toFixed(3));
+/* The globe moves in on the south pole, from zoom z0 to z1, in the same 15 steps a second. */
+const dive = (c, t0, seconds, z0, z1) =>
+  Number((z0 * Math.pow(z1 / z0, ease(clamp01((Math.floor(c.speak * 15 + 1e-6) / 15 - t0) / seconds)))).toFixed(3));
 const glide = (c, t0, seconds, y0, y1) => Math.round(y0 + (y1 - y0) * ease(clamp01((c.speak - t0) / seconds)));
 
 /* These run in the stage page. */
@@ -246,9 +253,33 @@ const SCENE_NOTES = {
   checks: 'the slide with our checks',
   short1: 'the first screen, IM-1 against the planned IM-2 site, with the 90 days running',
   short2: 'Shackleton crater, then the numbers table',
+  map: 'the south pole, with our sunlight map',
+  shortmap: 'the south pole, with our sunlight map',
   limits: 'the notes under the charts, then the foot of the page',
   close: 'the last slide'
 };
+
+/*
+ * The south pole with the sunlight map. The globe moves in during the lines
+ * before `fade`, the map fades in on line `fade`, site A
+ * moves to the sunniest point on line `pick`, and `marks` says what to outline
+ * on each line.
+ */
+function mapScene(fade, pick, marks) {
+  return {
+    enter: async (x) => { await x.open(TOOL, CASE_MAP, 'tool', 6000); },
+    state: (c) => ({
+      scroll: 0, scrub: 0, view: [-90, 0, dive(c, 0, c.L(fade) - 0.2, 1.6, 8)],
+      mapMix: fadeIn(c, c.L(fade) - 0.3, 1.2),
+      spot: c.on && c.line >= pick ? 1 : 0,
+      marks: c.on && marks[c.line] ? [marks[c.line]] : []
+    })
+  };
+}
+const MARK_SCALE = { sel: '.sunmap-scale' };
+const MARK_POINT = { sel: '#sunmap-spots button:first-child' };
+const MARK_MATCH = { sel: '#sunmap-match' };
+const MARK_RESULT = { sel: '#verdict' };
 
 const SCENES = {
   title: {
@@ -358,6 +389,8 @@ const SCENES = {
       marks: !c.on ? [] : c.line === 0 ? [{ sel: '[data-role=panorama]' }] : [{ row: 'Sunlight in' }]
     })
   },
+  map: mapScene(1, 7, { 3: MARK_SCALE, 4: MARK_POINT, 5: MARK_MATCH, 6: MARK_MATCH, 7: MARK_RESULT }),
+  shortmap: mapScene(1, 2, { 2: MARK_POINT, 3: MARK_MATCH }),
   end: {
     enter: async (x) => { await x.open(DECK, '', 'deck', 1500); await x.run(slide, 0, 'credit'); },
     state: () => ({})

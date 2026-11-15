@@ -13,6 +13,7 @@
  *   'intended' the planned site, not the measured touchdown
  *   'region'   centre of the landing region, not a touchdown point
  *   'place'    a reference place for comparison, not a landing site
+ *   'found'    one of the sunniest points on our sunlight map
  * elevationKm is height above the 1737.4 km reference sphere. It is 0 where
  * the source gives no elevation. For the two Shackleton places it is read
  * from the LOLA 240 m grid by tools/build_terrain.py.
@@ -112,7 +113,33 @@
     }
   ];
 
+  /*
+   * The sunniest points found by tools/build_sunmap.py join the list when the
+   * page has loaded vendor/sunlight-map.js before this file.
+   */
+  var sunMap = root.SUNLIGHT_MAP;
+  if (sunMap && sunMap.spots) {
+    var from = new Date(sunMap.start);
+    var fromText = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][from.getUTCMonth()] +
+      ' ' + from.getUTCDate() + ', ' + from.getUTCFullYear();
+    sunMap.spots.forEach(function (s, i) {
+      SITES.push({
+        id: s.id,
+        name: 'Sunniest point ' + (i + 1) + ' on our map',
+        place: s.poleKm + ' km from the south pole, in sunlight for ' + s.percent +
+          '% of the year from ' + fromText,
+        latDeg: s.latDeg,
+        lonEastDeg: s.lonEastDeg > 180 ? Number((s.lonEastDeg - 360).toFixed(4)) : s.lonEastDeg,
+        elevationKm: s.groundKm,
+        kind: 'found',
+        sourceName: 'NASA Planetary Data System, LOLA Gridded Data Records',
+        sourceUrl: 'https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/'
+      });
+    });
+  }
+
   var KIND_NOTE = {
+    found: 'Found by our sunlight map from the LOLA 240 m grid. Not a planned landing site.',
     landed: 'Position measured after landing.',
     intended: 'Planned site, not the measured touchdown.',
     region: 'Centre of the landing region, not a touchdown point.',

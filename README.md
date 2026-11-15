@@ -21,6 +21,13 @@ from the Sun's real direction at the chosen time. Drag it to turn it, click it
 to move a site, and press Play to watch the look-ahead period run: the day and
 night line sweeps the globe while the charts follow.
 
+The Sunlight map button colours the ground around the south pole by the share
+of a year each spot spends in sunlight. We worked it out from the same LOLA
+terrain for 50,220 cells. It marks the five sunniest places, and one click
+puts a scenario on any of them. The sunniest gets sunlight 90.9% of the year,
+and it is 136 m from the best-lit place in a published study of LOLA data
+(Mazarico and others, 2011).
+
 ## Open it
 
 Use the live page above, or download the files and open `index.html` in a
@@ -53,7 +60,7 @@ Needs Node.js 20 or newer. Nothing to install.
 
     node --test
 
-There are 39 tests. The position tests compare our numbers with tables saved
+There are 44 tests. The position tests compare our numbers with tables saved
 from NASA JPL Horizons in `reference/horizons/`: six tables, 852 time steps,
 at four places on the Moon. The largest difference found on 2026-11-14 was
 0.0073 degrees, and with a flat horizon the sunset time at the IM-1 site
@@ -68,6 +75,10 @@ and the longest-gap search.
 The point where the Sun is overhead lights the 3D Moon, so it is tested too:
 278 time steps in `reference/horizons-subpoints/`, largest difference 0.0067
 degrees.
+
+The sunlight map tests run the page's own calculation on the map's five
+sunniest points for the same year and compare it with the map file. They also
+check that the sunniest point is still within 0.5 km of the published one.
 
 To download the reference tables again (Python 3.11 or newer, no packages):
 
@@ -84,6 +95,12 @@ downloads about 240 MB the first time, and needs the Moon maps download above
 for its orientation check):
 
     python -I tools/build_terrain.py
+
+To rebuild the sunlight map (needs the terrain download above and Node.js;
+takes about 16 minutes and 2 GB of memory, and a stopped run picks up where it
+left off):
+
+    python -I tools/build_sunmap.py
 
 ## How it works, and questions a judge might ask
 
@@ -111,18 +128,18 @@ takes about ten minutes):
 The Space Apps demo is seven slides or a video of 30 seconds or less. Submit
 one of the two.
 
-`demo/Lunar-Landing-Site-Navigator-read-along.mp4` is a longer video, 3
-minutes 56 seconds, for the team to narrate. It shows the tool with our script
+`demo/Lunar-Landing-Site-Navigator-read-along.mp4` is a longer video, 4
+minutes 27 seconds, for the team to narrate. It shows the tool with our script
 in a band underneath, and an underline moves from word to word at reading
 pace. `docs/READ_ALONG.md` has the script and the recording steps. It is too
 long for the Demo field, so it would go in the project description or to the
 Dallas organisers. The words are in `tools/readalong_script.mjs`. After a
-change, record it again (about five minutes):
+change, record it again (about six minutes):
 
     node tools/record_readalong.mjs
 
 `demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` is the same idea cut to
-29.6 seconds, with one turn for each of two readers. With their voices added
+29.8 seconds, with one turn for each of two readers. With their voices added
 it fits the Demo field. To record it again:
 
     node tools/record_readalong.mjs --short
@@ -168,15 +185,17 @@ The full list of modelling choices is at the top of `src/lunar-sky.js`.
 | `src/charts.js` | The horizon view with its skyline, the timeline, and the visibility bars (plain SVG) |
 | `src/globe.js` | The 3D Moon: a WebGL sphere with no library behind it |
 | `src/app.js` | Reads the form, runs the calculation, writes the page |
-| `test/` | 39 tests: positions against the Horizons tables, the skyline on made-up terrain and against the Python reference, energy and gaps |
+| `test/` | 44 tests: positions against the Horizons tables, the skyline on made-up terrain and against the Python reference, energy and gaps, and the sunlight map |
 | `tools/fetch_horizons.py`, `tools/fetch_subpoints.py` | Download the reference tables from NASA JPL Horizons |
 | `tools/build_moon_maps.py` | Turns NASA's Moon colour and elevation files into `vendor/moon-maps.js` |
 | `tools/build_terrain.py` | Downloads NASA's LOLA polar grids, checks their orientation, and writes the three terrain files in `vendor/` and the checks in `reference/terrain/` |
+| `tools/build_sunmap.py` | Works out the sunlight map of the south pole from the 240 m LOLA grid, and writes `vendor/sunlight-map.js` and its checks in `reference/terrain/sunmap-report.json` |
 | `reference/horizons/`, `reference/horizons-subpoints/` | Saved Horizons answers, with the request URLs inside each file |
 | `reference/terrain/` | The Python skylines the tests compare against, and the build report with every check |
 | `vendor/astronomy.browser.js` | Astronomy Engine 2.1.19 (MIT), copied in so the page works offline |
 | `vendor/moon-maps.js` | NASA LRO colour and elevation maps of the Moon, stored inside a script so the page can open straight from disk |
 | `vendor/site-horizons.js` | Skylines of the four listed polar places from the 240 m LOLA grid |
+| `vendor/sunlight-map.js` | Share of one year in sunlight for 50,220 cells around the south pole, and the five sunniest points with their skylines |
 | `vendor/lola-south.js`, `vendor/lola-north.js` | NASA LOLA polar elevation at 960 m, loaded only when a typed or clicked polar point needs a skyline |
 | `docs/` | How the calculation works, questions and answers, and pitch scripts |
 | `vendor/fonts/` | Mona Sans (GitHub, SIL Open Font License 1.1) and its license text |

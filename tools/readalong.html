@@ -137,9 +137,11 @@
             await new Promise(function (ok) { view.onload = ok; view.src = '../' + page + (hash ? '#' + hash : ''); });
             S.page = page;
             S.mode = mode;
+            S.spot = 0;
             await sleep(settle);
           } else if (hash && win().location.hash.slice(1) !== hash) {
             win().location.hash = hash;
+            S.spot = 0;
             await sleep(1500);
           }
         },
@@ -158,6 +160,14 @@
                 s.value = st.scrub;
                 s.dispatchEvent(new w.Event('input', { bubbles: true }));
               }
+            }
+            // The sunlight map: where the globe looks, how strongly the map shows, and which point is picked.
+            if (st.view && w.lunarGlobe) w.lunarGlobe.lookAt(st.view[0], st.view[1], st.view[2], false);
+            if (st.mapMix != null && w.lunarGlobe) w.lunarGlobe.setSunMapMix(st.mapMix);
+            if (st.spot && S.spot !== st.spot) {
+              S.spot = st.spot;
+              d.querySelectorAll('#sunmap-spots button')[st.spot - 1].click();
+              await sleep(700);
             }
           }
           if (st.zoom != null) {

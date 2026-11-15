@@ -16,6 +16,8 @@
   var KIND_NOTE = window.LunarSites.KIND_NOTE;
   var Terrain = window.LunarTerrain || null;
   var SITE_HORIZONS = window.SITE_HORIZONS || null;   // skylines for the listed polar sites
+  var SUNMAP = window.SUNLIGHT_MAP || null;           // the sunlight map of the south pole, and its sunniest points
+  var sunMapOn = false;
 
   var HOUR_MS = 3600000;
   var DAY_MS = 24 * HOUR_MS;
@@ -116,6 +118,12 @@
 
   function siteById(id) {
     for (var i = 0; i < SITES.length; i++) if (SITES[i].id === id) return SITES[i];
+    return null;
+  }
+
+  function spotById(id) {
+    if (!SUNMAP) return null;
+    for (var i = 0; i < SUNMAP.spots.length; i++) if (SUNMAP.spots[i].id === id) return SUNMAP.spots[i];
     return null;
   }
 
@@ -270,8 +278,11 @@
     if (maskCache[key]) return maskCache[key];
     var out;
     var entry = SITE_HORIZONS && SITE_HORIZONS.sites[scn.siteId];
+    var spot = spotById(scn.siteId);
     if (entry) {
       out = { mask: Terrain.maskFromSite(entry, SITE_HORIZONS.stepDeg), kind: 'site', gridM: SITE_HORIZONS.gridM };
+    } else if (spot) {
+      out = { mask: Terrain.maskFromSite(spot), kind: 'site', gridM: SUNMAP.gridM };
     } else if (Math.abs(lat) < TERRAIN_MIN_LAT) {
       out = { mask: null, kind: 'far' };
     } else {
@@ -588,12 +599,96 @@
     if (!globe) return;
     var sub = Sky.subPoints(new Date(s.ms));
     globe.setSun(sub.sun.direction);
-    globe.setMarkers([
+    var marks = [
       { kind: 'sun', label: 'Sun overhead', latDeg: sub.sun.latDeg, lonEastDeg: sub.sun.lonEastDeg },
-      { kind: 'earth', label: 'Earth overhead', latDeg: sub.earth.latDeg, lonEastDeg: sub.earth.lonEastDeg },
-      { kind: 'site', label: 'A', latDeg: A.scn.site.latDeg, lonEastDeg: A.scn.site.lonEastDeg },
-      { kind: 'site', label: 'B', latDeg: B.scn.site.latDeg, lonEastDeg: B.scn.site.lonEastDeg }
-    ]);
+      { kind: 'earth', label: 'Earth overhead', latDeg: sub.earth.latDeg, lonEastDeg: sub.earth.lonEastDeg }
+    ];
+    if (sunMapOn && SUNMAP) {
+      SUNMAP.spots.forEach(function (s, i) {
+        marks.push({ kind: 'spot', label: String(i + 1), latDeg: s.latDeg, lonEastDeg: s.lonEastDeg });
+      });
+    }
+    marks.push({ kind: 'site', label: 'A', latDeg: A.scn.site.latDeg, lonEastDeg: A.scn.site.lonEastDeg });
+    marks.push({ kind: 'site', label: 'B', latDeg: B.scn.site.latDeg, lonEastDeg: B.scn.site.lonEastDeg });
+    globe.setMarkers(marks);
+  }
+
+  /* ---------- sunlight map ---------- */
+
+  /*
+   * The best-lit place at the south pole in Mazarico and others (2011), Icarus 211,
+   * as listed in Table 1 of Glaeser and others (2017). See SOURCES.md.
+   */
+  var BEST_LIT_PUBLISHED = { latDeg: -89.45, lonEastDeg: 222.69 };
+
+  /* Distance in km over the surface between two places given by latitude and east longitude. */
+  function kmApart(p, q) {
+    var k = Math.PI / 180;
+    var c = Math.sin(p.latDeg * k) * Math.sin(q.latDeg * k) +
+      Math.cos(p.latDeg * k) * Math.cos(q.latDeg * k) * Math.cos((p.lonEastDeg - q.lonEastDeg) * k);
+    return 1737.4 * Math.acos(Math.min(1, c));
+  }
+
+  /* Two bytes per cell for the globe: the value, then 255 inside the map or 0 outside it. */
+  function sunMapTexture() {
+    var raw = atob(SUNMAP.b64);
+    var bytes = new Uint8Array(raw.length * 2);
+    for (var i = 0; i < raw.length; i++) {
+      var v = raw.charCodeAt(i);
+      if (v !== 255) { bytes[2 * i] = v; bytes[2 * i + 1] = 255; }
+    }
+    return { size: SUNMAP.size, halfKm: SUNMAP.size * SUNMAP.scaleKm / 2, bytes: bytes };
+  }
+
+  function initSunMap() {
+    var toggle = document.getElementById('sunmap-toggle');
+    if (!SUNMAP) { toggle.hidden = true; return; }
+    var ramp = (window.LunarGlobe && window.LunarGlobe.SUN_RAMP) || [];
+    document.getElementById('sunmap-bar').style.background = 'linear-gradient(to right, ' +
+      ramp.map(function (c, i) { return 'rgb(' + c.join(',') + ') ' + (i * 100 / (ramp.length - 1)) + '%'; }).join(', ') + ')';
+    var start = new Date(SUNMAP.start);
+    document.getElementById('sunmap-note').textContent =
+      'One year from ' + MONTHS[start.getUTCMonth()] + ' ' + start.getUTCDate() + ', ' + start.getUTCFullYear() +
+      ', in ' + SUNMAP.scaleKm + ' km cells from the pole out to ' + SUNMAP.edgeLatDeg +
+      '\u00b0S. Each cell is judged at its highest point, using NASA\u2019s LOLA ' + SUNMAP.gridM + ' m terrain.';
+    // Say that point 1 matches the published one only while the map still puts it there.
+    var first = SUNMAP.spots[0];
+    if (first && kmApart(first, BEST_LIT_PUBLISHED) < 0.5) {
+      var match = document.getElementById('sunmap-match');
+      match.textContent = 'Point 1 is at ' + Math.abs(first.latDeg).toFixed(2) + '°S, ' + first.lonEastDeg.toFixed(2) +
+        '°E. A 2011 study by Mazarico and others gives those coordinates for the best-lit place it found at the south pole.';
+      match.hidden = false;
+    }
+    var list = document.getElementById('sunmap-spots');
+    SUNMAP.spots.forEach(function (s, i) {
+      var b = node('button', null, String(i + 1));
+      b.type = 'button';
+      b.appendChild(node('small', null, Math.round(s.percent) + '%'));
+      b.setAttribute('aria-label', 'Sunniest point ' + (i + 1) + ', in sunlight ' + s.percent + '% of the year');
+      b.addEventListener('click', function () {
+        var fs = fieldsets[document.querySelector('[name=pick]:checked').value];
+        $(fs, '[name=site]').value = s.id;
+        applySite(fs, s.id);
+        update();
+      });
+      list.appendChild(b);
+    });
+    toggle.addEventListener('click', function () {
+      sunMapOn = !sunMapOn;
+      syncSunMap(true);
+      if (sunMapOn && globe) globe.lookAt(-90, 0, 8);
+      if (results) writeHash(results.a, results.b, results.windowDays);
+    });
+  }
+
+  /* Bring the button, the legend and the globe in line with sunMapOn. */
+  function syncSunMap(animate) {
+    var on = sunMapOn && !!SUNMAP && !!globe;
+    document.getElementById('sunmap-toggle').setAttribute('aria-pressed', on ? 'true' : 'false');
+    document.getElementById('sunmap').hidden = !on;
+    document.querySelector('.lede').hidden = on;
+    if (globe && SUNMAP) globe.showSunMap(on, animate);
+    if (results) renderMoon();
   }
 
   /* Turn the globe so both sites show, tipped toward the equator so the Moon stays recognisable. */
@@ -697,10 +792,17 @@
       document.getElementById('globe-msg').textContent =
         'This browser cannot draw the 3D Moon. Everything else on the page still works.';
       document.querySelector('.views').hidden = true;
+      sunMapOn = false;
       document.querySelectorAll('.pick').forEach(function (label) { label.hidden = true; });
       return;
     }
     document.getElementById('relief-x').textContent = globe.reliefExaggeration;
+    if (SUNMAP) {
+      globe.setSunMap(sunMapTexture());
+      syncSunMap(false);
+    }
+    // tools/record_readalong.mjs steers the globe through this when it records the video.
+    window.lunarGlobe = globe;
 
     globe.onPick = function (place) {
       var fs = fieldsets[document.querySelector('[name=pick]:checked').value];
@@ -831,7 +933,7 @@
     var same = $(fieldsets.b, '[name=sameTime]').checked;
     var hash = 'a=' + part(A) + '&ta=' + toInputValue(A.scn.startMs) +
       '&b=' + part(B) + '&tb=' + (same ? 'same' : toInputValue(B.scn.startMs)) + '&w=' + days +
-      (horizonMode() === 'flat' ? '&h=flat' : '');
+      (horizonMode() === 'flat' ? '&h=flat' : '') + (sunMapOn ? '&m=1' : '');
     try { history.replaceState(null, '', '#' + hash); } catch (e) { /* file:// in some browsers */ }
   }
 
@@ -875,6 +977,7 @@
     var radio = form.querySelector('[name=window][value="' + (parseInt(h.w, 10) || 30) + '"]');
     if (radio) radio.checked = true;
     form.querySelector('[name=horizon][value="' + (h.h === 'flat' ? 'flat' : 'terrain') + '"]').checked = true;
+    sunMapOn = h.m === '1' && !!SUNMAP;
   }
 
   /* ---------- main update ---------- */
@@ -978,6 +1081,7 @@
       framed = false;
       applyLink();
       update();
+      syncSunMap(false);
     });
 
     // A case link changes the part after the #, which the listener above picks
@@ -997,6 +1101,7 @@
     });
 
     renderSources();
+    initSunMap();
     update();
     loadMoon();
 

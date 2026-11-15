@@ -1,0 +1,106 @@
+{
+ "generated_utc": "2026-11-15T04:45:07Z",
+ "start": "2026-11-15T00:00:00Z",
+ "hours": 8766,
+ "cellKm": 1.44,
+ "edgeLatDeg": 84.0,
+ "cells": 50220,
+ "raySteps": 427,
+ "azStepDeg": 1.0,
+ "percentMin": 0.0,
+ "percentMedian": 25.9,
+ "percentMax": 91.24,
+ "cellsAtZero": 3735,
+ "cellsAbove80": 12,
+ "checks": [
+  {
+   "id": "im1",
+   "latDeg": -80.13,
+   "lonEastDeg": 1.44,
+   "percentFast": 39.85,
+   "percentStored": 39.74,
+   "skylineMeanAbsDiffDeg": 0.032,
+   "skylineMaxAbsDiffDeg": 0.128
+  },
+  {
+   "id": "im2",
+   "latDeg": -84.78,
+   "lonEastDeg": 29.13,
+   "percentFast": 46.61,
+   "percentStored": 46.52,
+   "skylineMeanAbsDiffDeg": 0.016,
+   "skylineMaxAbsDiffDeg": 0.056
+  },
+  {
+   "id": "shackleton-floor",
+   "latDeg": -89.67,
+   "lonEastDeg": 129.78,
+   "percentFast": 0.0,
+   "percentStored": 0.0,
+   "skylineMeanAbsDiffDeg": 0.009,
+   "skylineMaxAbsDiffDeg": 0.042
+  },
+  {
+   "id": "shackleton-rim",
+   "latDeg": -89.7786,
+   "lonEastDeg": -155.7256,
+   "percentFast": 87.27,
+   "percentStored": 86.93,
+   "skylineMeanAbsDiffDeg": 0.025,
+   "skylineMaxAbsDiffDeg": 0.094
+  }
+ ],
+ "spots": [
+  {
+   "id": "sun-1",
+   "latDeg": -89.4455,
+   "lonEastDeg": 222.6863,
+   "groundKm": 1.9545,
+   "poleKm": 16.8,
+   "percent": 90.9,
+   "percentCell": 91.2,
+   "percentFast": 91.2
+  },
+  {
+   "id": "sun-2",
+   "latDeg": -88.807,
+   "lonEastDeg": 123.6374,
+   "groundKm": 1.646,
+   "poleKm": 36.2,
+   "percent": 85.2,
+   "percentCell": 85.5,
+   "percentFast": 85.5
+  },
+  {
+   "id": "sun-3",
+   "latDeg": -88.6736,
+   "lonEastDeg": 291.8966,
+   "groundKm": 1.8065,
+   "poleKm": 40.2,
+   "percent": 83.8,
+   "percentCell": 83.5,
+   "percentFast": 83.5
+  },
+  {
+   "id": "sun-4",
+   "latDeg": -85.5436,
+   "lonEastDeg": 37.5717,
+   "groundKm": 6.1194,
+   "poleKm": 135.2,
+   "percent": 82.0,
+   "percentCell": 82.2,
+   "percentFast": 82.2
+  },
+  {
+   "id": "sun-5",
+   "latDeg": -85.954,
+   "lonEastDeg": 356.5809,
+   "groundKm": 4.9575,
+   "poleKm": 122.7,
+   "percent": 81.6,
+   "percentCell": 81.8,
+   "percentFast": 81.8
+  }
+ ],
+ "seconds": 982
+}

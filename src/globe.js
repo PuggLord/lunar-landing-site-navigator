@@ -18,6 +18,9 @@
  *   - The night side is drawn very faintly instead of black, so places stay
  *     findable.
  *   - The view is from far away with no perspective. Longitude is east-positive.
+ *   - The sunlight map, when it is on, is a layer of numbers worked out by
+ *     tools/build_sunmap.py and drawn over the south pole in the colours of
+ *     SUN_RAMP. It does not change with the Sun's position on the globe.
  *
  * The canvas fills its host. The page marks where the Moon sits with a second
  * element, the slot: at zoom 1 the disk fills the slot, and zooming grows the
@@ -29,7 +32,16 @@
   var DEG = Math.PI / 180;
   var RELIEF_EXAGGERATION = 3;
   var MIN_ZOOM = 1;
-  var MAX_ZOOM = 6;
+  var MAX_ZOOM = 12;
+
+  /*
+   * Colours of the sunlight map, darkest for no sunlight. One hue, and each
+   * step is lighter than the one before. The page's legend reads this list too.
+   */
+  var SUN_RAMP = [[9, 10, 14], [51, 23, 13], [143, 56, 18], [242, 140, 36], [255, 237, 168]];
+  function glColor(c) {
+    return 'vec3(' + c.map(function (v) { return (v / 255).toFixed(4); }).join(', ') + ')';
+  }
 
   var VERTEX = '#version 300 es\nin vec2 corner;\nvoid main() { gl_Position = vec4(corner, 0.0, 1.0); }';
 
@@ -42,8 +54,17 @@
     'uniform vec3 uSun;',         // direction to the Sun, Moon-fixed frame
     'uniform sampler2D uColor, uRelief;',
     'uniform float uColorRows, uReliefRows, uSlopeMax, uExaggeration;',
+    'uniform sampler2D uSunMap;',   // red = share of the year in sunlight, green = 1 inside the map
+    'uniform float uSunMapMix;',    // 0 hides the sunlight map, 1 shows it
+    'uniform float uSunMapHalf;',   // half the width of the map, in Moon radii
     'out vec4 outColor;',
     'const float PI = 3.141592653589793;',
+    'vec3 sunRamp(float t) {',
+    '  if (t < 0.25) return mix(' + glColor(SUN_RAMP[0]) + ', ' + glColor(SUN_RAMP[1]) + ', t / 0.25);',
+    '  if (t < 0.5) return mix(' + glColor(SUN_RAMP[1]) + ', ' + glColor(SUN_RAMP[2]) + ', (t - 0.25) / 0.25);',
+    '  if (t < 0.75) return mix(' + glColor(SUN_RAMP[2]) + ', ' + glColor(SUN_RAMP[3]) + ', (t - 0.5) / 0.25);',
+    '  return mix(' + glColor(SUN_RAMP[3]) + ', ' + glColor(SUN_RAMP[4]) + ', (t - 0.75) / 0.25);',
+    '}',
     'void main() {',
     '  vec2 q = (gl_FragCoord.xy - uCenter) / uRadius;',
     '  float d = length(q);',
@@ -69,6 +90,18 @@
     '  float lit = max(dot(ground, uSun), 0.0) * day;',
     '  vec3 c = albedo * (0.03 + 1.7 * pow(lit, 0.7));',
     '  c = pow(clamp(c, 0.0, 1.0), vec3(1.0 / 2.2));',
+    // The rest of the Moon steps back while the sunlight map is showing.
+    '  c *= 1.0 - 0.5 * uSunMapMix;',
+    // The sunlight map lies on the south polar cap in the projection NASA's polar grids use.
+    '  if (uSunMapMix > 0.0 && n.z < -0.9) {',
+    '    vec2 m = vec2(n.y, -n.x) * (2.0 / (1.0 - n.z)) / uSunMapHalf;',
+    '    if (max(abs(m.x), abs(m.y)) < 1.0) {',
+    '      vec2 t = texture(uSunMap, m * 0.5 + 0.5).rg;',
+    '      float share = clamp(t.r / max(t.g, 0.004) * (255.0 / 200.0), 0.0, 1.0);',
+    '      float shade = clamp(1.0 - 0.5 * (slope.x + slope.y), 0.72, 1.2);',
+    '      c = mix(c, sunRamp(share) * shade, uSunMapMix * smoothstep(0.4, 0.95, t.g));',
+    '    }',
+    '  }',
     // Latitude and longitude lines every 30 degrees.
     '  float cell = PI / 6.0;',
     '  float toLat = abs(fract(lat / cell + 0.5) - 0.5) * cell;',
@@ -119,6 +152,9 @@
     var heights = null;       // 2D canvas context holding the relief map, for height lookups
     var frameRequested = false;
     var flight = null;
+    var sunMap = null;        // { size, halfKm, bytes } once the page hands one over
+    var sunMapMix = 0;
+    var sunMapFade = null;
     var api = { onPick: null, reliefExaggeration: RELIEF_EXAGGERATION };
 
     function compile(type, source) {
@@ -157,7 +193,8 @@
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
       gl.useProgram(program);
       ['uCenter', 'uRadius', 'uRight', 'uUp', 'uFwd', 'uSun', 'uColor', 'uRelief',
-        'uColorRows', 'uReliefRows', 'uSlopeMax', 'uExaggeration'].forEach(function (name) {
+        'uColorRows', 'uReliefRows', 'uSlopeMax', 'uExaggeration',
+        'uSunMap', 'uSunMapMix', 'uSunMapHalf'].forEach(function (name) {
         uniforms[name] = gl.getUniformLocation(program, name);
       });
       // One triangle that covers the whole canvas.
@@ -172,6 +209,24 @@
       gl.uniform1f(uniforms.uExaggeration, RELIEF_EXAGGERATION);
       if (images.color) gl.uniform1f(uniforms.uColorRows, upload(0, images.color));
       if (images.relief) gl.uniform1f(uniforms.uReliefRows, upload(1, images.relief));
+      gl.uniform1i(uniforms.uSunMap, 2);
+      uploadSunMap();
+    }
+
+    /* Two bytes per cell: the value, and 255 inside the map or 0 outside it. */
+    function uploadSunMap() {
+      var size = sunMap ? sunMap.size : 1;
+      gl.activeTexture(gl.TEXTURE2);
+      gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG8, size, size, 0, gl.RG, gl.UNSIGNED_BYTE,
+        sunMap ? sunMap.bytes : new Uint8Array(2));
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.uniform1f(uniforms.uSunMapHalf, sunMap ? sunMap.halfKm / 1737.4 : 1);
     }
 
     function load(name, slot, rowsUniform) {
@@ -271,6 +326,7 @@
       gl.uniform3fv(uniforms.uUp, ax.up);
       gl.uniform3fv(uniforms.uFwd, ax.fwd);
       gl.uniform3fv(uniforms.uSun, sun);
+      gl.uniform1f(uniforms.uSunMapMix, sunMap ? sunMapMix : 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
@@ -447,10 +503,29 @@
     api.lookAt = lookAt;
     api.zoomBy = function (factor) { lookAt(view.lat, view.lon, Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, view.zoom * factor))); };
     api.isVisible = isVisible;
+    /* map: { size, halfKm, bytes } with two bytes per cell, rows from the top. */
+    api.setSunMap = function (map) { sunMap = map; uploadSunMap(); draw(); };
+    /* Any strength from 0 to 1, with no fade. The video recorder uses this. */
+    api.setSunMapMix = function (x) { sunMapFade = null; sunMapMix = Math.max(0, Math.min(1, x)); draw(); };
+    api.showSunMap = function (on, animate) {
+      var target = on ? 1 : 0;
+      var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (animate === false || still) { sunMapFade = null; sunMapMix = target; draw(); return; }
+      var from = sunMapMix, started = performance.now();
+      var mine = sunMapFade = {};
+      function step(now) {
+        if (sunMapFade !== mine) return;
+        var t = Math.min(1, (now - started) / 900);
+        sunMapMix = from + (target - from) * (1 - Math.pow(1 - t, 3));
+        render();
+        if (t < 1) requestAnimationFrame(step); else sunMapFade = null;
+      }
+      requestAnimationFrame(step);
+    };
     api.heightAt = heightAt;
     api.view = function () { return { lat: view.lat, lon: view.lon, zoom: view.zoom }; };
     return api;
   }
 
-  root.LunarGlobe = { create: create, RELIEF_EXAGGERATION: RELIEF_EXAGGERATION };
+  root.LunarGlobe = { create: create, RELIEF_EXAGGERATION: RELIEF_EXAGGERATION, SUN_RAMP: SUN_RAMP };
 })(window);

@@ -95,3 +95,13 @@ Yes. Each case is a link that loads a comparison, and we read the figures in its
 ## How do the Shackleton figures compare with published work?
 
 Mazarico and others (2011, Icarus 211) studied polar lighting with LOLA terrain. They report a point near the Shackleton rim that is sunlit continuously for 240 days, with a longest period in total darkness of about 1.5 days. Our rim point is a different place on a coarser grid. Over 2024 the tool gives it sunlight 87% of the year counting the centre of the Sun's disk, or 91% counting any part of the disk. Its longest total darkness is 2.7 days, and its longest unbroken sunlight is 94 to 116 days across 2024 to 2026. Both show the same pattern, and our figures are the less favourable of the two.
+
+## What is the sunlight map, and how do we know it is right?
+
+It colours the ground within 6 degrees of the south pole by the share of one year each cell spends in sunlight. A Python script worked it out from the 240 m LOLA grid for 50,220 cells, with the Sun's position every hour for the year from Nov 15, 2026. The run took 16 minutes on a laptop.
+
+The sunniest point on the map gets sunlight 90.9% of that year. It is at 89.45 S, 222.69 E, and Mazarico and others (2011) give the same coordinates for the best-lit place they found at the south pole. Our point is 136 m from theirs. We made that comparison after the map was finished. The floor of Shackleton crater, 20 km away, is at 0%.
+
+We also checked the map against our own code. The page's JavaScript, run on the five sunniest points for the same year, gives the map's figure within half a percentage point at each.
+
+The map is a first look. It covers one year on cells 1.44 km wide, and each cell takes the value of its highest point. The published study covers 18.6 years.

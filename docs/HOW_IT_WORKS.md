@@ -166,13 +166,27 @@ The last step finds the longest unbroken time without the Sun, which a battery h
 
 Function: `longestGap(samples, body)`, exported. A body counts as down at every sample where `clearDeg` is zero or less. The start and end of each run are interpolated linearly between samples. The function returns `hours`, `startHours`, `endHours` and `openEnded`. `openEnded` is true when the run reaches the last sample, so the real gap can be longer than the number shown. The page reads the gaps from the same samples as step 9.
 
+## 11. The sunlight map
+
+The sunlight map shows, for the ground within 6 degrees of the south pole, the share of one year in which the centre of the Sun is above the skyline. `tools/build_sunmap.py` makes it with NumPy and stores it in `vendor/sunlight-map.js`. The page draws the map on the 3D Moon and does not compute it.
+
+The ground is split into cells of 1.44 km, which is 6 by 6 pixels of the 240 m grid. There are 50,220 cells poleward of 84 degrees south. The viewer for a cell stands 2 m above its highest pixel, because a lander sent to that cell for sunlight would aim for the high ground.
+
+Each viewer gets a skyline by the formula in step 5, on 360 directions one degree apart. A ray is sampled at 427 distances. The first is 0.12 km out, each step is 1.2 percent of the distance so far, kept between 0.12 and 0.72 km, and the last is at 200 km. Heights between pixels are interpolated.
+
+The Sun's direction is taken once an hour for 8,766 hours from 2026-11-15 00:00 UTC, from the `subPoints` function that also lights the 3D Moon. At each hour the script finds the Sun's compass direction and height at the cell and compares the height with the skyline in that direction. The cell's value is the share of hours with the Sun's centre above the skyline.
+
+The script then picks the five sunniest cells that are at least 12 km apart. For each it searches the 13 by 13 pixels around the cell's highest pixel for the best one, and computes that pixel's skyline the way the listed sites get theirs: 720 directions, five sub-rays each, steps of 0.1 km. The five points join the site list, and their skylines are stored in the same file.
+
+On the 3D Moon the map is a texture on the polar cap, in the polar stereographic projection of the LOLA grid. The colour runs from near black at 0 percent through orange to pale yellow at 100 percent. Half the cells are below 26 percent, 3,735 are at zero, and 12 are above 80 percent.
+
 ## How we know it is right
 
 The six saved Horizons tables in `reference/horizons/` hold 852 time steps. Four places on the Moon are covered: the IM-1 site (three tables), a point at 84.78 S and 29.13 E, a point at 0.67 N and 23.47 E, and a point at 45 N and 120 W. The last three are labelled test points, chosen to exercise the maths. The 84.78 S point shares the planned IM-2 coordinates. Each row compares the Sun and Earth elevation and azimuth from the engine with the Horizons values. Azimuth errors are multiplied by the cosine of the elevation, so they stay small near the zenith. The largest difference is 0.0073 degrees, and the test tolerance is 0.02 degrees.
 
 The sunset at the IM-1 site falls 4 seconds from the Horizons value, on the flat horizon. The test accepts 10 minutes. Every horizon crossing in the four 6-hour tables is found within 30 minutes. The reference times are interpolated across 6-hour steps, so that allowance covers the coarse spacing of the reference.
 
-The sub-solar and sub-Earth tests use 278 time steps in two saved tables, one for 2024 and one for 2026. The largest separation on the sphere is 0.0067 degrees. The file `test/lunar-sky.test.js` holds 14 tests. `test/terrain.test.js` adds 14 for the skyline, and `test/power.test.js` adds 11 for clearance, energy and gaps, which makes 39. They run with Node's built-in test runner, and the command is in `README.md`.
+The sub-solar and sub-Earth tests use 278 time steps in two saved tables, one for 2024 and one for 2026. The largest separation on the sphere is 0.0067 degrees. The file `test/lunar-sky.test.js` holds 14 tests. `test/terrain.test.js` adds 14 for the skyline, and `test/power.test.js` adds 11 for clearance, energy and gaps, and `test/sunmap.test.js` adds 5 for the sunlight map, which makes 44. They run with Node's built-in test runner, and the command is in `README.md`.
 
 The build checks the polar grids against the global elevation map used by the 3D Moon, and it writes the results to `reference/terrain/build-report.json`. It samples 300 points in each cap and stops unless the two maps correlate above 0.95. The south grid scores 0.998 and the north 0.989, which rules out a flipped or rotated grid. It also requires the centre of Shackleton to sit at least 2 km below the ground around it, and the grid puts it 3.3 km below.
 
@@ -188,9 +202,14 @@ Grid check: the 240 m table and the 960 m browser skyline differ on average by 1
 
 Published work: Mazarico and others (2011) report a point near the Shackleton rim that is sunlit continuously for 240 days a year with about 1.5 days of longest total darkness. Our rim point is a different place on a coarser grid, and over 2024 the tool gives it 87% sunlight and 2.7 days of longest total darkness.
 
+Sunlight map: the build runs its skyline on the four listed polar places and compares it with their stored 240 m skylines. The mean difference is 0.032 degrees or less, and the yearly sunlit share differs by at most 0.4 points (87.3% against 86.9% on the Shackleton rim). The floor of Shackleton is 0% in both. `test/sunmap.test.js` then runs the page's JavaScript on the five sunniest points for the same year, and at each one it gets the figure in the map file within 0.5 points. The build writes its checks to `reference/terrain/sunmap-report.json`.
+
+Sunlight map against published work: the sunniest point on the map is at 89.4455 S, 222.6863 E, 16.8 km from the pole on the ridge between Shackleton and de Gerlache craters. Mazarico and others (2011) give 89.45 S, 222.69 E as the best-lit place they found at the south pole, and that is 136 m away. Gläser and others (2017) list the 2011 figures for it, over about 20 years at the surface: 89.0% average illumination, some part of the Sun in view 92.7% of the time, and 141 hours for the longest time in shadow. For one year and a viewer 2 m up we get 90.4%, 94.0% and 143 hours. We made the comparison after the map was finished. A test fails if a rebuilt map moves the point more than 0.5 km, or if these figures drift more than 3 points or 24 hours from the published ones.
+
 ## What it does not model
 
 - Terrain poleward of 73 degrees only. Elsewhere the horizon is flat.
+- The sunlight map covers the south pole only, for one year from Nov 15, 2026, on cells 1.44 km wide. The Sun's path over the pole shifts on an 18.6-year cycle, so other years give different shares.
 - Grid smoothing: 240 m in the precomputed table, 960 m in the browser, and one ray per half-degree bin in the browser. Narrow peaks and small craters are smoothed out, and a peak that falls between rays can be missed.
 - Rays stop where the grid ends, so near the edge of the data a skyline can cover less than 200 km.
 - The lander is a point 2 m above the ground, with no tilt.

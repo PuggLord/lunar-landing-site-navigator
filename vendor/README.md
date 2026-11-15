@@ -33,6 +33,15 @@ a typed or clicked polar point needs a skyline.
 `tools/build_terrain.py` makes all three; do not edit them by hand. NASA
 material is not copyrighted in the United States.
 
+## sunlight-map.js
+
+The share of one year, from 2026-11-15, in which the centre of the Sun is
+above the skyline, for 50,220 cells of 1.44 km around the south pole. It also
+holds the five sunniest points and their skylines. `tools/build_sunmap.py`
+works it out from `LDEM_60S_240M`, the LOLA grid named above; do not edit it
+by hand. The checks the build ran are in
+`reference/terrain/sunmap-report.json`.
+
 ## fonts/
 
 `MonaSans-latin-variable.woff2` is Mona Sans by GitHub, the Latin subset that

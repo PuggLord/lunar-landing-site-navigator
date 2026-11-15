@@ -26,7 +26,7 @@ On screen: the Shackleton case in the charts, then the energy row in the table.
 
 On screen: the title and the project page link.
 
-## 3-minute script (about 420 spoken words)
+## 3-minute script (about 510 spoken words)
 
 [Speaker 1] Say a launch slips two weeks, or the landing site moves 175 km. Does the lander still have sunlight? Can it still see Earth? The data to answer that is public, in JPL Horizons, Quickmap and Moon Trek, but you pull it one site and one date at a time and compare by hand.
 
@@ -52,11 +52,15 @@ On screen: the energy row, then the longest-gap row in the numbers table.
 
 On screen: the "What the numbers assume" section, with the 0.0073 figure in view.
 
-[Speaker 1] The limits are written on the page. The grid smooths narrow peaks and small craters. We treat the lander as a point 2 metres above the ground with no tilt. Earth in view means the centre of its disk is above the skyline, with no antenna or data rate.
+[Speaker 1] We also mapped a year of sunlight around the south pole from the same terrain, 50,220 cells of it. The sunniest point on our map gets sunlight 90.9% of the year. It is 136 m from the place a 2011 study of LOLA data gives as the best-lit at the south pole. One click puts a scenario there.
+
+On screen: the Sunlight map on the 3D Moon, then point 1 picked.
+
+[Speaker 2] The limits are written on the page. The grid smooths narrow peaks and small craters. We treat the lander as a point 2 metres above the ground with no tilt. Earth in view means the centre of its disk is above the skyline, with no antenna or data rate.
 
 On screen: the "The horizon" and "Energy, and Earth in view" notes.
 
-[Speaker 2] The tool is for a planner who needs an answer in about a minute, before a terrain study starts. The code and the tests are in the repository, and anyone can rerun them.
+[Speaker 1] The tool is for a planner who needs an answer in about a minute, before a terrain study starts. The code and the tests are in the repository, and anyone can rerun them.
 
 On screen: the title, the project page link, and the repository link.
 

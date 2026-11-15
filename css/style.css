@@ -264,6 +264,67 @@ a:hover { text-decoration-thickness: 2px; }
 .views button:hover,
 .views button:focus-visible { color: var(--ink); background-size: 100% 1px; }
 
+/* ---------- sunlight map: its switch, legend and sunniest points ---------- */
+
+#sunmap-toggle::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  background: var(--sun);
+}
+.views button[aria-pressed="true"] { color: var(--ink); background-size: 100% 1px; }
+
+.sunmap {
+  grid-column: 1 / -1;
+  max-width: 300px;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.45;
+  text-shadow: 0 0 14px rgba(5, 6, 8, 0.9), 0 0 4px rgba(5, 6, 8, 0.9);
+}
+.sunmap p { margin: 0; }
+.sunmap .sunmap-title { margin-bottom: 10px; color: var(--ink); font-size: 15px; font-weight: 500; }
+.sunmap-scale {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 4px 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.sunmap-scale i { grid-column: 1 / -1; height: 10px; box-shadow: 0 0 0 1px var(--rule); }
+.sunmap-scale span:last-child { text-align: right; }
+.sunmap .sunmap-pick { margin: 18px 0 8px; }
+.sunmap-spots { display: flex; flex-wrap: wrap; gap: 8px; }
+.sunmap-spots button {
+  min-width: 48px;
+  min-height: 44px;
+  padding: 4px 9px;
+  border: 1px solid var(--rule);
+  background: rgba(5, 6, 8, 0.66);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 220ms var(--ease), background-color 220ms var(--ease);
+}
+.sunmap-spots button:hover { border-color: var(--ink); background: rgba(241, 242, 244, 0.1); }
+.sunmap-spots small { display: block; color: var(--ink-2); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.sunmap .hint { margin-top: 14px; }
+
+.globe-marker-spot i {
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--ink);
+  box-shadow: 0 0 0 1.5px rgba(5, 6, 8, 0.9);
+}
+.globe-marker-spot span { left: 9px; top: -9px; padding: 0 4px; font-size: 11px; line-height: 16px; }
+
 /* ---------- the answer, set as the headline ---------- */
 
 .answer {

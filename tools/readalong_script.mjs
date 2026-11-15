@@ -62,14 +62,24 @@ export const BLOCKS = [
     'Turn the terrain off, and the tool says 53 and 47 percent.',
     "Without the terrain, you'd get the wrong answer."
   ] },
-  { who: 2, scene: 'late', lines: [
+  { who: 2, scene: 'map', lines: [
+    'That gave us an idea.',
+    'We ran the same sunlight check on 50,000 patches of ground',
+    'around the south pole, hour by hour, for a year.',
+    'Black means no Sun at all. Yellow means Sun nearly all year.',
+    'The brightest point gets Sun 91 percent of the year.',
+    'A 2011 study of NASA data names the same spot.',
+    'Ours is 136 metres from theirs.',
+    'One click puts a landing site there.'
+  ] },
+  { who: 1, scene: 'late', lines: [
     'You can also compare two dates at the same site.',
     'Say you land at the IM-1 site on its real landing day.',
     'You get 8 days and 15 hours of Sun before it sets.',
     'Now land two weeks late.',
     'You land in the dark, and sunrise is 12 days and 2 hours away.'
   ] },
-  { who: 1, scene: 'energy', lines: [
+  { who: 2, scene: 'energy', lines: [
     'The table has the rest of the numbers.',
     'This row is solar energy, how much sunlight hits a panel',
     'that stays pointed at the Sun.',
@@ -77,22 +87,22 @@ export const BLOCKS = [
     "At the IM-1 site that's 18 days and 14 hours.",
     'A battery would have to last that long.'
   ] },
-  { who: 2, scene: 'checks', lines: [
+  { who: 1, scene: 'checks', lines: [
     'We checked the numbers a few ways.',
     "We compared our Sun and Earth positions with NASA's JPL Horizons.",
     'The biggest difference was 0.0073 degrees.',
     'A second version of the skyline code, in Python,',
     'gives the same result within 0.05 degrees.',
-    'There are 39 tests, and one command runs them all.'
+    'There are 44 tests, and one command runs them all.'
   ] },
-  { who: 1, scene: 'limits', lines: [
+  { who: 2, scene: 'limits', lines: [
     "Here's what it doesn't do.",
     "It doesn't model the solar panels or the antenna.",
     'And the terrain data is too coarse to show small craters.',
     'We used an AI coding tool, Claude Code, to write the code.',
     'The idea was ours, and we told it what to build.'
   ] },
-  { who: 2, scene: 'close', lines: [
+  { who: 1, scene: 'close', lines: [
     "It's for a mission planner who needs a quick first answer",
     'when a date or a site changes.',
     "It runs in a browser. There's nothing to install.",
@@ -107,14 +117,14 @@ export const BLOCKS = [
 export const SHORT_BLOCKS = [
   { who: 1, scene: 'short1', lines: [
     "Hi, we're team Ksig UNT.",
-    'Our tool compares two Moon landing sites, or two dates.',
-    'Here, B loses the Sun 23 hours before A,',
-    'and loses the Earth after 9 days.'
+    'Our tool compares two Moon landing sites or dates.',
+    'B loses the Sun 23 hours before A.'
   ] },
-  { who: 2, scene: 'short2', lines: [
+  { who: 2, scene: 'shortmap', lines: [
     'The skyline is real NASA terrain.',
-    'At Shackleton crater, the rim gets Sun 91 percent of the time.',
-    'The floor, 10 km away, gets none.'
+    'So we mapped a year of sunlight at the south pole.',
+    'The brightest point gets Sun 91 percent of the year.',
+    'A 2011 study of NASA data names that spot.'
   ] }
 ];
 
@@ -124,6 +134,7 @@ export const SHORT_BLOCKS = [
  */
 export const SAY = {
   'IM-1': 3, 'IM-2': 3, 'NASA': 2, "NASA's": 3, 'LOLA': 2, 'JPL': 3, 'UNT': 3, 'AI': 2, 'Ksig': 2, 'km': 4,
-  '175': 6, '0.0073': 8, '0.05': 5, '90': 2, '91': 3, '53': 3, '47': 4, '39': 3, '23': 3,
+  '175': 6, '0.0073': 8, '0.05': 5, '90': 2, '91': 3, '53': 3, '47': 4, '44': 3, '23': 3,
+  '50,000': 4, '2011': 5, '136': 6,
   '18': 2, '15': 2, '14': 2, '12': 1, '10': 1, '9': 1, '8': 1, '2': 1
 };

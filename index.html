@@ -28,8 +28,17 @@
         <button type="button" data-view="north">North pole</button>
         <button type="button" data-view="a">Site A</button>
         <button type="button" data-view="b">Site B</button>
+        <button type="button" id="sunmap-toggle" aria-pressed="false">Sunlight map</button>
       </div>
       <p class="lede">Compare two landing sites, or two landing dates, on the Moon. The page works out how long the Sun and the Earth stay above the skyline at each one.</p>
+      <div class="sunmap" id="sunmap" hidden>
+        <p class="sunmap-title">Share of one year with the Sun above the skyline</p>
+        <div class="sunmap-scale" aria-hidden="true"><i id="sunmap-bar"></i><span>0%</span><span>50%</span><span>100%</span></div>
+        <p class="sunmap-pick">Put a site on one of the sunniest points we found:</p>
+        <div class="sunmap-spots" id="sunmap-spots"></div>
+        <p class="hint" id="sunmap-match" hidden></p>
+        <p class="hint" id="sunmap-note"></p>
+      </div>
     </header>
 
     <div class="globe" id="globe" tabindex="0" role="group" aria-label="3D Moon lit from the Sun's real direction. Drag or use the arrow keys to turn it, plus and minus to zoom. A click moves a site.">
@@ -260,6 +269,13 @@
           <p>The Moon's axis is tilted by 1.5°, so at the poles the Sun stays low and circles the horizon once a month. The Earth hardly moves in the lunar sky. It drifts a few degrees up and down, and at a polar site that drift can carry it below the horizon for days.</p>
         </div>
         <div>
+          <h3>The sunlight map</h3>
+          <p>The Sunlight map button colours the ground around the south pole by how much of one year the centre of the Sun spends above the skyline. The year starts on Nov 15, 2026. We split the ground within 6° of the pole into 50,220 cells, each 1.44 km wide, and put a viewer 2 m above the highest point of each cell. For each viewer we found the skyline from the 240 m LOLA grid in 360 directions, out to 200 km, and checked the Sun against it once an hour.</p>
+          <p>Half the cells get sunlight less than 26% of the year, and 3,735 of them get none. Twelve cells get more than 80%. The numbered points are the five sunniest places that are at least 12 km apart. We worked each one out again with the finer skyline the listed sites use.</p>
+          <p>Point 1 gets sunlight 90.9% of the year. It is 136 m from the place Mazarico and others (2011) give as the best-lit at the south pole. The figures published for that place, over about 20 years, are 89.0% average illumination and 141 hours for the longest time in shadow. Ours for one year are 90.4% and 143 hours.</p>
+          <p>The map covers one year, and the Sun's path over the pole shifts on an 18.6-year cycle, so the shares change from year to year. A cell takes the value of its highest point, so lower ground inside a bright cell gets less.</p>
+        </div>
+        <div>
           <h3>What the 3D Moon shows</h3>
           <p id="globe-credit">The imagery and heights come from NASA's Lunar Reconnaissance Orbiter (LROC colour mosaic, LOLA heights) through NASA's CGI Moon Kit. We draw slopes <span id="relief-x">3</span> times steeper than they are so craters show up. The globe has no cast shadows, so a crater floor can look lit there while the charts, which use the terrain, report it dark. Near the poles the NASA mosaic also keeps the shadows from the day each strip was photographed.</p>
           <p>The bars next to the time slider show when the Sun is above each site's horizon. A lunar day lasts about 29.5 Earth days.</p>
@@ -284,6 +300,7 @@
   <script src="src/lunar-sky.js"></script>
   <script src="src/terrain.js"></script>
   <script src="vendor/site-horizons.js"></script>
+  <script src="vendor/sunlight-map.js"></script>
   <script src="src/sites.js"></script>
   <script src="src/charts.js"></script>
   <script src="src/globe.js"></script>

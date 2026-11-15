@@ -3,7 +3,7 @@
 
 # Read-along video
 
-`demo/Lunar-Landing-Site-Navigator-read-along.mp4` shows the tool with our script in a band under it. It runs 3:56 and has no sound. We play it, read the script out loud as the underline moves, and record our voices. With the voices added it becomes the long version of our demo.
+`demo/Lunar-Landing-Site-Navigator-read-along.mp4` shows the tool with our script in a band under it. It runs 4:27 and has no sound. We play it, read the script out loud as the underline moves, and record our voices. With the voices added it becomes the long version of our demo.
 
 ## How to record
 
@@ -24,7 +24,7 @@ ffmpeg -i demo/Lunar-Landing-Site-Navigator-read-along.mp4 -i voice.m4a -map 0:v
 
 ## The script
 
-531 words, about 137 words a minute with the pauses counted. The time beside each turn is when its first word starts.
+602 words, about 137 words a minute with the pauses counted. The time beside each turn is when its first word starts.
 
 **Caden, 0:02** (the title)
 
@@ -76,7 +76,18 @@ The floor gets zero.
 Turn the terrain off, and the tool says 53 and 47 percent.  
 Without the terrain, you'd get the wrong answer.
 
-**Jeremey, 2:11** (IM-1 on landing day and two weeks later)
+**Jeremey, 2:11** (the south pole, with our sunlight map)
+
+That gave us an idea.  
+We ran the same sunlight check on 50,000 patches of ground  
+around the south pole, hour by hour, for a year.  
+Black means no Sun at all. Yellow means Sun nearly all year.  
+The brightest point gets Sun 91 percent of the year.  
+A 2011 study of NASA data names the same spot.  
+Ours is 136 metres from theirs.  
+One click puts a landing site there.
+
+**Caden, 2:42** (IM-1 on landing day and two weeks later)
 
 You can also compare two dates at the same site.  
 Say you land at the IM-1 site on its real landing day.  
@@ -84,7 +95,7 @@ You get 8 days and 15 hours of Sun before it sets.
 Now land two weeks late.  
 You land in the dark, and sunrise is 12 days and 2 hours away.
 
-**Caden, 2:33** (the numbers table)
+**Jeremey, 3:04** (the numbers table)
 
 The table has the rest of the numbers.  
 This row is solar energy, how much sunlight hits a panel  
@@ -93,16 +104,16 @@ And this row is the longest stretch with no Sun.
 At the IM-1 site that's 18 days and 14 hours.  
 A battery would have to last that long.
 
-**Jeremey, 2:55** (the slide with our checks)
+**Caden, 3:26** (the slide with our checks)
 
 We checked the numbers a few ways.  
 We compared our Sun and Earth positions with NASA's JPL Horizons.  
 The biggest difference was 0.0073 degrees.  
 A second version of the skyline code, in Python,  
 gives the same result within 0.05 degrees.  
-There are 39 tests, and one command runs them all.
+There are 44 tests, and one command runs them all.
 
-**Caden, 3:20** (the notes under the charts, then the foot of the page)
+**Jeremey, 3:51** (the notes under the charts, then the foot of the page)
 
 Here's what it doesn't do.  
 It doesn't model the solar panels or the antenna.  
@@ -110,7 +121,7 @@ And the terrain data is too coarse to show small craters.
 We used an AI coding tool, Claude Code, to write the code.  
 The idea was ours, and we told it what to build.
 
-**Jeremey, 3:40** (the last slide)
+**Caden, 4:11** (the last slide)
 
 It's for a mission planner who needs a quick first answer  
 when a date or a site changes.  
@@ -119,7 +130,7 @@ Thanks for watching.
 
 ## The 30-second version
 
-`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` works the same way and runs 29.6 seconds, so with our voices added it fits the Space Apps limit for a video demo. This is the one we submit. Its first word starts at 1.5 seconds. It has 56 words, and there is no room to slow down, so practise it once before recording.
+`demo/Lunar-Landing-Site-Navigator-30s-read-along.mp4` works the same way and runs 29.8 seconds, so with our voices added it fits the Space Apps limit for a video demo. This is the one we submit. Its first word starts at 1.5 seconds. It has 58 words, and there is no room to slow down, so practise it once before recording.
 
 To add the voices, trim the recording the same way and run:
 
@@ -136,12 +147,12 @@ ffprobe -v error -show_entries format=duration -of csv=p=0 demo/Lunar-Landing-Si
 **Caden, 0:01** (the first screen, IM-1 against the planned IM-2 site, with the 90 days running)
 
 Hi, we're team Ksig UNT.  
-Our tool compares two Moon landing sites, or two dates.  
-Here, B loses the Sun 23 hours before A,  
-and loses the Earth after 9 days.
+Our tool compares two Moon landing sites or dates.  
+B loses the Sun 23 hours before A.
 
-**Jeremey, 0:16** (Shackleton crater, then the numbers table)
+**Jeremey, 0:12** (the south pole, with our sunlight map)
 
 The skyline is real NASA terrain.  
-At Shackleton crater, the rim gets Sun 91 percent of the time.  
-The floor, 10 km away, gets none.  
+So we mapped a year of sunlight at the south pole.  
+The brightest point gets Sun 91 percent of the year.  
+A 2011 study of NASA data names that spot.  

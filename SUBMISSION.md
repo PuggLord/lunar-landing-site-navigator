@@ -40,6 +40,11 @@ rim of Shackleton crater gets sunlight 91% of the time and the crater floor
 10 km away gets none. We tested the Sun and Earth positions against NASA JPL
 Horizons, and the largest difference we found was 0.0073 degrees.
 
+The tool also maps a year of sunlight around the south pole from the same
+terrain. The sunniest point on our map gets sunlight 90.9% of the year. It is
+136 m from the place a published study of LOLA data gives as the best-lit at
+the south pole (Mazarico and others, 2011).
+
 ## 3. Link to project demo
 
 Our pick is the narrated 30-second video:
@@ -83,6 +88,9 @@ The page then shows both scenarios together:
   move a site.
 - A Horizon control that switches between the LOLA skyline and a flat horizon,
   so you can see how much of an answer comes from terrain.
+- A Sunlight map button. It colours the ground within 6 degrees of the south
+  pole by the share of a year each spot spends in sunlight, and marks the five
+  sunniest places. One click puts a scenario on any of them.
 
 Four worked cases load with one click:
 
@@ -139,6 +147,12 @@ The 3D Moon is WebGL code written for this project, with no library behind
 it. It shades a sphere using the NASA colour mosaic and ground slopes worked
 out from the laser altimeter heights.
 
+The sunlight map is made ahead of time by a Python script. It splits the
+ground poleward of 84 degrees south into 50,220 cells of 1.44 km, finds the
+skyline at the highest point of each from the 240 m grid, and checks the Sun
+against it every hour for a year from Nov 15, 2026. The page draws the result
+on the 3D Moon.
+
 **How we know the numbers are right**
 
 Positions. Our tests compare the tool with tables saved from NASA JPL
@@ -157,7 +171,16 @@ in the tool. Mazarico and others (2011) report a point near the Shackleton rim
 that is sunlit for most of the year. Our rim point gets sunlight 87% of the
 time over 2024.
 
-All 39 tests run with one command, `node --test`, and need nothing installed.
+Sunlight map. The sunniest point on the map is at 89.45 S, 222.69 E. Mazarico
+and others (2011) give the same coordinates for the best-lit place they found
+at the south pole, and our point is 136 m from theirs. The figures published
+for it, over about 20 years, are 89.0% average illumination and 141 hours for
+the longest time in shadow. Ours for one year are 90.4% and 143 hours. We made
+the comparison after the map was finished. The page's own code, run on the
+map's five sunniest points, gives the map's yearly figure within half a
+percentage point at each.
+
+All 44 tests run with one command, `node --test`, and need nothing installed.
 
 **What it leaves out**
 
@@ -165,7 +188,8 @@ We use terrain within 17 degrees of a pole and a flat horizon elsewhere. The
 240 m and 960 m grids smooth narrow ridges and small craters. At the IM-1 site
 the two grids put the first sunset 4 hours apart, and on a narrow peak the
 coarse grid can miss about a quarter of the year's sunlight. We treat the
-lander as a point 2 m above the ground with no tilt.
+lander as a point 2 m above the ground with no tilt. The sunlight map covers
+the south pole only, for one year, on cells 1.44 km wide.
 
 The energy figure is sunlight arriving, before any panel turns it into
 electricity. We don't model panel angle, efficiency, temperature or dust.
@@ -215,6 +239,8 @@ Jake Manis ran the sessions with the tool. What the team decided:
   first script did not sound like us and had to be rewritten.
 - To make the code public under the MIT license, and to use the narrated
   30-second video as the demo.
+- To ask for one feature a judge would remember. The tool proposed the
+  sunlight map and built it, and we chose to keep it.
 
 The checks on the numbers are automated tests. The tool wrote them and ran
 them, and reported the results to us.
@@ -224,8 +250,8 @@ slides and the first draft of this page. The tool read the Space Apps guides
 and downloaded reference tables from NASA JPL Horizons. It downloaded and
 converted NASA's Moon maps and LOLA elevation grids, and it looked at
 published websites for design reference. A web capture service, Firecrawl,
-took screenshots of those reference sites and read two NASA pages and one
-paper abstract.
+took screenshots of those reference sites and read three NASA pages, one
+paper abstract and one preprint.
 
 How we label it. Each AI-written file starts with an "SI disclosure" comment,
 and the pages and the slides carry a `generator` tag in their metadata. The
@@ -276,8 +302,13 @@ Other references:
   for the floor point. https://planetarynames.wr.usgs.gov/Feature/5450
 - Mazarico, Neumann, Smith, Zuber and Torrence (2011), "Illumination
   conditions of the lunar polar regions using LOLA topography", Icarus 211,
-  1066-1081. Published lighting figures we compare the Shackleton result with.
-  https://doi.org/10.1016/j.icarus.2010.10.030
+  1066-1081. Published lighting figures we compare the Shackleton result and
+  the sunlight map with. https://doi.org/10.1016/j.icarus.2010.10.030
+- Gläser, Oberst, Neumann, Mazarico, Speyerer and Robinson (2017),
+  "Illumination conditions at the lunar poles: Implications for future
+  exploration", preprint on the NASA Technical Reports Server. Its Table 1
+  lists the 2011 study's best-lit south pole site and its figures.
+  https://ntrs.nasa.gov/api/citations/20170007365/downloads/20170007365.pdf
 - Barker and others (2021), "Improved LOLA elevation maps for south pole
   landing sites", Planetary and Space Science 203. The 5 m grids named under
   "What comes next"; not used in the tool.
